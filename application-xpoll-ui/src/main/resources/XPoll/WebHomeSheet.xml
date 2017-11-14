@@ -43,5 +43,22 @@
 {{velocity}}
 #set($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', 'true'))
 #set($docextras = [])
+#set($columnsProperties = {
+  'name': {'type': 'text', 'link' : 'view', 'size': 10, 'filterable': true, 'sortable': true, 'html': false},
+  'status': {'type': 'list', 'size': 10, 'filterable': true, 'sortable': true, 'html': false},
+  'winner': {'type': 'text', 'size': 10, 'filterable': true, 'sortable': true, 'html': false},
+  '_actions': {'html': true, 'sortable': false, 'actions': ['edit', 'delete']}
+})
+#set($options = {
+  'className': 'XPoll.XPollClass',
+  'translationPrefix': 'xpoll.livetable.',
+  'tagCloud': true,
+  'rowCount': 15,
+  'maxPages': 10,
+  'selectedColumn': 'name',
+  'defaultOrder': 'asc'
+})
+#set($columns = ['name', 'status', 'winner', '_actions'])
+#livetable('xpoll' $columns $columnsProperties $options)
 {{/velocity}}</content>
 </xwikidoc>

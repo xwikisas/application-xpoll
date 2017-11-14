@@ -37,7 +37,7 @@
   <title>Translation</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>contrib.xpoll.app.title=Polls
   
@@ -61,6 +61,8 @@ xpoll.livetable.status=Status
 xpoll.livetable.winner=Winner
 xpoll.livetable._actions=Actions
 xpoll.livetable.emptyvalue=-
+
+xpoll.error.noValidLicense=There is no valid license for the XWiki Poll Application (Pro).
 
 contrib.xpoll.preparation.hasRight=This xpoll is currently in preparation, click "edit" to modify it and activate it.
 contrib.xpoll.preparation.noRight=This xpoll is currently in preparation, you do not have the rights to modify it.

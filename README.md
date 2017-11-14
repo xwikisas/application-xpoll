@@ -3,12 +3,12 @@ XPoll Application
 
 XWiki Simple Poll Application - Doodle like
 
-* Project Lead: [Alexandru Cotiugă](http://www.xwiki.org/xwiki/bin/view/XWiki/acotiuga)
-* [Documentation & Download](http://extensions.xwiki.org/xwiki/bin/view/Extension/XPoll+Application)
-* [Issue Tracker](http://jira.xwiki.org/browse/XDOODLE)
+* Project Lead: [Alex Cotiugă](https://github.com/acotiuga)
+* [Documentation](https://store.xwiki.com/xwiki/bin/view/Extension/XPollApplication)
 * Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists>), [IRC]( http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
 * [Development Practices](http://dev.xwiki.org)
-* Minimal XWiki version supported: XWiki 6.4
+* Minimal XWiki version supported: XWiki 8.4
 * License: LGPL 2.1+.
-* [Translations](http://l10n.xwiki.org/xwiki/bin/view/Contrib/XPollTranslation)
-* Continuous Integration Status: [![Build Status](http://ci.xwiki.org/buildStatus/icon?job=Contrib%20-%20XPoll%20Application)](http://ci.xwiki.org/job/Contrib%20-%20XPoll%20Application/)
+* [Translations] N/A
+* Sonar Dashboard: N/A
+* Continuous Integration Status: [![Build Status](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-xpoll/job/master/badge/icon)](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-xpoll/job/master/)

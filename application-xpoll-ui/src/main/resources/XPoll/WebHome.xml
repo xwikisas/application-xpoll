@@ -40,23 +40,12 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>{{velocity}}
-#set($columnsProperties = {
-  'name': {'type': 'text', 'link' : 'view', 'size': 10, 'filterable': true, 'sortable': true, 'html': false},
-  'status': {'type': 'list', 'size': 10, 'filterable': true, 'sortable': true, 'html': false},
-  'winner': {'type': 'text', 'size': 10, 'filterable': true, 'sortable': true, 'html': false},
-  '_actions': {'html': true, 'sortable': false, 'actions': ['edit', 'delete']}
-})
-#set($options = {
-  'className': 'XPoll.XPollClass',
-  'translationPrefix': 'xpoll.livetable.',
-  'tagCloud': true,
-  'rowCount': 15,
-  'maxPages': 10,
-  'selectedColumn': 'name',
-  'defaultOrder': 'asc'
-})
-#set($columns = ['name', 'status', 'winner', '_actions'])
-#livetable('xpoll' $columns $columnsProperties $options)
+#set ($mainPageReference = $services.model.createDocumentReference('', ['XPoll'], 'WebHomeSheet'))
+#if (!$services.licensing.licensor.hasLicensureForEntity($mainPageReference))
+  {{error}}
+    $services.localization.render('xpoll.error.noValidLicense')
+  {{/error}}
+#end
 {{/velocity}}</content>
   <object>
     <name>XPoll.WebHome</name>
@@ -250,7 +239,7 @@
       <name>platform.panels.XPollApplication</name>
     </property>
     <property>
-      <parameters>label=$services.localization.render("contrib.xpoll.app.title")
+      <parameters>label=$services.localization.render('contrib.xpoll.app.title')
 target=XPoll.WebHome
 icon=icon:chart_pie</parameters>
     </property>
