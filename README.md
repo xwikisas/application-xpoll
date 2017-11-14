@@ -1,5 +1,4 @@
-XPoll Application
-=================
+# XPoll Application
 
 XWiki Simple Poll Application - Doodle like
 
