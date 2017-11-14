@@ -9,6 +9,6 @@ XWiki Simple Poll Application - Doodle like
 * [Development Practices](http://dev.xwiki.org)
 * Minimal XWiki version supported: XWiki 8.4
 * License: LGPL 2.1+.
-* [Translations] N/A
+* Translations N/A
 * Sonar Dashboard: N/A
 * Continuous Integration Status: [![Build Status](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-xpoll/job/master/badge/icon)](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-xpoll/job/master/)
