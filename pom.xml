@@ -34,7 +34,7 @@
   <name>XPoll Application (Pro) Parent POM</name>
   <description>XWiki Simple Poll Application - Doodle like</description>
   <properties>
-    <licensing.version>1.7</licensing.version>
+    <licensing.version>1.8-SNAPSHOT</licensing.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwikisas/application-xpoll.git</connection>
