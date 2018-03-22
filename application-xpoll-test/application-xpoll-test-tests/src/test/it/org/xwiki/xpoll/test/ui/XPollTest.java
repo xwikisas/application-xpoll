@@ -76,11 +76,7 @@ public class XPollTest extends AbstractTest
         String status = statusInPreparation;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
-        CreatePagePage createPage = xpollHomePage.createPage();
-        createPage.getDocumentPicker().setTitle(pollName);
-        createPage.setTemplate("XPollCode.XPollTemplateProvider");
-        createPage.setTerminalPage(true);
-        createPage.clickCreate();
+        CreatePagePage createPage = createPage(xpollHomePage);
 
         XPollEditPage xpollEditPage = new XPollEditPage();
         Assert.assertEquals(pollName, xpollEditPage.getName());
@@ -102,18 +98,9 @@ public class XPollTest extends AbstractTest
         String status = statusActive;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
-        CreatePagePage createPage = xpollHomePage.createPage();
-        createPage.getDocumentPicker().setTitle(pollName);
-        createPage.setTemplate("XPollCode.XPollTemplateProvider");
-        createPage.setTerminalPage(true);
-        createPage.clickCreate();
+        CreatePagePage createPage = createPage(xpollHomePage);
 
-        XPollEditPage xpollEditPage = new XPollEditPage();
-        Assert.assertEquals(pollName, xpollEditPage.getName());
-        xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatus(status);
-        xpollEditPage.setProposals(pollProposals);
-        xpollEditPage.clickSaveAndView();
+        editPage(status);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         Assert.assertEquals(pollName, activeStatusViewPage.getDocumentTitle());
@@ -130,18 +117,9 @@ public class XPollTest extends AbstractTest
     {
         String status = statusFinished;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
-        CreatePagePage createPage = xpollHomePage.createPage();
-        createPage.getDocumentPicker().setTitle(pollName);
-        createPage.setTemplate("XPollCode.XPollTemplateProvider");
-        createPage.setTerminalPage(true);
-        createPage.clickCreate();
+        CreatePagePage createPage = createPage(xpollHomePage);
 
-        XPollEditPage xpollEditPage = new XPollEditPage();
-        Assert.assertEquals(pollName, xpollEditPage.getName());
-        xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatus(status);
-        xpollEditPage.setProposals(pollProposals);
-        xpollEditPage.clickSaveAndView();
+        editPage(status);
 
         FinishedStatusViewPage finishedStatusViewPage = new FinishedStatusViewPage();
         Assert.assertEquals(pollName, finishedStatusViewPage.getDocumentTitle());
@@ -152,4 +130,25 @@ public class XPollTest extends AbstractTest
         ConfirmationPage deletePage = createPage.delete();
         deletePage.clickYes();
     }
+    
+    private CreatePagePage createPage(XPollHomePage xpollHomePage)
+    {
+        CreatePagePage createPage = xpollHomePage.createPage();
+        createPage.getDocumentPicker().setTitle(pollName);
+        createPage.setTemplate("XPollCode.XPollTemplateProvider");
+        createPage.setTerminalPage(true);
+        createPage.clickCreate();
+        return createPage;
+    }
+    
+    private void editPage(String status)
+    {
+        XPollEditPage xpollEditPage = new XPollEditPage();
+        Assert.assertEquals(pollName, xpollEditPage.getName());
+        xpollEditPage.setDescription(pollDescription);
+        xpollEditPage.setStatus(status);
+        xpollEditPage.setProposals(pollProposals);
+        xpollEditPage.clickSaveAndView();
+    }
+
 }
