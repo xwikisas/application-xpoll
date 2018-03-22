@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="XPoll.Translation" locale="fr">
   <web>XPoll</web>
   <name>Translation</name>
   <language>fr</language>
@@ -39,8 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-XPoll.XPollClass_description=Description
+  <content>XPoll.XPollClass_description=Description
 XPoll.XPollClass_name=Titre
 XPoll.XPollClass_proposals=Propositions
 XPoll.XPollClass_proposals_hint=(Liste d'éléments séparés par une virgule ou une barre verticale)
@@ -78,5 +77,8 @@ xpoll.livetable._actions=Actions
 xpoll.livetable.name=Nom
 xpoll.livetable.status=Statut
 xpoll.livetable.winner=Résultat 
-</content>
+
+# Template Provider
+templateProvider.xpoll.name=Sondage
+templateProvider.xpoll.description=Analyser les votes</content>
 </xwikidoc>
