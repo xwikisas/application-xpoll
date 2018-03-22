@@ -26,13 +26,6 @@ import org.openqa.selenium.support.ui.Select;
 
 public class XPollEditPage extends InlinePage
 {
-
-    public static final String statusInPreparation = "inpreparation";
-
-    public static final String statusActive = "active";
-
-    public static final String statusFinished = "finished";
-
     @FindBy(id = "XPoll.XPollClass_0_name")
     public WebElement entryName;
 
@@ -84,34 +77,14 @@ public class XPollEditPage extends InlinePage
     }
 
     /**
-     * status in preparation to be selected
+     * status to be set
      */
-
-    public void setStatusInPreparation()
-    {
+    
+    public void setStatus(String status) {
         Select select = new Select(this.entryStatus);
-        select.selectByValue(statusInPreparation);
+        select.selectByValue(status);
     }
 
-    /**
-     * status active to be set
-     */
-
-    public void setStatusActive()
-    {
-        Select select = new Select(this.entryStatus);
-        select.selectByValue(statusActive);
-    }
-
-    /**
-     * status finished to be set
-     */
-
-    public void setStatusFinished()
-    {
-        Select select = new Select(this.entryStatus);
-        select.selectByValue(statusFinished);
-    }
 
     /**
      * @param proposals to be set

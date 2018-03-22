@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.ui.po.ConfirmationPage;
+import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.xpoll.test.po.ActiveStatusViewPage;
 import org.xwiki.xpoll.test.po.FinishedStatusViewPage;
@@ -51,6 +53,12 @@ public class XPollTest extends AbstractTest
 
     public static final String pollProposals = "1,2,3,4,5";
 
+    public static final String statusActive = "active";
+
+    public static final String statusFinished = "finished";
+    
+    public static final String statusInPreparation = "inpreparation";
+
     public ArrayList<String> proposals = new ArrayList<String>(Arrays.asList(pollProposals.split(",")));
 
     @Test
@@ -60,40 +68,50 @@ public class XPollTest extends AbstractTest
         ViewPage vp = applicationPanel.clickApplication("Polls");
         Assert.assertEquals(XPollHomePage.getSpace(), vp.getMetaDataValue("space"));
         Assert.assertEquals(XPollHomePage.getPage(), vp.getMetaDataValue("page"));
-
     }
 
     @Test
     public void createNewEntryWithInPreparationStatus()
     {
+        String status = statusInPreparation;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
-        xpollHomePage.clickAddNewEntryButton();
-        xpollHomePage.setAddPollEntryInput(pollName);
 
-        XPollEditPage xpollEditPage = xpollHomePage.clickAddPollEntryButton();
+        CreatePagePage createPage = xpollHomePage.createPage();
+        createPage.getDocumentPicker().setTitle(pollName);
+        createPage.setTemplate("XPollCode.XPollTemplateProvider");
+        createPage.setTerminalPage(true);
+        createPage.clickCreate();
+
+        XPollEditPage xpollEditPage = new XPollEditPage();
         Assert.assertEquals(pollName, xpollEditPage.getName());
         xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatusInPreparation();
+        xpollEditPage.setStatus(status);
         xpollEditPage.setProposals(pollProposals);
         xpollEditPage.clickSaveAndView();
 
         InPreparationStatusViewPage inPreparationStatusViewPage = new InPreparationStatusViewPage();
         Assert.assertEquals(pollDescription, inPreparationStatusViewPage.getPollDescription());
         Assert.assertEquals(xpollEditPage.getStatusInPreparation(), inPreparationStatusViewPage.getPollStatus());
-
+        ConfirmationPage deletePage = createPage.delete();
+        deletePage.clickYes();
     }
 
     @Test
     public void createNewEntryWithActiveStatus()
     {
+        String status = statusActive;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
-        xpollHomePage.clickAddNewEntryButton();
-        xpollHomePage.setAddPollEntryInput(pollName);
 
-        XPollEditPage xpollEditPage = xpollHomePage.clickAddPollEntryButton();
+        CreatePagePage createPage = xpollHomePage.createPage();
+        createPage.getDocumentPicker().setTitle(pollName);
+        createPage.setTemplate("XPollCode.XPollTemplateProvider");
+        createPage.setTerminalPage(true);
+        createPage.clickCreate();
+
+        XPollEditPage xpollEditPage = new XPollEditPage();
         Assert.assertEquals(pollName, xpollEditPage.getName());
         xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatusActive();
+        xpollEditPage.setStatus(status);
         xpollEditPage.setProposals(pollProposals);
         xpollEditPage.clickSaveAndView();
 
@@ -103,20 +121,25 @@ public class XPollTest extends AbstractTest
 
         activeStatusViewPage.getProposals();
         Assert.assertEquals(this.proposals, activeStatusViewPage.pollProposals);
-
+        ConfirmationPage deletePage = createPage.delete();
+        deletePage.clickYes();
     }
 
     @Test
     public void createNewEntryWithFinishedStatus()
     {
+        String status = statusFinished;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
-        xpollHomePage.clickAddNewEntryButton();
-        xpollHomePage.setAddPollEntryInput(pollName);
+        CreatePagePage createPage = xpollHomePage.createPage();
+        createPage.getDocumentPicker().setTitle(pollName);
+        createPage.setTemplate("XPollCode.XPollTemplateProvider");
+        createPage.setTerminalPage(true);
+        createPage.clickCreate();
 
-        XPollEditPage xpollEditPage = xpollHomePage.clickAddPollEntryButton();
+        XPollEditPage xpollEditPage = new XPollEditPage();
         Assert.assertEquals(pollName, xpollEditPage.getName());
         xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatusFinished();
+        xpollEditPage.setStatus(status);
         xpollEditPage.setProposals(pollProposals);
         xpollEditPage.clickSaveAndView();
 
@@ -126,5 +149,7 @@ public class XPollTest extends AbstractTest
 
         finishedStatusViewPage.getProposals();
         Assert.assertEquals(this.proposals, finishedStatusViewPage.pollProposals);
+        ConfirmationPage deletePage = createPage.delete();
+        deletePage.clickYes();
     }
 }
