@@ -1433,7 +1433,7 @@
       <ldap_validate_password/>
     </property>
     <property>
-      <leftPanels>Panels.Applications</leftPanels>
+      <leftPanels/>
     </property>
     <property>
       <leftPanelsWidth>---</leftPanelsWidth>
