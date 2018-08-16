@@ -41,7 +41,8 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #*
- Displays the value of the name property as the title of the document. If value is empty (e.g. creation step), displays the document title.
+ Displays the value of the name property as the title of the document.
+ If value is empty (e.g. creation step), displays the document title.
 *#
 #macro(displayPollTitle)
   #set($pollObj = $!doc.getObject('XPoll.XPollClass'))
@@ -68,17 +69,14 @@
   (% class="xform" %)
   (((
     #if ($xcontext.action == 'edit')
-      ; &lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;##
-        (% class="xHint" %)$services.localization.render('')
+      ; &lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;
       : #displayPollTitle()
     #end
-    ; &lt;label for="XPoll.XPollClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
-      (% class="xHint" %)$services.localization.render('')
+    ; &lt;label for="XPoll.XPollClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;
     : $doc.display('description')
-    ; &lt;label for="XPoll.XPollClass_0_status"&gt;$doc.displayPrettyName('status', false, false)&lt;/label&gt;##
-      (% class="xHint" %)$services.localization.render('')
+    ; &lt;label for="XPoll.XPollClass_0_status"&gt;$doc.displayPrettyName('status', false, false)&lt;/label&gt;
     : $doc.display('status')
-    ; &lt;label for="XPoll.XPollClass_0_proposals"&gt;$doc.displayPrettyName('proposals', false, false)&lt;/label&gt;##
+    ; &lt;label for="XPoll.XPollClass_0_proposals"&gt;$doc.displayPrettyName('proposals', false, false)&lt;/label&gt;
       (% class="xHint" %)$services.localization.render('XPoll.XPollClass_proposals_hint')
     : $doc.display('proposals')
   )))
@@ -120,7 +118,8 @@
               #set($nbvotes = $nbvotes + 1)
               #set($discard = $voteCount.put($proposal, $nbvotes))
             #end ##
-            | &lt;input type="checkbox" name="${proposal.hashCode()}" #if($checked)CHECKED#end #if($xcontext.user != $user) disabled #end /&gt;
+            | &lt;input type="checkbox" name="${proposal.hashCode()}"
+                  #if($checked)CHECKED#end #if($xcontext.user != $user) disabled #end /&gt;
           #end ##
           #if($user == $xcontext.user)
             |(% style="border: none;" %)
