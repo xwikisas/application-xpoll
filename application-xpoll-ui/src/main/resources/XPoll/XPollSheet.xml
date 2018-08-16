@@ -41,15 +41,14 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #*
- Displays the value of the name property as the title of the document. If value is empty (e.g. creation step), displays the document name.
+ Displays the value of the name property as the title of the document. If value is empty (e.g. creation step), displays the document title.
 *#
 #macro(displayPollTitle)
   #set($pollObj = $!doc.getObject('XPoll.XPollClass'))
-  #if("$!pollObj.getProperty('name').value" != '')
-    $doc.display('name')
-  #else
-    {{html}}&lt;input id="XPoll.XPollClass_${pollObj.number}_name" type="text" value="$escapetool.xml($doc.title)" size="30" name="XPoll.XPollClass_${pollObj.number}_name"&gt;&lt;/input&gt;{{/html}}
+  #if("$!pollObj.getProperty('name').value" == '')
+    $pollObj.set('name', $doc.title)
   #end
+  $doc.display('name')
 #end
 
 #set($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
@@ -68,9 +67,11 @@
   ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
   (% class="xform" %)
   (((
-    ; &lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;##
-      (% class="xHint" %)$services.localization.render('')
-    : #displayPollTitle()
+    #if ($xcontext.action == 'edit')
+      ; &lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;##
+        (% class="xHint" %)$services.localization.render('')
+      : #displayPollTitle()
+    #end
     ; &lt;label for="XPoll.XPollClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
       (% class="xHint" %)$services.localization.render('')
     : $doc.display('description')
