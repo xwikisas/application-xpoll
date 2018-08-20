@@ -51,10 +51,8 @@
   #end
   $doc.display('name')
 #end
-
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
-
 #if ($hasEdit &amp;&amp; $xcontext.action == 'view' &amp;&amp; $doc.getValue('status') == 'inpreparation')
   $services.localization.render('contrib.xpoll.preparation.hasRight')
 #elseif (!$hasEdit)
@@ -128,7 +126,7 @@
           #end ##
           #if ($user == $xcontext.user)
             |(% style="border: none;" %)
-            &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")" class="button" /&gt;##
+            &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")" class="button"/&gt;##
           #end 
 
         #end
@@ -136,7 +134,7 @@
         |= $xwiki.getUserName($xcontext.user)
         #foreach ($proposal in $proposals)
           #set ($checked = false) ##
-          | &lt;input type="checkbox" name="${proposal.hashCode()}" #if($checked)CHECKED#end /&gt; 
+          | &lt;input type="checkbox" name="${proposal.hashCode()}" #if($checked)CHECKED#end /&gt;
         #end ##
         |(% style="border: none;" %)
         &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")"
