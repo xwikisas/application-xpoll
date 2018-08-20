@@ -94,12 +94,17 @@
       #set ($ok = $voteCount.put($proposal, 0))
     #end
     #set ($actionDoc = $xwiki.getDocument('XPoll.XPollService'))
-    #set ($actionURL = $actionDoc.getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;page=$escapetool.url($doc.fullName)"))
+    #set ($queryString = $escapetool.url({
+      'xpage' : 'plain',
+      'outputSyntax' : 'plain',
+      'page' : $escapetool.url($doc.fullName)
+    }))
+    #set ($actionURL = $actionDoc.getURL('get', $queryString))
     {{html clean='false' wiki='true'}}
       &lt;form id="xpollSaveForm" action="$actionURL" method="post"&gt;
         (% class='xpoll' %)
         ## first table row
-        |= $services.localization.render('contrib.xpoll.user') #foreach ($proposal in $proposals)|= $proposal #end
+        |= $services.localization.render('contrib.xpoll.user') #foreach($proposal in $proposals)|= $proposal #end
 
         #set ($foundUser = false)
         ## second table row
@@ -134,7 +139,8 @@
           | &lt;input type="checkbox" name="${proposal.hashCode()}" #if($checked)CHECKED#end /&gt; 
         #end ##
         |(% style="border: none;" %)
-        &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")" class="button" /&gt; 
+        &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")"
+            class="button" /&gt; 
       #end
       ## third table row
       |= $services.localization.render('contrib.xpoll.numberVotes') #foreach ($proposal in $proposals)|= $!voteCount.get($proposal) #end
@@ -165,7 +171,9 @@
       |= #if ($xcontext.action == 'export')
           #if ($checked) X #end##
         #else
-          {{html clean=="false"}}&lt;input type="checkbox" name="$proposal" #if ($checked)CHECKED#end disabled /&gt;{{/html}}##
+          {{html clean=="false"}}
+          &lt;input type="checkbox" name="$proposal" #if ($checked)CHECKED#end disabled /&gt;
+          {{/html}}##
         #end ##
       #end
 
