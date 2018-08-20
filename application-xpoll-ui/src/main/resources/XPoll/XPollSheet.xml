@@ -126,7 +126,7 @@
           #end ##
           #if ($user == $xcontext.user)
             |(% style="border: none;" %)
-            &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")" class="button"/&gt;##
+            &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")" class="button" /&gt;##
           #end 
         #end
         #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
