@@ -51,10 +51,8 @@
   #end
   $doc.display('name')
 #end
-
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
-
 #if ($hasEdit &amp;&amp; $xcontext.action == 'view' &amp;&amp; $doc.getValue('status') == 'inpreparation')
   $services.localization.render('contrib.xpoll.preparation.hasRight')
 #elseif (!$hasEdit)
@@ -86,9 +84,7 @@
 
   #set ($status = $doc.getValue('status'))
   #set ($proposals = $doc.getValue('proposals'))
-  #if ($status == 'inpreparation')
-
-  #elseif($status == 'active')
+  #if ($status == 'active')
     #set ($voteCount = {})
     #foreach ($proposal in $proposals)
       #set ($ok = $voteCount.put($proposal, 0))
