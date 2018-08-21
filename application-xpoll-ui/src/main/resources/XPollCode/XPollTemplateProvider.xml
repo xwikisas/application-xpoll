@@ -231,6 +231,14 @@
       <action>edit</action>
     </property>
     <property>
+      <creationRestrictions>
+        <value>XPoll</value>
+      </creationRestrictions>
+    </property>
+    <property>
+      <creationRestrictionsAreSuggestions>1</creationRestrictionsAreSuggestions>
+    </property>
+    <property>
       <description>templateProvider.xpoll.description</description>
     </property>
     <property>
@@ -247,6 +255,12 @@
     </property>
     <property>
       <terminal/>
+    </property>
+    <property>
+      <visibilityRestrictions>
+        <value>XPoll</value>
+        <value>Meeting</value>
+      </visibilityRestrictions>
     </property>
   </object>
 </xwikidoc>
