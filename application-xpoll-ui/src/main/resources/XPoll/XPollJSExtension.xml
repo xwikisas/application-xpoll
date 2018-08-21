@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XPoll.XPollJSExtension" locale="">
+<xwikidoc version="1.3" reference="XPoll.XPollJSExtension" locale="">
   <web>XPoll</web>
   <name>XPollJSExtension</name>
   <language/>
@@ -71,7 +71,9 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
