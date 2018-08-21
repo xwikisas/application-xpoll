@@ -134,8 +134,6 @@
         data: $(this).serialize(),
         beforeSend: function() {
           this.progressNotification = new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saving')", 'inprogress');
-          // disable Save button
-          submitInput.prop('disabled', true);
         },
         complete:function() {
           // disable inprogress notification widget
@@ -143,11 +141,11 @@
         },
         success: function(data) {
           new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saved')", 'done');
+          // reload just the form with the id="xpollSaveForm"
+          $('#xpollSaveForm').load(document.URL +  ' #xpollSaveForm&gt;*');
         },
         error: function(data) {
           new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error');
-          // enable Save button
-          submitInput.prop('disabled', false);
         }
       });
     });
