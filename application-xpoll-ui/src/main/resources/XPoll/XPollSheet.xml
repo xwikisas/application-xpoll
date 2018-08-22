@@ -149,7 +149,7 @@
       #set ($ok = $voteCount.put($proposal, 0))
     #end
     ## first table row
-    |= $services.localization.render('contrib.xpoll.user') #foreach ($proposal in $proposals)|= $proposal #end
+    |=$services.localization.render('contrib.xpoll.user') #foreach ($proposal in $proposals)|=$proposal #end
 
     ## second table row
     #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
@@ -175,9 +175,9 @@
 
     #end
     ## third table row
-    |= $services.localization.render('contrib.xpoll.numberVotes') ##
+    |=$services.localization.render('contrib.xpoll.numberVotes') ##
     #foreach ($proposal in $proposals)
-      |= $!voteCount.get($proposal)##
+      |=$!voteCount.get($proposal)##
     #end
   #end
 #end
