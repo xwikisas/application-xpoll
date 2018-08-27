@@ -71,7 +71,9 @@
       : #displayPollTitle()
     #end
     #if ($xcontext.action == 'edit' || "$!doc.getValue('description')" != '')
-      ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_description"#end&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;
+      ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_description"#end&gt;
+          $doc.displayPrettyName('description', false, false)
+        &lt;/label&gt;
       : $doc.display('description')
     #else
       $services.localization.render('XPoll.XPollClass_no_description')
@@ -80,13 +82,17 @@
   (((
     (% class="col-xs-12 col-sm-6" %)
     (((
-    ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_proposals"#end&gt;$doc.displayPrettyName('proposals', false, false)&lt;/label&gt;
+    ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_proposals"#end&gt;
+        $doc.displayPrettyName('proposals', false, false)
+      &lt;/label&gt;
       (% class="xHint" %)$services.localization.render('XPoll.XPollClass_proposals_hint')
     : $doc.display('proposals')
     )))
     (% class="col-xs-12 col-sm-6" %)
     (((
-    ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_status"#end&gt;$doc.displayPrettyName('status', false, false)&lt;/label&gt;
+    ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_status"#end&gt;
+        $doc.displayPrettyName('status', false, false)
+      &lt;/label&gt;
       (% class="xHint" %)I would add one hint here to make the labels symmetrical
     #if($xcontext.action == 'view')
       : &lt;span class="label label-warning"&gt;$doc.display('status')&lt;/span&gt;
