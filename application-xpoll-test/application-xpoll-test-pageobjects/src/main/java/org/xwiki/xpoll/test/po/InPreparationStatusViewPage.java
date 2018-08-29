@@ -29,10 +29,10 @@ public class InPreparationStatusViewPage extends ViewPage
     public WebElement pollDescription;
 
     @FindBy(xpath = "//div[@class = 'xform']//dd[2]")
-    public WebElement pollStatus;
-
-    @FindBy(xpath = "//div[@class = 'xform']//dd[3]")
     public WebElement pollProposals;
+
+    @FindBy(xpath = "//div[@class = 'xform']//div//div[2]//dl//dd//span")
+    public WebElement pollStatus;
 
     public String getPollDescription()
     {
