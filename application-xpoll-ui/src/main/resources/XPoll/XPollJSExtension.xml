@@ -141,7 +141,7 @@
         },
         success: function(data) {
           new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saved')", 'done');
-          //reload just the div with the id="xpollSaveForm" which contains the table
+          //reload just the form with the id="xpollSaveForm" which contains the table
           $('#xpollSaveForm').load(XWiki.currentDocument.getURL('get') +  ' #xpollSaveForm&gt;*');
         },
         error: function(data) {
