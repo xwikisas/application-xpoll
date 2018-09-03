@@ -93,7 +93,7 @@
     ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_status"#end&gt;
         $doc.displayPrettyName('status', false, false)
       &lt;/label&gt;
-      (% class="xHint" %)I would add one hint here to make the labels symmetrical
+      (% class="xHint" %)$services.localization.render('XPoll.XPollClass_status_hint')
     #if($xcontext.action == 'view')
       : &lt;span class="label label-warning"&gt;$doc.display('status')&lt;/span&gt;
     #else
