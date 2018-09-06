@@ -25,13 +25,13 @@ import org.xwiki.test.ui.po.ViewPage;
 
 public class InPreparationStatusViewPage extends ViewPage
 {
-    @FindBy(xpath = "//div[@class = 'xform']//dd[1]")
+    @FindBy(xpath = "//div[@class = 'xform']/dl/dd")
     public WebElement pollDescription;
 
-    @FindBy(xpath = "//div[@class = 'xform']//dd[2]")
+    @FindBy(xpath = "//div[@class = 'xform']//dd[1]")
     public WebElement pollProposals;
 
-    @FindBy(xpath = "//div[@class = 'xform']//div//div[2]//dl//dd//span")
+    @FindBy(css = ".xform .label.label-warning")
     public WebElement pollStatus;
 
     public String getPollDescription()
