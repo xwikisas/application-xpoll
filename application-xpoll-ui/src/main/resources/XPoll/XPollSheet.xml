@@ -99,7 +99,7 @@
         &lt;/label&gt;
       : $doc.display('description')
     #else
-      $services.localization.render('XPoll.XPollClass_no_description')
+      $services.localization.render('XPoll.XPollClass_description_emptyvalue')
     #end
   )))
   {{/html}}
