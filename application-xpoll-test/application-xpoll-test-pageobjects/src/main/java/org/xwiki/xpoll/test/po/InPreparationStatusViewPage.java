@@ -19,9 +19,6 @@
  */
 package org.xwiki.xpoll.test.po;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
@@ -31,13 +28,11 @@ public class InPreparationStatusViewPage extends ViewPage
     @FindBy(xpath = "//div[@class = 'xform']/dl/dd")
     public WebElement pollDescription;
 
-    @FindBy(xpath = "//div[@class = 'xform']//div[@class='row']//div[1]//dd")
-    public WebElement proposals;
+    @FindBy(xpath = "//div[@class = 'xform']//dd[1]")
+    public WebElement pollProposals;
 
     @FindBy(css = ".xform .label.label-warning")
     public WebElement pollStatus;
-
-    public ArrayList<String> pollProposals = new ArrayList<String>();
 
     public String getPollDescription()
     {
@@ -49,12 +44,9 @@ public class InPreparationStatusViewPage extends ViewPage
         return pollStatus.getText();
     }
 
-    public void getPollProposals()
+    public String getPollProposals()
     {
-        String[] proposalsList = proposals.getText().split(",");
-        for (String proposal : proposalsList) {
-            pollProposals.add(proposal);
-        }
+        return pollProposals.getText();
     }
 
 }
