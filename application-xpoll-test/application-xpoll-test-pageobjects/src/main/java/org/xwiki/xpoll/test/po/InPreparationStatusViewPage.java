@@ -37,8 +37,7 @@ public class InPreparationStatusViewPage extends ViewPage
     @FindBy(css = ".xform .label.label-warning")
     public WebElement pollStatus;
 
-    String proposalsString = proposals.getText();
-    public ArrayList<String> pollProposals = new ArrayList<String>(Arrays.asList(proposalsString.split(",")));
+    public ArrayList<String> pollProposals = new ArrayList<String>();
 
     public String getPollDescription()
     {
@@ -48,6 +47,14 @@ public class InPreparationStatusViewPage extends ViewPage
     public String getPollStatus()
     {
         return pollStatus.getText();
+    }
+
+    public void getPollProposals()
+    {
+        String[] proposalsList = proposals.getText().split(",");
+        for (String proposal : proposalsList) {
+            pollProposals.add(proposal);
+        }
     }
 
 }
