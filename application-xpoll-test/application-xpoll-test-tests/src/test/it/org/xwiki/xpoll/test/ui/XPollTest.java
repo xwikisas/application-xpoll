@@ -88,6 +88,7 @@ public class XPollTest extends AbstractTest
         InPreparationStatusViewPage inPreparationStatusViewPage = new InPreparationStatusViewPage();
         Assert.assertEquals(pollDescription, inPreparationStatusViewPage.getPollDescription());
         Assert.assertEquals(xpollEditPage.getStatusInPreparation(), inPreparationStatusViewPage.getPollStatus());
+        Assert.assertEquals(pollProposals, inPreparationStatusViewPage.getPollProposals());
         ConfirmationPage deletePage = createPage.delete();
         deletePage.clickYes();
     }

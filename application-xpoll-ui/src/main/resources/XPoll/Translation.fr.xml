@@ -43,7 +43,9 @@
 XPoll.XPollClass_name=Titre
 XPoll.XPollClass_proposals=Propositions
 XPoll.XPollClass_proposals_hint=(Liste d'éléments séparés par une virgule ou une barre verticale)
+XPoll.XPollClass_description_emptyvalue=Il n'y a pas de description
 XPoll.XPollClass_status=Statut
+XPoll.XPollClass_status_hint=Montre la progression de ce sondage
 XPoll.XPollClass_status_active=Actif
 XPoll.XPollClass_status_finished=Terminé
 XPoll.XPollClass_status_inpreparation=En cours de préparation
