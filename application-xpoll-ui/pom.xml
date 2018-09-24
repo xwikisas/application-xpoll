@@ -33,7 +33,7 @@
   <description>XWiki Simple Poll Application - Doodle like</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>XPoll Application (Pro)</xwiki.extension.name>
+    <xwiki.extension.name>Polls Application (Pro)</xwiki.extension.name>
     <xwiki.extension.category>application</xwiki.extension.category>
     <!-- The list of documents that have an implicit unlimited free license. The users can view these documents without
       buying a license or getting a trial license, but they cannot edit or delete them. -->
