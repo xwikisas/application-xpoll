@@ -70,19 +70,29 @@ try {
       }
       def maxvote = 0;
       def currentWinners = [];
+      def isProposal;
       for(obj in xpolldoc.getObjects('XPoll.XPollVoteClass')) {
         xpolldoc.use(obj);
         def currentvotes = xpolldoc.getValue('votes');
         for (vote in currentvotes) {
-          def nbvotes = voteCount.get(vote);
-          nbvotes = nbvotes + 1;
-          voteCount.put(vote, nbvotes);
-          if (nbvotes == maxvote) {
-            currentWinners.add(vote); 
-          } else if (nbvotes &gt; maxvote) {
-            currentWinners = [];
-            currentWinners.add(vote); 
-            maxvote = nbvotes;
+          isProposal = false;
+          for (proposal in proposals) {
+            if (vote == proposal) {
+              isProposal = true;
+              break;
+            }
+          }
+          if (isProposal == true) {
+            def nbvotes = voteCount.get(vote);
+            nbvotes = nbvotes + 1;
+            voteCount.put(vote, nbvotes);
+            if (nbvotes == maxvote) {
+              currentWinners.add(vote);
+            } else if (nbvotes &gt; maxvote) {
+              currentWinners = [];
+              currentWinners.add(vote);
+              maxvote = nbvotes;
+            }
           }
         }
       }
