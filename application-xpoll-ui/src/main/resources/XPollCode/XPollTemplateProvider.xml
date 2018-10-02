@@ -19,8 +19,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XPollCode.XPollTemplateProvider" locale="">
-  <web>XPollCode</web>
+<xwikidoc version="1.3" reference="XPoll.XPollCode.XPollTemplateProvider" locale="">
+  <web>XPoll.XPollCode</web>
   <name>XPollTemplateProvider</name>
   <language/>
   <defaultLanguage/>
@@ -40,7 +40,7 @@
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>XPollCode.XPollTemplateProvider</name>
+    <name>XPoll.XPollCode.XPollTemplateProvider</name>
     <number>0</number>
     <className>XWiki.TemplateProviderClass</className>
     <guid>763d097a-b87e-47d9-ae38-393d988ee9d4</guid>

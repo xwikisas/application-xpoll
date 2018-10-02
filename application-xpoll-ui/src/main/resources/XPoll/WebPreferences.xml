@@ -1460,7 +1460,7 @@
       <registration_registered>---</registration_registered>
     </property>
     <property>
-      <rightPanels>XPollCode.RecentPollsPanel</rightPanels>
+      <rightPanels>XPoll.XPollCode.RecentPollsPanel</rightPanels>
     </property>
     <property>
       <rightPanelsWidth>Medium</rightPanelsWidth>
