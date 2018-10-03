@@ -136,7 +136,7 @@ public class XPollTest extends AbstractTest
     {
         CreatePagePage createPage = xpollHomePage.createPage();
         createPage.getDocumentPicker().setTitle(pollName);
-        createPage.setTemplate("XPollCode.XPollTemplateProvider");
+        createPage.setTemplate("XPoll.Code.XPollTemplateProvider");
         createPage.setTerminalPage(true);
         createPage.clickCreate();
         return createPage;
