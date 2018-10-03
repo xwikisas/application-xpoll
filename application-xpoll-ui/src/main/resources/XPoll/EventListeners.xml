@@ -89,7 +89,7 @@
       </scope>
     </class>
     <property>
-      <roleHint>updateWinners</roleHint>
+      <roleHint>com.xwiki.xpoll.UpdatePollWinners</roleHint>
     </property>
     <property>
       <roleType>org.xwiki.observation.EventListener</roleType>
@@ -182,7 +182,7 @@ xcontext.method.output.value = [new DocumentCreatingEvent(), new DocumentUpdatin
     <property>
       <code>{{groovy}}
 def docSource = xcontext.method.input.get(1);
-def myContext = xcontext.method.input.get(2);
+def xwikiContext = xcontext.method.input.get(2);
 def pollObject = docSource.getObject('XPoll.XPollClass');
 // This EventListener is applied only for pages that have a XPollClass object.
 if (pollObject != null) {
@@ -220,7 +220,7 @@ if (pollObject != null) {
           maxvote = nbvotes;
         }
       }
-      pollObject.set('winner', currentWinners.join(','), myContext);
+      pollObject.set('winner', currentWinners.join(','), xwikiContext);
     }
   }
 }
@@ -267,7 +267,7 @@ if (pollObject != null) {
     </class>
     <property>
       <code>{{groovy}}
-xcontext.method.output.value = "updateWinners"
+xcontext.method.output.value = "com.xwiki.xpoll.UpdatePollWinners"
 {{/groovy}}</code>
     </property>
     <property>
