@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XPoll.EventListeners" locale="">
+  <web>XPoll</web>
+  <name>EventListeners</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1538482945000</creationDate>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1538483056000</date>
+  <contentUpdateDate>1538482945000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content/>
+  <object>
+    <name>XPoll.EventListeners</name>
+    <number>0</number>
+    <className>XWiki.ComponentClass</className>
+    <guid>36f9751c-99d8-47c5-816e-8560e69648fe</guid>
+    <class>
+      <name>XWiki.ComponentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <roleHint>
+        <disabled>0</disabled>
+        <name>roleHint</name>
+        <number>2</number>
+        <prettyName>Component Role Hint</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </roleHint>
+      <roleType>
+        <disabled>0</disabled>
+        <name>roleType</name>
+        <number>1</number>
+        <prettyName>Component Role Type</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </roleType>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>3</number>
+        <prettyName>Component Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <roleHint>com.xwiki.xpoll.UpdatePollWinners</roleHint>
+    </property>
+    <property>
+      <roleType>org.xwiki.observation.EventListener</roleType>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>XPoll.EventListeners</name>
+    <number>0</number>
+    <className>XWiki.ComponentMethodClass</className>
+    <guid>8a07816a-0cc0-4e89-8df1-8dd0fd4a93fc</guid>
+    <class>
+      <name>XWiki.ComponentMethodClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Method body code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Method name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <code>{{groovy}}
+import org.xwiki.bridge.event.*
+
+xcontext.method.output.value = [new DocumentCreatingEvent(), new DocumentUpdatingEvent()]
+{{/groovy}}</code>
+    </property>
+    <property>
+      <name>getEvents</name>
+    </property>
+  </object>
+  <object>
+    <name>XPoll.EventListeners</name>
+    <number>1</number>
+    <className>XWiki.ComponentMethodClass</className>
+    <guid>e284c040-b2e3-4b9f-a813-10ed905cceca</guid>
+    <class>
+      <name>XWiki.ComponentMethodClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Method body code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Method name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <code>{{groovy}}
+def docSource = xcontext.method.input.get(1);
+def xwikiContext = xcontext.method.input.get(2);
+def pollObject = docSource.getObject('XPoll.XPollClass');
+// This EventListener is applied only for pages that have a XPollClass object.
+if (pollObject != null) {
+  def proposals = pollObject.get('proposals').value;
+  def voteCount = [:];
+  // voteCount will hold the number of votes for each proposal.
+  for (proposal in proposals) {
+    voteCount.put(proposal, 0);
+  }
+  def maxvote = 0;
+  def currentWinners = [];
+  def isProposal;
+  // Determine the winners.
+  for(voteObject in docSource.getObjects('XPoll.XPollVoteClass')) {
+    def votes = voteObject.get('votes').value;
+    for (vote in votes) {
+      isProposal = false;
+      for (proposal in proposals) {
+        if (vote == proposal) {
+          isProposal = true;
+          break;
+        }
+      }
+      // If the vote is among proposals the number will be updated in voteCount
+      // and the winners are calculated.
+      if(isProposal == true) {
+        nbvotes = voteCount.get(vote);
+        nbvotes = nbvotes + 1;
+        voteCount.put(vote, nbvotes);
+        if (nbvotes == maxvote) {
+          currentWinners.add(vote);
+        } else if (nbvotes &gt; maxvote) {
+          currentWinners = [];
+          currentWinners.add(vote);
+          maxvote = nbvotes;
+        }
+      }
+      pollObject.set('winner', currentWinners.join(','), xwikiContext);
+    }
+  }
+}
+{{/groovy}}</code>
+    </property>
+    <property>
+      <name>onEvent</name>
+    </property>
+  </object>
+  <object>
+    <name>XPoll.EventListeners</name>
+    <number>2</number>
+    <className>XWiki.ComponentMethodClass</className>
+    <guid>f30a6c2f-fc54-425a-b7bb-6b65f63e3840</guid>
+    <class>
+      <name>XWiki.ComponentMethodClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Method body code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Method name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <code>{{groovy}}
+xcontext.method.output.value = "com.xwiki.xpoll.UpdatePollWinners"
+{{/groovy}}</code>
+    </property>
+    <property>
+      <name>getName</name>
+    </property>
+  </object>
+</xwikidoc>
