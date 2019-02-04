@@ -182,7 +182,6 @@
         <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>
-        <hint/>
         <idField/>
         <multiSelect>0</multiSelect>
         <name>template</name>
