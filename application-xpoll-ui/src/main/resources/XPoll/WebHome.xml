@@ -50,6 +50,34 @@
   <object>
     <name>XPoll.WebHome</name>
     <number>0</number>
+    <className>XWiki.DefaultPageTemplateClass</className>
+    <guid>c2dc9583-1be9-4e4e-b29b-7ccc07963e74</guid>
+    <class>
+      <name>XWiki.DefaultPageTemplateClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultPageTemplate>
+        <disabled>0</disabled>
+        <name>defaultPageTemplate</name>
+        <number>1</number>
+        <prettyName>defaultPageTemplate</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultPageTemplate>
+    </class>
+    <property>
+      <defaultPageTemplate>XPoll.Code.XPollTemplateProvider</defaultPageTemplate>
+    </property>
+  </object>
+  <object>
+    <name>XPoll.WebHome</name>
+    <number>0</number>
     <className>XWiki.DocumentSheetBinding</className>
     <guid>fe43fe9e-4a9d-4aea-ae87-b5d5242e4857</guid>
     <class>

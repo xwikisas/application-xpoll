@@ -79,5 +79,14 @@
       <version>${platform.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- This application is needed to preselect the Polls template at creation step according to
+      https://github.com/xwikisas/application-xpoll/issues/16 only for xwiki versions until 9.5 -->
+    <dependency>
+      <groupId>com.xwiki.defaultPageTemplate</groupId>
+      <artifactId>application-defaultPageTemplate</artifactId>
+      <version>1.1</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
   </dependencies>
 </project>
