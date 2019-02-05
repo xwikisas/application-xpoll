@@ -39,20 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content> XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-XPoll.XPollClass_description=Popis
-XPoll.XPollClass_name=Názov
-XPoll.XPollClass_proposals=Návrhy
-XPoll.XPollClass_proposals_hint=(hodnoty oddelené čiarkami)
-XPoll.XPollClass_status=Stav
-XPoll.XPollClass_status_active=Aktívny
-XPoll.XPollClass_status_finished=Ukončený
-XPoll.XPollClass_status_inpreparation=V príprave
-contrib.xpoll.WebHome.description=Vitajte v aplikácii XWiki Poll. 
-contrib.xpoll.WebHome.name=Názov
-contrib.xpoll.WebHome.status=Stav
-contrib.xpoll.WebHome.winner=Výherca
-contrib.xpoll.app.title=Ankety
+  <content>contrib.xpoll.app.title=Ankety
 contrib.xpoll.finish.message=Hlasovanie je ukončené. Tu sú výsledky\:
 contrib.xpoll.home.title=Ankety
 contrib.xpoll.numberVotes=Počet hlasov
@@ -62,14 +49,34 @@ contrib.xpoll.status.inPreparation=V príprave
 contrib.xpoll.user=Používateľ
 contrib.xpoll.vote.guest.submit=Uložiť
 contrib.xpoll.vote.user.submit=Uložiť
-polls.addfiles=Pridať anketu
-polls.nofiles=Zatiaľ nie sú žiadne ankety.
-polls.recentpolls.title=Najnovšie ankety
-polls.seeallfiles=Ukázať všetky
-rendering.macro.pollsrecent.name=Najnovšie ankety
-rendering.macro.pollsrecent.parameter.limit.description=Počet maximálnych záznamov.
+contrib.xpoll.WebHome.description=Vitajte v aplikácii XWiki Poll.
+contrib.xpoll.WebHome.name=Názov
+contrib.xpoll.WebHome.status=Stav
+contrib.xpoll.WebHome.winner=Výherca
+
+## Class properties
+XPoll.XPollClass_description=Popis
+XPoll.XPollClass_name=Názov
+XPoll.XPollClass_proposals=Návrhy
+XPoll.XPollClass_proposals_hint=(hodnoty oddelené čiarkami)
+XPoll.XPollClass_status=Stav
+XPoll.XPollClass_status_active=Aktívny
+XPoll.XPollClass_status_finished=Ukončený
+XPoll.XPollClass_status_inpreparation=V príprave
+
+## Livetable
 xpoll.livetable._actions=Akcie
 xpoll.livetable.name=Názov
 xpoll.livetable.status=Stav
-xpoll.livetable.winner=Výherca</content>
+xpoll.livetable.winner=Výherca
+
+## Generic
+polls.addfiles=Pridať anketu
+polls.nofiles=Zatiaľ nie sú žiadne ankety.
+polls.seeallfiles=Ukázať všetky
+
+## Recent polls macro
+polls.recentpolls.title=Najnovšie ankety
+rendering.macro.pollsrecent.name=Najnovšie ankety
+rendering.macro.pollsrecent.parameter.limit.description=Počet maximálnych záznamov.</content>
 </xwikidoc>

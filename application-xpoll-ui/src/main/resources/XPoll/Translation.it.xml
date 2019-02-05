@@ -39,20 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content> XWiki Translation for language it generated from http://www.l10n.xwiki.org
-XPoll.XPollClass_description=Descrizione
-XPoll.XPollClass_name=Nome
-XPoll.XPollClass_proposals=Proposte
-XPoll.XPollClass_proposals_hint=(Lista di proposte separate da virgola o da | )
-XPoll.XPollClass_status=Stato
-XPoll.XPollClass_status_active=Attivo
-XPoll.XPollClass_status_finished=Finito
-XPoll.XPollClass_status_inpreparation=In preparazione
-contrib.xpoll.WebHome.description=Benvenuto all'applicazione XWiki Sondaggio. Puoi creare un sondaggio per le tue necessità interne.
-contrib.xpoll.WebHome.name=Nome
-contrib.xpoll.WebHome.status=Stato
-contrib.xpoll.WebHome.winner=Vincitore
-contrib.xpoll.app.title=Sondaggi
+  <content>contrib.xpoll.app.title=Sondaggi
 contrib.xpoll.finish.message=Votazione terminata. Ecco i risultati\:
 contrib.xpoll.home.title=Sondaggi
 contrib.xpoll.numberVotes=Numero di voti
@@ -64,18 +51,38 @@ contrib.xpoll.status.inPreparation=In preparazione
 contrib.xpoll.user=Utente
 contrib.xpoll.vote.guest.submit=Salva
 contrib.xpoll.vote.user.submit=Salva
+contrib.xpoll.WebHome.description=Benvenuto all'applicazione XWiki Sondaggio. Puoi creare un sondaggio per le tue necessità interne.
+contrib.xpoll.WebHome.name=Nome
+contrib.xpoll.WebHome.status=Stato
+contrib.xpoll.WebHome.winner=Vincitore
+
+## Class properties
+XPoll.XPollClass_description=Descrizione
+XPoll.XPollClass_name=Nome
+XPoll.XPollClass_proposals=Proposte
+XPoll.XPollClass_proposals_hint=(Lista di proposte separate da virgola o da | )
+XPoll.XPollClass_status=Stato
+XPoll.XPollClass_status_active=Attivo
+XPoll.XPollClass_status_finished=Finito
+XPoll.XPollClass_status_inpreparation=In preparazione
+
+## Livetable
+xpoll.livetable._actions=Azioni
+xpoll.livetable.name=Nome
+xpoll.livetable.status=Stato
+xpoll.livetable.winner=Vincitore
+
+## Generic
 polls.addfiles=Aggiungi sondaggio
 polls.author=di {0}
 polls.date=il {0}
 polls.nofiles=Non ci sono ancora sondaggi
-polls.recentpolls.title=Sondaggi Recenti
 polls.seeallfiles=Vedi tutti i sondaggi
+
+## Recent polls macro
+polls.recentpolls.title=Sondaggi Recenti
 rendering.macro.pollsrecent.description=Mostra i N sondaggi più recenti.
 rendering.macro.pollsrecent.name=Sondaggi Recenti
 rendering.macro.pollsrecent.parameter.limit.description=Numero massimo di voci.
-rendering.macro.pollsrecent.parameter.limit.name=Limite
-xpoll.livetable._actions=Azioni
-xpoll.livetable.name=Nome
-xpoll.livetable.status=Stato
-xpoll.livetable.winner=Vincitore</content>
+rendering.macro.pollsrecent.parameter.limit.name=Limite</content>
 </xwikidoc>
