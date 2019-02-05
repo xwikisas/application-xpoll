@@ -20,30 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.2" reference="XPoll.Translation" locale="it">
   <web>XPoll</web>
   <name>Translation</name>
   <language>it</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>XPoll.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1386247559000</creationDate>
-  <date>1386247874000</date>
-  <contentUpdateDate>1386247874000</contentUpdateDate>
+  <parent>XPoll.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1549364746000</date>
+  <contentUpdateDate>1549364617000</contentUpdateDate>
   <version>1.1</version>
   <title>Translation</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language it generated from http://www.l10n.xwiki.org
+  <content> XWiki Translation for language it generated from http://www.l10n.xwiki.org
 XPoll.XPollClass_description=Descrizione
 XPoll.XPollClass_name=Nome
 XPoll.XPollClass_proposals=Proposte
@@ -81,6 +77,5 @@ rendering.macro.pollsrecent.parameter.limit.name=Limite
 xpoll.livetable._actions=Azioni
 xpoll.livetable.name=Nome
 xpoll.livetable.status=Stato
-xpoll.livetable.winner=Vincitore
-</content>
+xpoll.livetable.winner=Vincitore</content>
 </xwikidoc>
