@@ -47,7 +47,7 @@ $services.localization.render('contrib.xpoll.WebHome.description')
   'name': {'type': 'text', 'link' : 'view', 'size': 10},
   'status': {'type': 'list', 'size': 10},
   'winner': {'type': 'text', 'size': 10},
-  '_actions': {'html': true, 'sortable': false, 'actions': ['edit', 'delete']}
+  '_actions': {'html': true, 'sortable': false, 'filterable': false, 'actions': ['edit', 'delete']}
 })
 #set($options = {
   'className': 'XPoll.XPollClass',
