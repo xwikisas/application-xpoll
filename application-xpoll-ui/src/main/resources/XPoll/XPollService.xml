@@ -102,6 +102,7 @@ try {
      xpolldoc.set('winner', currentWinners.join(','));
 
      // ready to save the vote results
+     xpolldoc.document.setAuthor(xcontext.user);
      xwiki.getXWiki().saveDocument(xpolldoc.document, 'New vote', xcontext.context);
      println "OK ${votes.size()} votes - Winner ${currentWinners.join(',')}";
     }
