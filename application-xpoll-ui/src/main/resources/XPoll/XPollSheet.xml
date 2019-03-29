@@ -55,10 +55,10 @@
   {{html wiki='true' clean='false'}}
     &lt;div class='clearfix'&gt;
         &lt;span id="avatar_$user.fullName" class='avatar'&gt;
-          {{useravatar username="$user.fullName" width='40' height='40' /}}
+          {{useravatar username="$user.prefixedFullName" width='40' height='40' /}}
         &lt;/span&gt;
         &lt;span class='info'&gt;
-          &lt;b&gt;[[$user.getValue('first_name') $user.getValue('last_name')&gt;&gt;$user.fullName]]&lt;/b&gt;
+          &lt;b&gt;[[$user.getValue('first_name') $user.getValue('last_name')&gt;&gt;$user.prefixedFullName]]&lt;/b&gt;
           &lt;br/&gt;
           #if("$!user.getValue('email')" != '')
             [[$user.getValue('email')&gt;&gt;mailto:$user.getValue('email')]]
