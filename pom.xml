@@ -43,7 +43,7 @@
   <scm>
     <connection>scm:git:git://github.com/xwikisas/application-xpoll.git</connection>
     <developerConnection>scm:git:git@github.com:xwikisas/application-xpoll.git</developerConnection>
-    <url>https://github.com/xwikisas/application-xpoll/tree/master</url>
+    <url>https://github.com/xwikisas/application-xpoll</url>
     <tag>HEAD</tag>
   </scm>
   <modules>
