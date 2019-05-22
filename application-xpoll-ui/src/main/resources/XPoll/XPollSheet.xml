@@ -172,19 +172,6 @@
               #end ##
             &lt;/tr&gt;
           #end
-          #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
-            &lt;tr&gt;
-              &lt;td&gt;
-                #displayUser($xwiki.getDocument($xcontext.user))
-              &lt;/td&gt;
-              #foreach ($proposal in $proposals)
-                #set ($checked = false) ##
-                  &lt;td&gt;
-                    &lt;input type="checkbox" name="${proposal.hashCode()}" #if($checked)CHECKED#end /&gt;
-                  &lt;/td&gt;
-              #end ##
-            &lt;/tr&gt;
-          #end
 
           ## third table row
           &lt;tr&gt;
@@ -193,6 +180,25 @@
             &lt;/td&gt;
             #foreach ($proposal in $proposals) &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt; #end
           &lt;/tr&gt;
+
+          ## Separate the current user if he hasn't voted yet.
+          #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
+            &lt;tr&gt;
+              &lt;td class="noBorder"&gt;$services.localization.render('contrib.xpoll.notVoted')&lt;/td&gt;
+              #foreach ($proposal in $proposals) &lt;td class="noBorder"&gt;&lt;/td&gt; #end
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td&gt;
+                #displayUser($xwiki.getDocument($xcontext.user))
+              &lt;/td&gt;
+              #foreach ($proposal in $proposals)
+                #set ($checked = false)
+                  &lt;td&gt;
+                    &lt;input type="checkbox" name="${proposal.hashCode()}" #if($checked)CHECKED#end /&gt;
+                  &lt;/td&gt;
+              #end
+            &lt;/tr&gt;
+          #end
         &lt;/table&gt;
 
         #if ($xcontext.user != 'XWiki.XWikiGuest')
@@ -398,7 +404,13 @@
 .info
 {
   float: left;
-}</code>
+}
+
+#xpollSaveForm .noBorder {
+  border-right: solid 1px #FFF;
+  border-left: solid 1px #FFF;
+  padding-top: 30px;
+ }</code>
     </property>
     <property>
       <contentType>CSS</contentType>
