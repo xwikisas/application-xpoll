@@ -55,7 +55,9 @@
   {{html wiki='true' clean='false'}}
     &lt;div class='clearfix user'&gt;
         &lt;span id="avatar_$user.fullName" class='avatar user-avatar-wrapper'&gt;
-          &lt;span class="user-avatar"&gt;{{useravatar username="$user.prefixedFullName" width='40' height='40'/}}&lt;/span&gt;
+          &lt;span class="user-avatar"&gt;
+            {{useravatar username="$user.prefixedFullName" width='40' height='40'/}}
+          &lt;/span&gt;
         &lt;/span&gt;
         &lt;span class='info'&gt;
           [[$user.getValue('first_name') $user.getValue('last_name')&gt;&gt;$user.prefixedFullName]]
