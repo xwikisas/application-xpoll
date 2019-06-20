@@ -53,16 +53,16 @@
 #end
 #macro (displayUser $user)
   {{html wiki='true' clean='false'}}
-    &lt;div class='clearfix'&gt;
-        &lt;span id="avatar_$user.fullName" class='avatar'&gt;
-          {{useravatar username="$user.prefixedFullName" width='40' height='40' /}}
+    &lt;div class='clearfix user'&gt;
+        &lt;span id="avatar_$user.fullName" class='avatar user-avatar-wrapper'&gt;
+          &lt;span class="user-avatar"&gt;
+            {{useravatar username="$user.prefixedFullName" width='40' height='40'/}}
+          &lt;/span&gt;
         &lt;/span&gt;
         &lt;span class='info'&gt;
-          &lt;b&gt;[[$user.getValue('first_name') $user.getValue('last_name')&gt;&gt;$user.prefixedFullName]]&lt;/b&gt;
+          [[$user.getValue('first_name') $user.getValue('last_name')&gt;&gt;$user.prefixedFullName]]
           &lt;br/&gt;
-          #if("$!user.getValue('email')" != '')
-            [[$user.getValue('email')&gt;&gt;mailto:$user.getValue('email')]]
-          #end
+          &lt;span class="user-alias"&gt;$user.name&lt;/span&gt;
         &lt;/span&gt;
     &lt;/div&gt;
   {{/html}}
@@ -138,17 +138,23 @@
     #set ($actionURL = $actionDoc.getURL('get', $queryString))
     {{html clean='false' wiki='true'}}
       &lt;form id="xpollSaveForm" action="$actionURL" method="post"&gt;
-        &lt;table class='xpoll'&gt;
-          ## first table row
-          &lt;tr&gt;
-            &lt;th&gt; $services.localization.render('contrib.xpoll.user') &lt;/th&gt;
-            #foreach($proposal in $proposals) &lt;th&gt; $proposal &lt;/th&gt; #end
-          &lt;/tr&gt;
+        &lt;table class='xpoll medium-avatars table table-bordered'&gt;
+          ## Table header row.
+          &lt;thead&gt;
+            &lt;tr&gt;
+              &lt;th&gt; $services.localization.render('contrib.xpoll.user') &lt;/th&gt;
+              #foreach($proposal in $proposals) &lt;th&gt; $proposal &lt;/th&gt; #end
+            &lt;/tr&gt;
+          &lt;/thead&gt;
 
-          ## second table row
+          ## Users and their votes.
+          &lt;tbody&gt;
           #set ($foundUser = false)
           #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
-            &lt;tr&gt;
+            #set ($discard = $doc.use($obj))
+            #set ($user = $doc.getValue('user'))
+            #set ($votes = $doc.getValue('votes'))
+            &lt;tr #if ($user == $xcontext.user) class="active" #end&gt;
               #set ($discard = $doc.use($obj))
               #set ($user = $doc.getValue('user'))
               #if ($user == $xcontext.user)
@@ -172,27 +178,32 @@
               #end ##
             &lt;/tr&gt;
           #end
+
+          ## Display the current user if he hasn't voted yet.
           #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
-            &lt;tr&gt;
+            &lt;tr class="active"&gt;
               &lt;td&gt;
                 #displayUser($xwiki.getDocument($xcontext.user))
               &lt;/td&gt;
               #foreach ($proposal in $proposals)
-                #set ($checked = false) ##
+                #set ($checked = false)
                   &lt;td&gt;
                     &lt;input type="checkbox" name="${proposal.hashCode()}" #if($checked)CHECKED#end /&gt;
                   &lt;/td&gt;
-              #end ##
+              #end
             &lt;/tr&gt;
           #end
+          &lt;/tbody&gt;
 
-          ## third table row
-          &lt;tr&gt;
-            &lt;td&gt;
-              $services.localization.render('contrib.xpoll.numberVotes')
-            &lt;/td&gt;
-            #foreach ($proposal in $proposals) &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt; #end
-          &lt;/tr&gt;
+          ## Votes count.
+          &lt;tfoot&gt;
+            &lt;tr&gt;
+              &lt;td&gt;
+                $services.localization.render('contrib.xpoll.numberVotes')
+              &lt;/td&gt;
+              #foreach ($proposal in $proposals) &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt; #end
+            &lt;/tr&gt;
+          &lt;/tfoot&gt;
         &lt;/table&gt;
 
         #if ($xcontext.user != 'XWiki.XWikiGuest')
@@ -210,19 +221,19 @@
       #foreach ($proposal in $proposals)
         #set ($ok = $voteCount.put($proposal, 0))
       #end
-      &lt;table class='xpoll'&gt;
-        ## first table row
+      &lt;table class='xpoll medium-avatars table table-bordered'&gt;
+        ## Table header row.
         &lt;tr&gt;
           &lt;th&gt; $services.localization.render('contrib.xpoll.user') &lt;/th&gt;
           #foreach ($proposal in $proposals)&lt;th&gt; $proposal &lt;/th&gt; #end
         &lt;/tr&gt;
 
-        ## second table row
+        ## Users and their votes.
         #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
           #set ($discard = $doc.use($obj))
           #set ($user = $doc.getValue('user'))
           #set ($votes = $doc.getValue('votes'))
-          &lt;tr&gt;
+          &lt;tr #if ($user == $xcontext.user) class="active" #end&gt;
             &lt;td&gt;
               #displayUser($xwiki.getDocument($user))
             &lt;/td&gt;
@@ -244,7 +255,7 @@
           &lt;/tr&gt;
         #end
 
-        ## third table row
+        ## Votes count.
         &lt;tr&gt;
           &lt;td&gt; $services.localization.render('contrib.xpoll.numberVotes') &lt;/td&gt;
           #foreach ($proposal in $proposals)
@@ -389,15 +400,22 @@
   visibility: hidden;
 }
 
-.avatar
-{
+.avatar {
   float: left;
   margin-right: 10px;
+}
+
+.user .user-avatar-wrapper {
+  position: relative;
 }
 
 .info
 {
   float: left;
+}
+
+.active {
+  font-weight: bold;
 }</code>
     </property>
     <property>

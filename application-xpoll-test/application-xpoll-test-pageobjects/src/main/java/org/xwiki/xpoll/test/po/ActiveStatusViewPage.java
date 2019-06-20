@@ -36,7 +36,7 @@ public class ActiveStatusViewPage extends ViewPage
     public WebElement pollDescription;
 
     public List<WebElement> proposals = getDriver().findElements(
-        By.xpath("//table[@class = 'xpoll']//tr[1]//th[position()>1]"));
+        By.xpath("//table[contains(@class, 'xpoll')]//tr[1]//th[position()>1]"));
 
     public ArrayList<String> pollProposals = new ArrayList<String>();
 

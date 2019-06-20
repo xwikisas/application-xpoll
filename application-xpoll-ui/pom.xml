@@ -88,5 +88,12 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-useravatar</artifactId>
+      <version>${platform.version}</version>
+      <type>jar</type>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>
