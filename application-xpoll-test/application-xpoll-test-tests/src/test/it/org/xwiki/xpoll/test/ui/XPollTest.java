@@ -22,6 +22,7 @@ package org.xwiki.xpoll.test.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.junit.BeforeClass;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,9 +62,16 @@ public class XPollTest extends AbstractTest
 
     public ArrayList<String> proposals = new ArrayList<String>(Arrays.asList(pollProposals.split(",")));
 
+    @BeforeClass
+    public static void createUsers()
+    {
+        getUtil().createUser("JaneDoe", "pass", getUtil().getURLToNonExistentPage(), "first_name", "Jane", "last_name", "Doe");
+    }
+
     @Test
     public void appEntryRedirectsToHomePage()
     {
+        getUtil().login("JaneDoe", "pass");
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
         ViewPage vp = applicationPanel.clickApplication("Polls");
         Assert.assertEquals(XPollHomePage.getSpace(), vp.getMetaDataValue("space"));
@@ -73,6 +81,7 @@ public class XPollTest extends AbstractTest
     @Test
     public void createNewEntryWithInPreparationStatus()
     {
+        getUtil().login("JaneDoe", "pass");
         String status = statusInPreparation;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
@@ -96,6 +105,7 @@ public class XPollTest extends AbstractTest
     @Test
     public void createNewEntryWithActiveStatus()
     {
+        getUtil().login("JaneDoe", "pass");
         String status = statusActive;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
@@ -116,6 +126,7 @@ public class XPollTest extends AbstractTest
     @Test
     public void createNewEntryWithFinishedStatus()
     {
+        getUtil().login("JaneDoe", "pass");
         String status = statusFinished;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
         CreatePagePage createPage = createPage(xpollHomePage);
@@ -137,7 +148,6 @@ public class XPollTest extends AbstractTest
         CreatePagePage createPage = xpollHomePage.createPage();
         createPage.getDocumentPicker().setTitle(pollName);
         createPage.setTemplate("XPoll.Code.XPollTemplateProvider");
-        createPage.setTerminalPage(true);
         createPage.clickCreate();
         return createPage;
     }
