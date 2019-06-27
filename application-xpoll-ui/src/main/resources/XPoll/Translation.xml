@@ -43,13 +43,13 @@
 contrib.xpoll.finish.message=Vote is finished. Here are the results:
 contrib.xpoll.home.title=Polls
 contrib.xpoll.notVoted=You haven't voted yet
-contrib.xpoll.numberVotes=Number of votes ({0})
+contrib.xpoll.numberVotes=Number of votes
 contrib.xpoll.preparation.hasRight=This xpoll is currently in preparation, click "edit" to modify it and activate it.
 contrib.xpoll.preparation.noRight=This xpoll is currently in preparation, you do not have the rights to modify it.
 contrib.xpoll.status.active=Active
 contrib.xpoll.status.finished=Finished
 contrib.xpoll.status.inPreparation=In preparation
-contrib.xpoll.user=Users ({0})
+contrib.xpoll.user=Users
 contrib.xpoll.vote.failed=Failed to save the document. Reason: {0}
 contrib.xpoll.vote.guest.submit=Save
 contrib.xpoll.vote.user.submit=Save
