@@ -124,6 +124,8 @@
 
   #set ($status = $doc.getValue('status'))
   #set ($proposals = $doc.getValue('proposals'))
+  #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
+  #set ($totalVotesCount = 0)
   #if ($status == 'active')
     #set ($voteCount = {})
     #foreach ($proposal in $proposals)
@@ -142,7 +144,7 @@
           ## Table header row.
           &lt;thead&gt;
             &lt;tr&gt;
-              &lt;th&gt; $services.localization.render('contrib.xpoll.user') &lt;/th&gt;
+              &lt;th&gt; $services.localization.render('contrib.xpoll.user', $usersCount) &lt;/th&gt;
               #foreach($proposal in $proposals) &lt;th&gt; $proposal &lt;/th&gt; #end
             &lt;/tr&gt;
           &lt;/thead&gt;
@@ -196,10 +198,13 @@
           &lt;/tbody&gt;
 
           ## Votes count.
+           #foreach ($key in $voteCount.keySet())
+             #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
+           #end
           &lt;tfoot&gt;
             &lt;tr&gt;
               &lt;td&gt;
-                $services.localization.render('contrib.xpoll.numberVotes')
+                $services.localization.render('contrib.xpoll.numberVotes', $totalVotesCount)
               &lt;/td&gt;
               #foreach ($proposal in $proposals) &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt; #end
             &lt;/tr&gt;
@@ -224,7 +229,7 @@
       &lt;table class='xpoll medium-avatars table table-bordered'&gt;
         ## Table header row.
         &lt;tr&gt;
-          &lt;th&gt; $services.localization.render('contrib.xpoll.user') &lt;/th&gt;
+          &lt;th&gt; $services.localization.render('contrib.xpoll.user', $usersCount) &lt;/th&gt;
           #foreach ($proposal in $proposals)&lt;th&gt; $proposal &lt;/th&gt; #end
         &lt;/tr&gt;
 
