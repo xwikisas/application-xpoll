@@ -131,12 +131,11 @@
   #set ($status = $doc.getValue('status'))
   #set ($proposals = $doc.getValue('proposals'))
   #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
-  ## Count only the existing users, without the deleted users. This is needed to update the number of user when the status is active and the deleted users are hidden.
+  ## Count only the existing users, without the deleted users.
+  ## This is needed to update the number of user when the status is active and the deleted users are hidden.
   #set ($usersCountActive = 0)
   #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
-    #set ($discard = $doc.use($obj))
-    #set ($user = $doc.getValue('user'))
-    #if ($xwiki.exists($user))
+    #if ($xwiki.exists($obj.user))
       #set ($usersCountActive = $usersCountActive + 1)
     #end
   #end
