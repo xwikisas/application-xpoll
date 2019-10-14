@@ -54,16 +54,23 @@
 #macro (displayUser $user)
   {{html wiki='true' clean='false'}}
     &lt;div class='clearfix user'&gt;
-        &lt;span id="avatar_$user.fullName" class='avatar user-avatar-wrapper'&gt;
-          &lt;span class="user-avatar"&gt;
+      &lt;span id="avatar_$user.fullName" class='avatar user-avatar-wrapper'&gt;
+        &lt;span class="user-avatar"&gt;
+          #if ($xwiki.exists($user))
             {{useravatar username="$user.prefixedFullName" width='40' height='40'/}}
-          &lt;/span&gt;
+          #else
+            &lt;img alt="Picture of $user.documentReference.name" src="$xwiki.getSkinFile('icons/xwiki/noavatar.png')"
+              title="$user.documentReference.name" width="40" height="40"&gt;
+          #end
         &lt;/span&gt;
-        &lt;span class='info'&gt;
+      &lt;/span&gt;
+      &lt;span class='info'&gt;
+        #if ($xwiki.exists($user))
           [[$user.getValue('first_name') $user.getValue('last_name')&gt;&gt;$user.prefixedFullName]]
           &lt;br/&gt;
-          &lt;span class="user-alias"&gt;$user.name&lt;/span&gt;
-        &lt;/span&gt;
+        #end
+        &lt;span class="user-alias"&gt;$user.name&lt;/span&gt;
+      &lt;/span&gt;
     &lt;/div&gt;
   {{/html}}
 #end
@@ -125,6 +132,14 @@
   #set ($status = $doc.getValue('status'))
   #set ($proposals = $doc.getValue('proposals'))
   #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
+  ## Count only the existing users, without the deleted users.
+  ## This is needed to update the number of user when the status is active and the deleted users are hidden.
+  #set ($usersCountActive = 0)
+  #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
+    #if ($xwiki.exists($obj.user))
+      #set ($usersCountActive = $usersCountActive + 1)
+    #end
+  #end
   #set ($totalVotesCount = 0)
   #if ($status == 'active')
     #set ($voteCount = {})
@@ -146,7 +161,7 @@
             &lt;tr&gt;
               &lt;th&gt;
                 $services.localization.render('contrib.xpoll.user')
-                &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
+                &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
               &lt;/th&gt;
               #foreach($proposal in $proposals) &lt;th&gt; $proposal &lt;/th&gt; #end
             &lt;/tr&gt;
@@ -166,20 +181,22 @@
                 #set ($foundUser = true)
               #end
               #set ($votes = $doc.getValue('votes'))
-              &lt;td&gt;
-                #displayUser($xwiki.getDocument($user))
-              &lt;/td&gt;
-              #foreach ($proposal in $proposals)
-                #set ($checked = $votes.contains($proposal))
-                #if ($checked)
-                  #set ($nbvotes = $voteCount.get($proposal))
-                  #set ($nbvotes = $nbvotes + 1)
-                  #set ($discard = $voteCount.put($proposal, $nbvotes))
-                #end ##
+              #if ($xwiki.exists($user))
                 &lt;td&gt;
-                  &lt;input type="checkbox" name="${proposal.hashCode()}"
-                      #if ($checked)CHECKED#end #if ($xcontext.user != $user) disabled #end /&gt;
+                  #displayUser($xwiki.getDocument($user))
                 &lt;/td&gt;
+                #foreach ($proposal in $proposals)
+                  #set ($checked = $votes.contains($proposal))
+                  #if ($checked)
+                    #set ($nbvotes = $voteCount.get($proposal))
+                    #set ($nbvotes = $nbvotes + 1)
+                    #set ($discard = $voteCount.put($proposal, $nbvotes))
+                  #end ##
+                  &lt;td&gt;
+                    &lt;input type="checkbox" name="${proposal.hashCode()}"
+                    #if ($checked)CHECKED#end #if ($xcontext.user != $user) disabled #end /&gt;
+                  &lt;/td&gt;
+                #end
               #end ##
             &lt;/tr&gt;
           #end
