@@ -66,7 +66,11 @@
       &lt;/span&gt;
       &lt;span class='info'&gt;
         #if ($xwiki.exists($user))
-          [[$user.getValue('first_name') $user.getValue('last_name')&gt;&gt;$user.prefixedFullName]]
+          #set ($username = "$user.getValue('first_name') $user.getValue('last_name')")
+          #if ("$!username.trim()" == '')
+            #set ($username = $user.name)
+          #end
+          [[$username&gt;&gt;$user.prefixedFullName]]
           &lt;br/&gt;
         #end
         &lt;span class="user-alias"&gt;$user.name&lt;/span&gt;
