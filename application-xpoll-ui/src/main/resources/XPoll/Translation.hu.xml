@@ -65,6 +65,9 @@ XPoll.XPollClass_status=Állapot
 XPoll.XPollClass_status_active=Aktív
 XPoll.XPollClass_status_finished=Befejeződött
 XPoll.XPollClass_status_inpreparation=Előkészítés alatt
+XPoll.XPollClass_type_hint=A lekérdezés konfigurálható úgy, hogy csak egy vagy több értékre legyen szükség
+XPoll.XPollClass_type_0=Több lehetőség engedélyezése
+XPoll.XPollClass_type_1=Kiválaszthat egyetlen lehetőséget
 
 ## Livetable
 xpoll.livetable._actions=Műveletek

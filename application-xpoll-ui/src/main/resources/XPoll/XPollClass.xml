@@ -120,6 +120,20 @@
       <values>inpreparation=In Preparation|active=Active|finished=Finished</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </status>
+    <type>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType>1/0</displayType>
+      <name>type</name>
+      <number>6</number>
+      <prettyName>Type</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </type>
     <winner>
       <customDisplay/>
       <disabled>0</disabled>

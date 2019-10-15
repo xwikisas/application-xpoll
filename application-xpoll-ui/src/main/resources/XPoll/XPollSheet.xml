@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity output="false"}}
 #*
  Displays the value of the name property as the title of the document.
  If value is empty (e.g. creation step), displays the document title.
@@ -51,7 +51,8 @@
   #end
   $doc.display('name')
 #end
-#macro (displayUser $user)
+#macro (displayUser $userName)
+  #set ($user = $xwiki.getDocument($userName))
   {{html wiki='true' clean='false'}}
     &lt;div class='clearfix user'&gt;
       &lt;span id="avatar_$user.fullName" class='avatar user-avatar-wrapper'&gt;
@@ -78,16 +79,48 @@
     &lt;/div&gt;
   {{/html}}
 #end
+#macro(displayInput $votes $voteCount $isCurrentUser $user)
+  #set ($disabled = '')
+  #if (!$isCurrentUser)
+    #set ($disabled = 'disabled')
+  #end
+  #foreach ($proposal in $proposals)
+    #set ($isChecked = $votes.contains($proposal))
+    #set ($checked = '')
+    #if ($isChecked)
+      #set ($checked = 'checked')
+      #set ($nbvotes = $voteCount.get($proposal))
+      #set ($nbvotes = $nbvotes + 1)
+      #set ($discard = $voteCount.put($proposal, $nbvotes))
+    #end
+    &lt;td&gt;
+      #if ($xcontext.action == 'export')
+        #if($isChecked)X#end
+      #else
+        #if ($isRadio)
+          &lt;input type="radio" name="$user" value="$proposal.hashCode()" $checked $disabled /&gt;
+        #else
+          &lt;input type="checkbox" name="$proposal.hashCode()" $checked $disabled /&gt;
+        #end
+      #end
+    &lt;/td&gt;
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
+#set ($pollObj = $doc.getObject('XPoll.XPollClass'))
 #if ($hasEdit &amp;&amp; $xcontext.action == 'view' &amp;&amp; $doc.getValue('status') == 'inpreparation')
   $services.localization.render('contrib.xpoll.preparation.hasRight')
 #elseif (!$hasEdit)
   $services.localization.render('contrib.xpoll.preparation.noRight')
 #end
-
+## Flag to know wheter the options must be displayed as checkbox or radio inputs.
+#set ($isRadio = $pollObj.getProperty('type').value == 1)
 #if ($xcontext.action == 'edit' || $doc.getValue('status') == 'inpreparation')
-  {{html wiki='true'}}
+  {{html wiki='true' clean='false'}}
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
   #set ($discard = $doc.use('XPoll.XPollClass'))
   ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
@@ -99,7 +132,7 @@
     #end
     (% class="row" %)
     (((
-    (% class="col-xs-12 col-sm-6" %)
+    (% class="col-xs-12 col-sm-4" %)
       (((
       ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_proposals"#end&gt;
           $doc.displayPrettyName('proposals', false, false)
@@ -107,7 +140,7 @@
         (% class="xHint" %)$services.localization.render('XPoll.XPollClass_proposals_hint')
       : $doc.display('proposals')
       )))
-      (% class="col-xs-12 col-sm-6" %)
+      (% class="col-xs-12 col-sm-4" %)
       (((
       ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_status"#end&gt;
           $doc.displayPrettyName('status', false, false)
@@ -117,6 +150,18 @@
         : &lt;span class="label label-warning"&gt;$doc.display('status')&lt;/span&gt;
       #else
         : $doc.display('status')
+      #end
+      )))
+      (% class="col-xs-12 col-sm-4" %)
+      (((
+      ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_type"#end&gt;
+          $doc.displayPrettyName('type', false, false)
+        &lt;/label&gt;
+        (% class="xHint" %)$services.localization.render('XPoll.XPollClass_type_hint')
+      #if($xcontext.action == 'view')
+        : $doc.display('type')
+      #else
+        : $doc.display('type')
       #end
       )))
     )))
@@ -131,10 +176,9 @@
   )))
   {{/html}}
 #else
+  #set ($status = $pollObj.getValue('status'))
+  #set ($proposals = $pollObj.getValue('proposals'))
   $doc.display('description')
-
-  #set ($status = $doc.getValue('status'))
-  #set ($proposals = $doc.getValue('proposals'))
   #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
   ## Count only the existing users, without the deleted users.
   ## This is needed to update the number of user when the status is active and the deleted users are hidden.
@@ -174,34 +218,20 @@
           ## Users and their votes.
           &lt;tbody&gt;
           #set ($foundUser = false)
-          #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
-            #set ($discard = $doc.use($obj))
-            #set ($user = $doc.getValue('user'))
-            #set ($votes = $doc.getValue('votes'))
-            &lt;tr #if ($user == $xcontext.user) class="active" #end&gt;
-              #set ($discard = $doc.use($obj))
-              #set ($user = $doc.getValue('user'))
-              #if ($user == $xcontext.user)
+          #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+            #set ($user = $voteObj.user)
+            #set ($isCurrentUser = $user == $xcontext.user)
+            #set ($votes = $voteObj.votes)
+            &lt;tr #if($isCurrentUser)class="active"#end&gt;
+              #if ($isCurrentUser)
                 #set ($foundUser = true)
               #end
-              #set ($votes = $doc.getValue('votes'))
               #if ($xwiki.exists($user))
                 &lt;td&gt;
-                  #displayUser($xwiki.getDocument($user))
+                  #displayUser($user)
                 &lt;/td&gt;
-                #foreach ($proposal in $proposals)
-                  #set ($checked = $votes.contains($proposal))
-                  #if ($checked)
-                    #set ($nbvotes = $voteCount.get($proposal))
-                    #set ($nbvotes = $nbvotes + 1)
-                    #set ($discard = $voteCount.put($proposal, $nbvotes))
-                  #end ##
-                  &lt;td&gt;
-                    &lt;input type="checkbox" name="${proposal.hashCode()}"
-                    #if ($checked)CHECKED#end #if ($xcontext.user != $user) disabled #end /&gt;
-                  &lt;/td&gt;
-                #end
-              #end ##
+                #displayInput($votes $voteCount $isCurrentUser $user)
+              #end
             &lt;/tr&gt;
           #end
 
@@ -209,14 +239,10 @@
           #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
             &lt;tr class="active"&gt;
               &lt;td&gt;
-                #displayUser($xwiki.getDocument($xcontext.user))
+                #displayUser($xcontext.user)
               &lt;/td&gt;
-              #foreach ($proposal in $proposals)
-                #set ($checked = false)
-                  &lt;td&gt;
-                    &lt;input type="checkbox" name="${proposal.hashCode()}" #if($checked)CHECKED#end /&gt;
-                  &lt;/td&gt;
-              #end
+              ## The 3rd parameter is true in order to not disable the input for current user.
+              #displayInput([] {} true $xcontext.user)
             &lt;/tr&gt;
           #end
           &lt;/tbody&gt;
@@ -245,7 +271,7 @@
       &lt;/form&gt;
     {{/html}}
   #elseif ($status=="finished")
-    {{html wiki='true'}}
+    {{html wiki='true' clean='false'}}
       $services.localization.render('contrib.xpoll.finish.message')
       #set ($voteCount = {})
       #foreach ($proposal in $proposals)
@@ -262,29 +288,16 @@
         &lt;/tr&gt;
 
         ## Users and their votes.
-        #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
-          #set ($discard = $doc.use($obj))
-          #set ($user = $doc.getValue('user'))
-          #set ($votes = $doc.getValue('votes'))
-          &lt;tr #if ($user == $xcontext.user) class="active" #end&gt;
+        #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+          #set ($user = $voteObj.user)
+          #set ($votes = $voteObj.votes)
+          #set ($isCurrentUser = $user == $xcontext.user)
+          &lt;tr #if($isCurrentUser)class="active"#end&gt;
             &lt;td&gt;
-              #displayUser($xwiki.getDocument($user))
+              #displayUser($user)
             &lt;/td&gt;
-            #foreach ($proposal in $proposals)
-              #set ($checked = $votes.contains($proposal))
-              #if ($checked)
-                #set ($nbvotes = $voteCount.get($proposal))
-                #set ($nbvotes = $nbvotes + 1)
-                #set ($discard = $voteCount.put($proposal, $nbvotes))
-              #end ##
-            &lt;td&gt;
-              #if ($xcontext.action == 'export')
-                #if ($checked) X #end##
-              #else
-                &lt;input type="checkbox" name="$proposal" #if ($checked)CHECKED#end disabled /&gt;
-              #end ##
-            &lt;/td&gt;
-            #end
+            ## The 3rd parameter is false in order to disable the input when the poll is finished.
+            #displayInput($votes $voteCount false $user)
           &lt;/tr&gt;
         #end
 

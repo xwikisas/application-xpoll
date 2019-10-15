@@ -63,6 +63,9 @@ XPoll.XPollClass_status=Stav
 XPoll.XPollClass_status_active=Aktívny
 XPoll.XPollClass_status_finished=Ukončený
 XPoll.XPollClass_status_inpreparation=V príprave
+XPoll.XPollClass_type_hint=Prieskum môže byť nakonfigurovaný tak, aby vyžadoval iba jednu alebo viac hodnôt
+XPoll.XPollClass_type_0=Povoliť viac možností
+XPoll.XPollClass_type_1=Môže vybrať jednu možnosť
 
 ## Livetable
 xpoll.livetable._actions=Akcie

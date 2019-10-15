@@ -71,6 +71,9 @@ XPoll.XPollClass_status_active=Active
 XPoll.XPollClass_status_finished=Finished
 XPoll.XPollClass_status_hint=Shows the stage of this poll
 XPoll.XPollClass_status_inpreparation=In preparation
+XPoll.XPollClass_type_hint=A poll can be configured to require only one or multiple values
+XPoll.XPollClass_type_0=Allow multiple options
+XPoll.XPollClass_type_1=Can select a single option
 
 ## Livetable
 xpoll.livetable._actions=Actions

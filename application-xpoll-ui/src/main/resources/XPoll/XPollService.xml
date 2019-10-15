@@ -51,7 +51,9 @@ try {
       def proposals = xpolldoc.getValue('proposals');
       def votes = [];
       for (proposal in proposals) {
-        if (request.get("${proposal.hashCode()}")) {
+        // The first rule applies checkbox inputs and the second one applies to radio inputs.
+        if (request.get(proposal.hashCode().toString()) ||
+           request.get(xcontext.user).equals(proposal.hashCode().toString())) {
           votes.add(proposal);
         }
       }
