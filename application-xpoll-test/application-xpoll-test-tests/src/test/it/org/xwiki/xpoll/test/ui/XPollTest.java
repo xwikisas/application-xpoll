@@ -57,7 +57,7 @@ public class XPollTest extends AbstractTest
     public static final String statusActive = "active";
 
     public static final String statusFinished = "finished";
-    
+
     public static final String statusInPreparation = "inpreparation";
 
     public ArrayList<String> proposals = new ArrayList<String>(Arrays.asList(pollProposals.split(",")));
@@ -65,7 +65,8 @@ public class XPollTest extends AbstractTest
     @BeforeClass
     public static void createUsers()
     {
-        getUtil().createUser("JaneDoe", "pass", getUtil().getURLToNonExistentPage(), "first_name", "Jane", "last_name", "Doe");
+        getUtil().createUser("JaneDoe", "pass", getUtil().getURLToNonExistentPage(), "first_name", "Jane", "last_name",
+            "Doe");
     }
 
     @Test
@@ -82,7 +83,6 @@ public class XPollTest extends AbstractTest
     public void createNewEntryWithInPreparationStatus()
     {
         getUtil().login("JaneDoe", "pass");
-        String status = statusInPreparation;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
         CreatePagePage createPage = createPage(xpollHomePage);
@@ -90,13 +90,13 @@ public class XPollTest extends AbstractTest
         XPollEditPage xpollEditPage = new XPollEditPage();
         Assert.assertEquals(pollName, xpollEditPage.getName());
         xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatus(status);
+        xpollEditPage.setStatus(statusInPreparation);
         xpollEditPage.setProposals(pollProposals);
         xpollEditPage.clickSaveAndView();
 
         InPreparationStatusViewPage inPreparationStatusViewPage = new InPreparationStatusViewPage();
         Assert.assertEquals(pollDescription, inPreparationStatusViewPage.getPollDescription());
-        Assert.assertEquals(xpollEditPage.getStatusInPreparation(), inPreparationStatusViewPage.getPollStatus());
+        Assert.assertEquals(XPollEditPage.IN_PREPARATION, inPreparationStatusViewPage.getPollStatus());
         Assert.assertEquals(pollProposals, inPreparationStatusViewPage.getPollProposals());
         ConfirmationPage deletePage = createPage.delete();
         deletePage.clickYes();
@@ -106,19 +106,18 @@ public class XPollTest extends AbstractTest
     public void createNewEntryWithActiveStatus()
     {
         getUtil().login("JaneDoe", "pass");
-        String status = statusActive;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
         CreatePagePage createPage = createPage(xpollHomePage);
 
-        editPage(status);
+        editPage(statusActive);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         Assert.assertEquals(pollName, activeStatusViewPage.getDocumentTitle());
         Assert.assertEquals(pollDescription, activeStatusViewPage.getDescription());
 
         activeStatusViewPage.getProposals();
-        Assert.assertEquals(this.proposals, activeStatusViewPage.pollProposals);
+        Assert.assertEquals(this.proposals, activeStatusViewPage.getPollProposals());
         ConfirmationPage deletePage = createPage.delete();
         deletePage.clickYes();
     }
@@ -127,22 +126,21 @@ public class XPollTest extends AbstractTest
     public void createNewEntryWithFinishedStatus()
     {
         getUtil().login("JaneDoe", "pass");
-        String status = statusFinished;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
         CreatePagePage createPage = createPage(xpollHomePage);
 
-        editPage(status);
+        editPage(statusFinished);
 
         FinishedStatusViewPage finishedStatusViewPage = new FinishedStatusViewPage();
         Assert.assertEquals(pollName, finishedStatusViewPage.getDocumentTitle());
         Assert.assertEquals(pollDescription, finishedStatusViewPage.getDescription());
 
         finishedStatusViewPage.getProposals();
-        Assert.assertEquals(this.proposals, finishedStatusViewPage.pollProposals);
+        Assert.assertEquals(this.proposals, finishedStatusViewPage.getPollProposals());
         ConfirmationPage deletePage = createPage.delete();
         deletePage.clickYes();
     }
-    
+
     private CreatePagePage createPage(XPollHomePage xpollHomePage)
     {
         CreatePagePage createPage = xpollHomePage.createPage();
@@ -151,7 +149,7 @@ public class XPollTest extends AbstractTest
         createPage.clickCreate();
         return createPage;
     }
-    
+
     private void editPage(String status)
     {
         XPollEditPage xpollEditPage = new XPollEditPage();

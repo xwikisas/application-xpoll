@@ -26,6 +26,8 @@ import org.openqa.selenium.support.ui.Select;
 
 public class XPollEditPage extends InlinePage
 {
+    public static final String IN_PREPARATION = "In preparation";
+
     @FindBy(id = "XPoll.XPollClass_0_name")
     public WebElement entryName;
 
@@ -65,15 +67,6 @@ public class XPollEditPage extends InlinePage
     {
         entryDescription.clear();
         this.entryDescription.sendKeys(description);
-    }
-
-    /**
-     * @return the in preparation status
-     */
-
-    public String getStatusInPreparation()
-    {
-        return "In preparation";
     }
 
     /**
