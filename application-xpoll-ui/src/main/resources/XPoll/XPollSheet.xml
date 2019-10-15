@@ -67,7 +67,7 @@
       &lt;/span&gt;
       &lt;span class='info'&gt;
         #if ($xwiki.exists($user))
-          #set ($username = "$user.getValue('first_name') $user.getValue('last_name')")
+          #set ($username = "$!user.getValue('first_name') $!user.getValue('last_name')")
           #if ("$!username.trim()" == '')
             #set ($username = $user.name)
           #end
