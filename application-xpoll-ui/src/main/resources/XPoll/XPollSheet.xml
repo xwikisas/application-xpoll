@@ -98,9 +98,9 @@
         #if($isChecked)X#end
       #else
         #if ($isRadio)
-          &lt;input type="radio" name="$user" value="$proposal.hashCode()" $checked $disabled /&gt;
+          &lt;input type="radio" #if($isCurrentUser)id="${user}_$proposal.hashCode()"#end name="$user" value="$proposal.hashCode()" $checked $disabled /&gt;
         #else
-          &lt;input type="checkbox" name="$proposal.hashCode()" $checked $disabled /&gt;
+          &lt;input type="checkbox" #if($isCurrentUser)id="$proposal.hashCode()"#end name="$proposal.hashCode()" $checked $disabled /&gt;
         #end
       #end
     &lt;/td&gt;
@@ -211,7 +211,9 @@
                 $services.localization.render('contrib.xpoll.user')
                 &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
               &lt;/th&gt;
-              #foreach($proposal in $proposals) &lt;th&gt; $proposal &lt;/th&gt; #end
+              #foreach($proposal in $proposals)
+                &lt;th&gt;&lt;label for="#if($isRadio)${xcontext.user}_$proposal.hashCode()#{else}$proposal.hashCode()#end"&gt;$proposal&lt;/label&gt;&lt;/th&gt;
+              #end
             &lt;/tr&gt;
           &lt;/thead&gt;
 
@@ -425,6 +427,10 @@
 
 .xpoll th {
   background-color: $theme.backgroundSecondaryColor;
+}
+
+.xpoll th label {
+  font-weight: bold;
 }
 
 .polls {
