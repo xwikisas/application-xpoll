@@ -111,17 +111,20 @@
 {{/velocity}}
 
 {{velocity}}
+#set ($pollObj = $doc.getObject('XPoll.XPollClass'))
+#set ($status = $pollObj.getValue('status'))
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
-#set ($pollObj = $doc.getObject('XPoll.XPollClass'))
-#if ($hasEdit &amp;&amp; $xcontext.action == 'view' &amp;&amp; $doc.getValue('status') == 'inpreparation')
-  $services.localization.render('contrib.xpoll.preparation.hasRight')
-#elseif (!$hasEdit)
-  $services.localization.render('contrib.xpoll.preparation.noRight')
+#if ($xcontext.action == 'view' &amp;&amp; $status == 'inpreparation')
+  #if ($hasEdit)
+    $services.localization.render('contrib.xpoll.preparation.hasRight')
+  #else
+    $services.localization.render('contrib.xpoll.preparation.noRight')
+  #end
 #end
 ## Flag to know wheter the options must be displayed as checkbox or radio inputs.
 #set ($isRadio = $pollObj.getProperty('type').value == 1)
-#if ($xcontext.action == 'edit' || $doc.getValue('status') == 'inpreparation')
+#if ($xcontext.action == 'edit' || $status == 'inpreparation')
   {{html wiki='true' clean='false'}}
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
   #set ($discard = $doc.use('XPoll.XPollClass'))
@@ -178,9 +181,8 @@
   )))
   {{/html}}
 #else
-  #set ($status = $pollObj.getValue('status'))
-  #set ($proposals = $pollObj.getValue('proposals'))
   $doc.display('description')
+  #set ($proposals = $pollObj.getValue('proposals'))
   #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
   ## Count only the existing users, without the deleted users.
   ## This is needed to update the number of user when the status is active and the deleted users are hidden.
@@ -203,7 +205,8 @@
       'page': $doc.fullName
     }))
     #set ($actionURL = $actionDoc.getURL('get', $queryString))
-    {{html clean='false' wiki='true'}}
+
+    {{html wiki='true'}}
       &lt;form id="xpollSaveForm" action="$actionURL" method="post"&gt;
         &lt;table class='xpoll medium-avatars table table-bordered'&gt;
           ## Table header row.
@@ -222,7 +225,6 @@
               #end
             &lt;/tr&gt;
           &lt;/thead&gt;
-
           ## Users and their votes.
           &lt;tbody&gt;
           #set ($foundUser = false)
@@ -269,7 +271,6 @@
             &lt;/tr&gt;
           &lt;/tfoot&gt;
         &lt;/table&gt;
-
         #if ($xcontext.user != 'XWiki.XWikiGuest')
           &lt;div class='save'&gt;
             &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")"
@@ -278,8 +279,9 @@
         #end
       &lt;/form&gt;
     {{/html}}
-  #elseif ($status=="finished")
-    {{html wiki='true' clean='false'}}
+  #elseif ($status == 'finished')
+
+    {{html wiki='true'}}
       $services.localization.render('contrib.xpoll.finish.message')
       #set ($voteCount = {})
       #foreach ($proposal in $proposals)

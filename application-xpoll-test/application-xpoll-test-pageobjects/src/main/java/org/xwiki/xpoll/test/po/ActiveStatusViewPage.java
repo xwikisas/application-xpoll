@@ -35,10 +35,10 @@ public class ActiveStatusViewPage extends ViewPage
     @FindBy(xpath = "//div[@id = 'xwikicontent']/p")
     public WebElement pollDescription;
 
-    private List<WebElement> proposals =
-        getDriver().findElements(By.xpath("//table[contains(@class, 'xpoll')]//tr[1]//th[position()>1]"));
+    public List<WebElement> proposals = getDriver().findElements(
+        By.xpath("//table[contains(@class, 'xpoll')]//tr[1]//th[position()>1]"));
 
-    private List<String> pollProposals = new ArrayList<>();
+    public ArrayList<String> pollProposals = new ArrayList<String>();
 
     public String getDescription()
     {
@@ -50,10 +50,5 @@ public class ActiveStatusViewPage extends ViewPage
         for (WebElement proposal : proposals) {
             pollProposals.add(proposal.getText().trim());
         }
-    }
-
-    public List<String> getPollProposals()
-    {
-        return pollProposals;
     }
 }
