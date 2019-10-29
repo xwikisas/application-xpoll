@@ -161,29 +161,40 @@
     </class>
     <property>
       <code>{{velocity}}
-#set($limit = $xcontext.macro.params.limit)
+#set ($limit = $xcontext.macro.params.limit)
 #if (!$limit)
-  #set($limit = 5)
+  #set ($limit = 5)
 #end
-#set($discard = $doc.use('XPoll.XPollClass'))
-#set($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
-##
-#set($query = "from doc.object(XPoll.XPollClass) as poll where doc.fullName&lt;&gt;'XPoll.XPollTemplate' order by doc.creationDate desc")
-#set($results = $services.query.xwql($query).setLimit($limit).execute())
-#foreach($result in $results)
-  #set($pollDoc = $xwiki.getDocument($result))
-  #if($pollDoc.hasAccessLevel('view', $xcontext.user) == 'true')
-    (% class="polls secondary" %) [[$services.icon.render('chart_pie') $pollDoc.plainTitle.trim()&gt;&gt;$result]] $services.localization.render('polls.author', ["[[$xwiki.getUserName($pollDoc.author, false)&gt;&gt;$pollDoc.author]]"]) $services.localization.render('polls.date', [$xwiki.formatDate($pollDoc.creationDate)])
-  #end
-#end
-#if($results.size() == 0)
-    (% class="polls secondary" %)$services.localization.render('polls.nofiles')
-  #set($spaceReference = $services.model.resolveSpace('XPoll'))
-  #if($services.security.authorization.hasAccess('edit', $spaceReference))
-    (% class="polls" %)[[$services.localization.render('polls.addfiles')&gt;&gt;XPoll.WebHome]]
-  #end
+#set ($discard = $doc.use('XPoll.XPollClass'))
+#set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
+#set ($query = "from doc.object(XPoll.XPollClass) as poll where doc.fullName&lt;&gt;'XPoll.XPollTemplate' order by doc.creationDate desc")
+#set ($results = $services.query.xwql($query).setLimit($limit).execute())
+#if ($results.size() &gt; 0)
+  (% class="polls secondary" %)(((
+    #foreach ($result in $results)
+      #set ($pollDoc = $xwiki.getDocument($result))
+      #if ($services.security.authorization.hasAccess('view', $pollDoc.documentReference))
+        #set ($pollTitle = "[[$services.icon.render('chart_pie') $pollDoc.plainTitle.trim()&gt;&gt;$result]]")
+        #set ($pollAuthor = $services.localization.render('polls.author',
+          ["[[$xwiki.getUserName($pollDoc.author, false)&gt;&gt;$pollDoc.author]]"]))
+        #set ($pollDate = $services.localization.render('polls.date', [$xwiki.formatDate($pollDoc.creationDate)]))
+        $pollTitle $pollAuthor $pollDate
+      #end
+    #end
+  )))
+  (% class="polls" %)(((
+    [[$services.localization.render('polls.seeallfiles')&gt;&gt;XPoll.WebHome]]
+  )))
 #else
-  (% class="polls" %)[[$services.localization.render('polls.seeallfiles')&gt;&gt;XPoll.WebHome]]
+  (% class="polls secondary" %)(((
+    $services.localization.render('polls.nofiles')
+  )))
+  #set ($spaceReference = $services.model.resolveSpace('XPoll'))
+  #if ($services.security.authorization.hasAccess('edit', $spaceReference))
+    (% class="polls" %)(((
+      [[$services.localization.render('polls.addfiles')&gt;&gt;XPoll.WebHome]]
+    )))
+  #end
 #end
 {{/velocity}}</code>
     </property>
