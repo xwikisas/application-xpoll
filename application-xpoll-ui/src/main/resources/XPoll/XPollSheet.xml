@@ -52,21 +52,22 @@
   $doc.display('name')
 #end
 #macro (displayUser $userName)
-  #set ($user = $xwiki.getDocument($userName))
+  #set ($userReference = $services.model.resolveDocument($userName))
+  #set ($user = $xwiki.getDocument($userReference))
   {{html wiki='true' clean='false'}}
     &lt;div class='clearfix user'&gt;
       &lt;span id="avatar_$user.fullName" class='avatar user-avatar-wrapper'&gt;
         &lt;span class="user-avatar"&gt;
-          #if ($xwiki.exists($user))
+          #if ($xwiki.exists($userReference))
             {{useravatar username="$user.prefixedFullName" width='40' height='40'/}}
           #else
-            &lt;img alt="Picture of $user.documentReference.name" src="$xwiki.getSkinFile('icons/xwiki/noavatar.png')"
-              title="$user.documentReference.name" width="40" height="40"&gt;
+            &lt;img alt="Picture of $userReference.name" src="$xwiki.getSkinFile('icons/xwiki/noavatar.png')"
+              title="$userReference.name" width="40" height="40"&gt;
           #end
         &lt;/span&gt;
       &lt;/span&gt;
       &lt;span class='info'&gt;
-        #if ($xwiki.exists($user))
+        #if ($xwiki.exists($userReference))
           #set ($username = "$!user.getValue('first_name') $!user.getValue('last_name')")
           #if ("$!username.trim()" == '')
             #set ($username = $user.name)
