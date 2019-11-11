@@ -53,7 +53,7 @@
 #end
 #macro (displayUser $userName)
   #set ($userReference = $services.model.resolveDocument($userName))
-  #set ($user = $xwiki.getDocument($userReference))
+  #set ($user = $xwiki.getDocumentAsAuthor($userReference))
   {{html wiki='true' clean='false'}}
     &lt;div class='clearfix user'&gt;
       &lt;span id="avatar_$user.fullName" class='avatar user-avatar-wrapper'&gt;
