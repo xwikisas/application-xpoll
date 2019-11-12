@@ -162,14 +162,16 @@
       )))
       (% class="col-xs-12 col-sm-4" %)
       (((
-      ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_type"#end&gt;
-          $doc.displayPrettyName('type', false, false)
-        &lt;/label&gt;
-        (% class="xHint" %)$services.localization.render('XPoll.XPollClass_type_hint')
-      #if($xcontext.action == 'view')
-        : $doc.display('type')
-      #else
-        : $doc.display('type')
+      #if ($doc.getValue('status') == 'inpreparation' &amp;&amp; ($hasAdmin || $xcontext.user == $doc.creator))
+        ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_type"#end&gt;
+            $doc.displayPrettyName('type', false, false)
+          &lt;/label&gt;
+          (% class="xHint" %)$services.localization.render('XPoll.XPollClass_type_hint')
+        #if($xcontext.action == 'view')
+          : $doc.display('type')
+        #else
+          : $doc.display('type')
+        #end
       #end
       )))
     )))
