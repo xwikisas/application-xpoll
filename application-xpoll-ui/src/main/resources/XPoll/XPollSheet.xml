@@ -434,12 +434,22 @@
     <property>
       <code>#template('colorThemeInit.vm')
 
+/*
+ * Changed overflow properties to make the table header sticky.
+ * This causes problems when your table width is pretty hight.
+*/
+#xwikicontent {
+  overflow: visible;
+}
 .xpoll th, .xpoll td {
   border: 1px solid $theme.borderColor;
 }
 
 .xpoll th {
   background-color: $theme.backgroundSecondaryColor;
+  position: sticky;
+  z-index: 2;
+  top: 0;
 }
 
 .xpoll th label,
