@@ -34,7 +34,7 @@
   <date>1571915591000</date>
   <contentUpdateDate>1571915591000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if("$!doc.getObject('XPoll.XPollClass').getProperty('name').value" != '')$!doc.getObject('XPoll.XPollClass').getProperty('name').value #elseif($doc.documentReference.name=='XPollSheet' )Polls Sheet #else${doc.title} #end</title>
+  <title>#if("$!doc.getObject('XPoll.XPollClass').documentReference.name" != '')$!doc.getObject('XPoll.XPollClass').documentReference.name #elseif($doc.documentReference.name=='XPollSheet' )Polls Sheet #else${doc.title} #end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -70,12 +70,12 @@
         #if ($xwiki.exists($userReference))
           #set ($username = "$!user.getValue('first_name') $!user.getValue('last_name')")
           #if ("$!username.trim()" == '')
-            #set ($username = $user.name)
+            #set ($username = $user.documentReference.name)
           #end
           [[$username&gt;&gt;$user.prefixedFullName]]
           &lt;br/&gt;
         #end
-        &lt;span class="user-alias"&gt;$user.name&lt;/span&gt;
+        &lt;span class="user-alias"&gt;$user.documentReference.name&lt;/span&gt;
       &lt;/span&gt;
     &lt;/div&gt;
   {{/html}}
