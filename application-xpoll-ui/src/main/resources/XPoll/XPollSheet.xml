@@ -70,12 +70,12 @@
         #if ($xwiki.exists($userReference))
           #set ($username = "$!userDoc.getValue('first_name') $!userDoc.getValue('last_name')")
           #if ("$!username.trim()" == '')
-            #set ($username = $userDoc.name)
+            #set ($username = $userDoc.documentReference.name)
           #end
           [[$username&gt;&gt;$userDoc.prefixedFullName]]
           &lt;br/&gt;
         #end
-        &lt;span class="user-alias"&gt;$userDoc.name&lt;/span&gt;
+        &lt;span class="user-alias"&gt;$userDoc.documentReference.name&lt;/span&gt;
       &lt;/span&gt;
     &lt;/div&gt;
   {{/html}}
