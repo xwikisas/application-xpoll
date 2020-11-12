@@ -30,7 +30,7 @@
   <artifactId>application-xpoll-ui</artifactId>
   <packaging>xar</packaging>
   <name>XPoll Application (Pro) UI</name>
-  <description>XWiki Simple Poll Application - Doodle like. Note that this is a paying application.</description>
+  <description>Create polls easily and enable your team to make decisions asynchronously. The app can be purchased individually or part of the XWiki Pro package. Try it free.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Polls Application (Pro)</xwiki.extension.name>
