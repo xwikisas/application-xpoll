@@ -236,7 +236,7 @@
           #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
             #set ($user = $voteObj.user)
             #set ($isCurrentUser = $user == $xcontext.user)
-            #set ($votes = $voteObj.votes)
+            #set ($votes = $voteObj.getValue('votes'))
             &lt;tr #if($isCurrentUser)class="active"#end&gt;
               #if ($isCurrentUser)
                 #set ($foundUser = true)
