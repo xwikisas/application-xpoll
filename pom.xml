@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xwiki.parent</groupId>
     <artifactId>xwikisas-parent-platform</artifactId>
-    <version>9.11-5</version>
+    <version>11.10</version>
   </parent>
   <groupId>com.xwiki.xpoll</groupId>
   <artifactId>application-xpoll</artifactId>
@@ -34,7 +34,7 @@
   <name>XPoll Application (Pro) Parent POM</name>
   <description>XWiki Simple Poll Application - Doodle like</description>
   <properties>
-    <licensing.version>1.16.1</licensing.version>
+    <licensing.version>1.19</licensing.version>
   </properties>
   <issueManagement>
     <system>GitHub</system>
