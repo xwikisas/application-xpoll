@@ -200,16 +200,16 @@
     #foreach ($proposal in $proposals)
       #set ($ok = $voteCount.put($proposal, 0))
     #end
-    #set ($actionDoc = $xwiki.getDocument('XPoll.XPollService'))
-    #set ($queryString = $escapetool.url({
-      'xpage': 'plain',
-      'outputSyntax': 'plain',
-      'page': $doc.fullName
-    }))
-    #set ($actionURL = $actionDoc.getURL('get', $queryString))
+
+    #set ($docRef = $doc.documentReference)
+    #set ($restURL = "/xwiki/rest/xpoll/$docRef.wikiReference.name/spaces/")
+    #foreach ($space in $docRef.spaceReferences)
+      #set($restURL = "${restURL}$space.name/")
+    #end
+    #set ($restURL = "${restURL}pages/$docRef.name")
 
     {{html wiki='true'}}
-      &lt;form id="xpollSaveForm" action="$actionURL" method="post"&gt;
+      &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
         &lt;table class='xpoll medium-avatars table table-bordered'&gt;
           ## Table header row.
           &lt;thead&gt;

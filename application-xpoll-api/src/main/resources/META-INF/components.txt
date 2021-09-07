@@ -1,0 +1,2 @@
+com.xwiki.xpoll.internal.DefaultXPollManager
+com.xwiki.xpoll.internal.rest.DefaultXPollResource
