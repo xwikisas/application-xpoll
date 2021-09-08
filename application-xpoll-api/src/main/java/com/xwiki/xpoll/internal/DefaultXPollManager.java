@@ -123,7 +123,7 @@ public class DefaultXPollManager implements XPollManager
         }
         int maxVote = 0;
         List<String> currentWinners = new ArrayList<>();
-        boolean isProposal = false;
+        boolean isProposal;
         for (BaseObject xpollVote : xpollVotes) {
             List<String> currentVotes = xpollVote.getListValue(VOTES);
             for (String currentVote : currentVotes) {
@@ -152,10 +152,5 @@ public class DefaultXPollManager implements XPollManager
         xpollClass.set(WINNER, String.join(",", currentWinners), context);
         doc.setAuthorReference(context.getAuthorReference());
         context.getWiki().saveDocument(doc, "New Vote", context);
-    }
-
-    @Override public String test(String a)
-    {
-        return a.toLowerCase();
     }
 }

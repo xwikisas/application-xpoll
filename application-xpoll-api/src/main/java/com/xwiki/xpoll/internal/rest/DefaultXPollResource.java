@@ -45,7 +45,7 @@ import com.xwiki.xpoll.rest.XPollResource;
  * Default implementation of {@link XPollResource}.
  *
  * @version $Id$
- * @since 12.10
+ * @since 2.0.5
  */
 @Component
 @Named("com.xwiki.xpoll.internal.rest.DefaultXPollResource")
@@ -55,11 +55,6 @@ public class DefaultXPollResource extends XWikiResource implements XPollResource
     @Inject private XPollManager xPollManager;
 
     @Inject private Logger logger;
-
-    @Override public Response test(String wikiName, String spaces, String pageName)
-    {
-        return Response.ok(String.join("!dic!", Arrays.asList(wikiName, spaces, pageName))).build();
-    }
 
     @Override public Response saveXPollAnswers(String wikiName, String spaces, String pageName)
     {
@@ -82,8 +77,7 @@ public class DefaultXPollResource extends XWikiResource implements XPollResource
             xPollManager.execute(doc, votedProposals, context);
 
         } catch (XWikiException e) {
-            return Response.ok("caught exception").build();
-
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.ok().build();
     }

@@ -20,44 +20,27 @@
 package com.xwiki.xpoll.rest;
 
 import javax.ws.rs.Encoded;
-import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 /**
- * Provides the list of entries from an existing.
+ * Provides the functionality of saving the user's votes and determining the winning proposal in a desired page.
  *
  * @version $Id$
- * @since 12.10
+ * @since 2.0.5
  */
 @Path("/xpoll/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}")
 public interface XPollResource
 {
     /**
+     *  Used to create/modify a user's votes and to determine the winning proposal whenever a vote is cast.
      *
-     * @param wikiName sada
-     * @param spaces sadad
-     * @param pageName gfas
-     * @return gfda
-     */
-    @GET
-    Response test(
-        @PathParam("wikiName") String wikiName,
-        @PathParam("spaceName") @Encoded String spaces,
-        @PathParam("pageName") String pageName);
-    // getting the form parameters from context request
-    // https://github.com/xwiki/xwiki-platform/blob/a0e4456359e3682c98f33013be3076eda75b863a/
-    // xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-rest/src/
-    // main/java/org/xwiki/notifications/rest/internal/DefaultNotificationsResource.java#L237-L239
-
-    /**
-     *  sad a.
-     * @param wikiName asdasd
-     * @param spaces sadasd
-     * @param pageName sadad
-     * @return dasdas
+     * @param wikiName the name of the wiki in which the page resides
+     * @param spaces the spaces of the page
+     * @param pageName the name of the page
+     * @return returns 404 if the page doesn't exist or doesn't have a XPollClass object, 200 otherwise
      */
     @PUT
     Response saveXPollAnswers(

@@ -28,23 +28,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
- * @since 1.0
+ * @since 2.0.5
  */
 @Role
 public interface XPollManager
 {
     /**
-     *
-     * @param page dsada
-     * @param votedProposals dasads
-     * @param context contestwe
+     * @param page the page that contains an instance of XPollClass
+     * @param votedProposals a map containing the proposals voted by the current user
+     * @param context xwiki context
      */
     void execute(XWikiDocument page, Map<String, String> votedProposals, XWikiContext context);
-
-    /**
-     *
-     * @param a sda
-     * @return sdad
-     */
-    String test(String a);
 }
