@@ -23,13 +23,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,14 +42,13 @@ import com.xwiki.xpoll.XPollManager;
 
 public class DefaultXPollManager implements XPollManager
 {
-    private static final String SPACENAME = "XPoll";
-    private static final LocalDocumentReference XPOLL_CLASSREFERENCE =
-        new LocalDocumentReference(SPACENAME, "XPollClass");
+    private static final String XPOLL_SPACE_NAME = "XPoll";
 
-    private static final LocalDocumentReference XPOLL_VOTES_CLASSREFERENCE =
-        new LocalDocumentReference(SPACENAME, "XPollVoteClass");
+    private static final LocalDocumentReference XPOLL_CLASS_REFERENCE =
+        new LocalDocumentReference(XPOLL_SPACE_NAME, "XPollClass");
 
-    private static final String STATUS = "status";
+    private static final LocalDocumentReference XPOLL_VOTES_CLASS_REFERENCE =
+        new LocalDocumentReference(XPOLL_SPACE_NAME, "XPollVoteClass");
 
     private static final String PROPOSALS = "proposals";
 
@@ -59,98 +61,123 @@ public class DefaultXPollManager implements XPollManager
     @Inject
     private Logger logger;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> serializer;
+
     @Override
-    public void execute(XWikiDocument page, Map<String, String> votedProposals, XWikiContext context)
+    // one more method -> getVoteResults (primeste poll-ul - doc ref)
+    public void vote(DocumentReference docReference, DocumentReference user, List<String> votedProposals)
+        throws XWikiException
     {
-        try {
-            BaseObject xpollObj = page.getXObject(XPOLL_CLASSREFERENCE);
+        XWikiContext context = contextProvider.get();
+        XWikiDocument document = context.getWiki().getDocument(docReference, context);
 
-            List<String> proposals = xpollObj.getListValue(PROPOSALS);
-
-            setUserVotes(votedProposals, context, page, proposals);
-            updateWinner(context, page, xpollObj, proposals);
-        } catch (XWikiException e) {
-            logger.error(e.getFullMessage());
-        }
+        setUserVotes(votedProposals, context, document, user);
+        updateWinner(context, document);
     }
 
-    private void setUserVotes(Map<String, String> votedProposals, XWikiContext context, XWikiDocument doc,
-        List<String> proposals) throws XWikiException
+    @Override public String getRestURL(DocumentReference documentReference)
     {
-        String currentUserName = context.getUserReference().getLocalDocumentReference().toString();
-        BaseObject xpollVoteOfCUrrentUser = doc.getXObject(XPOLL_VOTES_CLASSREFERENCE, USER,
+        String contextPath = contextProvider.get().getRequest().getContextPath();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(contextPath);
+        stringBuilder.append("/rest/wikis/");
+        stringBuilder.append(documentReference.getWikiReference().getName());
+        stringBuilder.append("/spaces/");
+
+        for (SpaceReference spaceReference : documentReference.getSpaceReferences()) {
+            stringBuilder.append(spaceReference.getName());
+            stringBuilder.append('/');
+        }
+
+        stringBuilder.append("pages/");
+        stringBuilder.append(documentReference.getName());
+        stringBuilder.append("/xpoll");
+        return stringBuilder.toString();
+    }
+
+    @Override
+    public Map<String, Integer> getVoteResults(DocumentReference documentReference) {
+        XWikiContext context = contextProvider.get();
+        try {
+            XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
+            List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASS_REFERENCE);
+            BaseObject xpollObj = doc.getXObject(XPOLL_CLASS_REFERENCE);
+            List<String> proposals = xpollObj.getListValue(PROPOSALS);
+            return getXPollResults(xpollVotes, proposals);
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        }
+        return new HashMap<>();
+    }
+
+    private void setUserVotes(List<String> votedProposals, XWikiContext context, XWikiDocument doc,
+        DocumentReference user) throws XWikiException
+    {
+        String currentUserName = serializer.serialize(user, doc.getDocumentReference().getWikiReference().getName());
+        BaseObject xpollVoteOfCUrrentUser = doc.getXObject(XPOLL_VOTES_CLASS_REFERENCE, USER,
             currentUserName, false);
-        Map<String, String> sortedVotes = new TreeMap<>();
-
-        List<String> votes = new ArrayList<>();
-        for (String proposal : proposals) {
-            String proposalHash = String.valueOf(proposal.hashCode());
-            String value = votedProposals.get(proposalHash);
-            if (value != null) {
-                if (StringUtils.isNumeric(value)) {
-                    sortedVotes.put(value, proposal);
-                } else {
-                    votes.add(proposal);
-                }
-            } else if (votedProposals.get(currentUserName) != null
-                && votedProposals.get(currentUserName).equals(proposalHash)) {
-                votes.add(proposal);
-                break;
-            }
-        }
-
-        for (String s : sortedVotes.keySet()) {
-            votes.add(sortedVotes.get(s));
-        }
 
         if (xpollVoteOfCUrrentUser == null) {
-            xpollVoteOfCUrrentUser = doc.newXObject(XPOLL_VOTES_CLASSREFERENCE, context);
+            xpollVoteOfCUrrentUser = doc.newXObject(XPOLL_VOTES_CLASS_REFERENCE, context);
         }
 
         xpollVoteOfCUrrentUser.set(USER, currentUserName, context);
-        xpollVoteOfCUrrentUser.set(VOTES, votes, context);
+        xpollVoteOfCUrrentUser.set(VOTES, votedProposals, context);
     }
 
-
-    private void updateWinner(XWikiContext context, XWikiDocument doc,
-        BaseObject xpollClass, List<String> proposals) throws XWikiException
+    private void updateWinner(XWikiContext context, XWikiDocument doc) throws XWikiException
     {
-        List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASSREFERENCE);
+        BaseObject xpollObj = doc.getXObject(XPOLL_CLASS_REFERENCE);
+        List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASS_REFERENCE);
 
+        List<String> proposals = xpollObj.getListValue(PROPOSALS);
+
+        Map<String, Integer> voteCount = getXPollResults(xpollVotes, proposals);
+
+        List<String> currentWinners = findWinner(voteCount);
+
+        xpollObj.set(WINNER, String.join(",", currentWinners), context);
+        doc.setAuthorReference(context.getAuthorReference());
+        context.getWiki().saveDocument(doc, "New Vote", context);
+    }
+
+    private List<String> findWinner(Map<String, Integer> voteCount)
+    {
+        List<String> currentWinners = new ArrayList<>();
+
+        int maxVotes = 0;
+        for (Map.Entry<String, Integer> proposal : voteCount.entrySet()) {
+            if (proposal.getValue() == maxVotes) {
+                currentWinners.add(proposal.getKey());
+            } else if (proposal.getValue() > maxVotes) {
+                currentWinners.clear();
+                currentWinners.add(proposal.getKey());
+                maxVotes = proposal.getValue();
+            }
+        }
+        return currentWinners;
+    }
+
+    private Map<String, Integer> getXPollResults(List<BaseObject> xpollVotes, List<String> proposals)
+    {
         Map<String, Integer> voteCount = new HashMap<>();
         for (String proposal : proposals) {
             voteCount.put(proposal, 0);
         }
-        int maxVote = 0;
-        List<String> currentWinners = new ArrayList<>();
-        boolean isProposal;
         for (BaseObject xpollVote : xpollVotes) {
             List<String> currentVotes = xpollVote.getListValue(VOTES);
             for (String currentVote : currentVotes) {
-                isProposal = false;
-                for (String proposal : proposals) {
-                    if (currentVote.equals(proposal)) {
-                        isProposal = true;
-                        break;
-                    }
-                }
-                if (isProposal) {
-                    int nbvotes = voteCount.get(currentVote);
-                    nbvotes += 1;
+                if (proposals.contains(currentVote)) {
+                    int nbvotes = voteCount.get(currentVote) + 1;
                     voteCount.put(currentVote, nbvotes);
-                    if (nbvotes == maxVote) {
-                        currentWinners.add(currentVote);
-                    } else if (nbvotes > maxVote) {
-                        currentWinners = new ArrayList<>();
-                        currentWinners.add(currentVote);
-                        maxVote = nbvotes;
-                    }
                 }
             }
         }
-
-        xpollClass.set(WINNER, String.join(",", currentWinners), context);
-        doc.setAuthorReference(context.getAuthorReference());
-        context.getWiki().saveDocument(doc, "New Vote", context);
+        return voteCount;
     }
 }

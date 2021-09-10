@@ -17,46 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xwiki.xpoll;
+package com.xwiki.xpoll.script;
 
-import java.util.List;
 import java.util.Map;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.script.service.ScriptService;
+
+import com.xwiki.xpoll.XPollManager;
 
 /**
  * @version $Id$
  * @since 2.1
  */
-@Role
-@Unstable
-public interface XPollManager
+@Component
+@Named("xpoll")
+@Singleton
+public class XPollManagerScriptService implements ScriptService
 {
-    /**
-     * @param page the page that contains an instance of XPollClass
-     * @param votedProposals a array or Proposals that the user voted
-     * @param user a reference to the user that cast the votes
-     * @throws XWikiException thrown if the page is not found or if the function fails to create a new XPollVote or
-     * save the Document
-     */
-    void vote(DocumentReference page, DocumentReference user, List<String> votedProposals) throws XWikiException;
+    @Inject
+    private XPollManager pollManager;
 
     /**
      *
      * @param documentReference the document that we want to get the URL for
      * @return the REST URL of the XPoll associated with the specific document
      */
-    String getRestURL(DocumentReference documentReference);
+    public String url(DocumentReference documentReference) {
+        return pollManager.getRestURL(documentReference);
+    }
 
     /**
-     *
      * @param documentReference a document reference
      * @return  a map that has the XPoll proposals as keys and the number of votes as values. The function returns an
      * empty map if the document doesn't have an XPollObject
      */
-    Map<String, Integer> getVoteResults(DocumentReference documentReference);
+    public Map<String, Integer> getVoteResults(DocumentReference documentReference) {
+        return pollManager.getVoteResults(documentReference);
+    }
 }

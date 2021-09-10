@@ -77,7 +77,7 @@
     &lt;/div&gt;
   {{/html}}
 #end
-#macro(displayInput $votes $voteCount $isCurrentUser $user)
+#macro(displayInput $votes $isCurrentUser $user)
   #set ($disabled = '')
   #if (!$isCurrentUser)
     #set ($disabled = 'disabled')
@@ -87,22 +87,15 @@
     #set ($checked = '')
     #if ($isChecked)
       #set ($checked = 'checked')
-      #set ($nbvotes = $voteCount.get($proposal))
-      #set ($nbvotes = $nbvotes + 1)
-      #set ($discard = $voteCount.put($proposal, $nbvotes))
     #end
     &lt;td&gt;
       #if ($xcontext.action == 'export')
         #if($isChecked)X#end
       #else
         &lt;label&gt;
-          #if ($isRadio)
-            &lt;input type="radio" #if($isCurrentUser)id="${user}_$proposal.hashCode()"#end name="$user"
-              value="$proposal.hashCode()" $checked $disabled /&gt;
-          #else
-            &lt;input type="checkbox" #if($isCurrentUser)id="$proposal.hashCode()"#end name="$proposal.hashCode()"
-              $checked $disabled /&gt;
-          #end
+            &lt;input type="#if($isRadio)radio#{else}checkbox#end"
+    #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
+    $disabled /&gt;
         &lt;/label&gt;
       #end
     &lt;/td&gt;
@@ -194,19 +187,8 @@
       #set ($usersCountActive = $usersCountActive + 1)
     #end
   #end
-  #set ($totalVotesCount = 0)
   #if ($status == 'active')
-    #set ($voteCount = {})
-    #foreach ($proposal in $proposals)
-      #set ($ok = $voteCount.put($proposal, 0))
-    #end
-
-    #set ($docRef = $doc.documentReference)
-    #set ($restURL = "/xwiki/rest/xpoll/$docRef.wikiReference.name/spaces/")
-    #foreach ($space in $docRef.spaceReferences)
-      #set($restURL = "${restURL}$space.name/")
-    #end
-    #set ($restURL = "${restURL}pages/$docRef.name")
+    #set ($restURL = $services.xpoll.url($doc.documentReference))
 
     {{html wiki='true'}}
       &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
@@ -220,7 +202,7 @@
               &lt;/th&gt;
               #foreach($proposal in $proposals)
                 &lt;th&gt;
-                  &lt;label for="#if($isRadio)${xcontext.user}_$proposal.hashCode()#{else}$proposal.hashCode()#end"&gt;
+                  &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
                     $proposal
                   &lt;/label&gt;
                 &lt;/th&gt;
@@ -242,7 +224,7 @@
                 &lt;td&gt;
                   #displayUser($user)
                 &lt;/td&gt;
-                #displayInput($votes $voteCount $isCurrentUser $user)
+                #displayInput($votes $isCurrentUser $user)
               #end
             &lt;/tr&gt;
           #end
@@ -254,12 +236,14 @@
                 #displayUser($xcontext.user)
               &lt;/td&gt;
               ## The 3rd parameter is true in order to not disable the input for current user.
-              #displayInput([] {} true $xcontext.user)
+              #displayInput([] true $xcontext.user)
             &lt;/tr&gt;
           #end
           &lt;/tbody&gt;
 
           ## Votes count.
+          #set ($totalVotesCount = 0)
+          #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
           #foreach ($key in $voteCount.keySet())
             #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
           #end
@@ -285,10 +269,6 @@
 
     {{html wiki='true'}}
       $services.localization.render('contrib.xpoll.finish.message')
-      #set ($voteCount = {})
-      #foreach ($proposal in $proposals)
-        #set ($ok = $voteCount.put($proposal, 0))
-      #end
       &lt;table class='xpoll medium-avatars table table-bordered'&gt;
         ## Table header row.
         &lt;tr&gt;
@@ -309,14 +289,16 @@
               #displayUser($user)
             &lt;/td&gt;
             ## The 3rd parameter is false in order to disable the input when the poll is finished.
-            #displayInput($votes $voteCount false $user)
+            #displayInput($votes false $user)
           &lt;/tr&gt;
         #end
 
         ## Votes count.
-        #foreach ($key in $voteCount.keySet())
-          #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
-        #end
+          #set ($totalVotesCount = 0)
+          #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
+          #foreach ($key in $voteCount.keySet())
+            #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
+          #end
         &lt;tr&gt;
           &lt;td&gt;
             $services.localization.render('contrib.xpoll.numberVotes')
