@@ -48,6 +48,7 @@
   </scm>
   <modules>
     <module>application-xpoll-ui</module>
+    <module>application-xpoll-api</module>
   </modules>
   <profiles>
     <profile>
