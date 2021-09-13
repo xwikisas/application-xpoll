@@ -19,6 +19,7 @@
  */
 package com.xwiki.xpoll.script;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -28,6 +29,8 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xwiki.xpoll.XPollManager;
 
@@ -38,26 +41,34 @@ import com.xwiki.xpoll.XPollManager;
 @Component
 @Named("xpoll")
 @Singleton
-public class XPollManagerScriptService implements ScriptService
+public class XPollScriptService implements ScriptService
 {
     @Inject
     private XPollManager pollManager;
 
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
     /**
-     *
      * @param documentReference the document that we want to get the URL for
      * @return the REST URL of the XPoll associated with the specific document
      */
-    public String url(DocumentReference documentReference) {
+    public String url(DocumentReference documentReference)
+    {
         return pollManager.getRestURL(documentReference);
     }
 
     /**
      * @param documentReference a document reference
-     * @return  a map that has the XPoll proposals as keys and the number of votes as values. The function returns an
-     * empty map if the document doesn't have an XPollObject
+     * @return a map that has the XPoll proposals as keys and the scores as values. The function returns an empty map if
+     *     the document doesn't have an XPollObject
      */
-    public Map<String, Integer> getVoteResults(DocumentReference documentReference) {
-        return pollManager.getVoteResults(documentReference);
+    public Map<String, Integer> getVoteResults(DocumentReference documentReference)
+    {
+        if (contextualAuthorizationManager.hasAccess(Right.VIEW)) {
+            return pollManager.getVoteResults(documentReference);
+        } else {
+            return new HashMap<>();
+        }
     }
 }

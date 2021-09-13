@@ -19,6 +19,8 @@
  */
 package com.xwiki.xpoll.internal;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,19 +29,26 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
 
+@Component
+@Singleton
 public class DefaultXPollManager implements XPollManager
 {
     private static final String XPOLL_SPACE_NAME = "XPoll";
@@ -69,39 +78,50 @@ public class DefaultXPollManager implements XPollManager
     private EntityReferenceSerializer<String> serializer;
 
     @Override
-    // one more method -> getVoteResults (primeste poll-ul - doc ref)
     public void vote(DocumentReference docReference, DocumentReference user, List<String> votedProposals)
-        throws XWikiException
+        throws XPollException
     {
         XWikiContext context = contextProvider.get();
-        XWikiDocument document = context.getWiki().getDocument(docReference, context);
-
-        setUserVotes(votedProposals, context, document, user);
-        updateWinner(context, document);
-    }
-
-    @Override public String getRestURL(DocumentReference documentReference)
-    {
-        String contextPath = contextProvider.get().getRequest().getContextPath();
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(contextPath);
-        stringBuilder.append("/rest/wikis/");
-        stringBuilder.append(documentReference.getWikiReference().getName());
-        stringBuilder.append("/spaces/");
-
-        for (SpaceReference spaceReference : documentReference.getSpaceReferences()) {
-            stringBuilder.append(spaceReference.getName());
-            stringBuilder.append('/');
+        XWikiDocument document = null;
+        try {
+            document = context.getWiki().getDocument(docReference, context);
+            setUserVotes(votedProposals, context, document, user);
+            updateWinner(context, document);
+        } catch (XWikiException e) {
+            throw new XPollException("Failed to do a document specific operation: ", e);
         }
-
-        stringBuilder.append("pages/");
-        stringBuilder.append(documentReference.getName());
-        stringBuilder.append("/xpoll");
-        return stringBuilder.toString();
     }
 
     @Override
-    public Map<String, Integer> getVoteResults(DocumentReference documentReference) {
+    public String getRestURL(DocumentReference documentReference)
+    {
+
+        String contextPath = contextProvider.get().getRequest().getContextPath();
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            stringBuilder.append(contextPath);
+            stringBuilder.append("/rest/wikis/");
+            stringBuilder
+                .append(URLEncoder.encode(documentReference.getWikiReference().getName(), XWiki.DEFAULT_ENCODING));
+            stringBuilder.append("/spaces/");
+
+            for (SpaceReference spaceReference : documentReference.getSpaceReferences()) {
+                stringBuilder.append(URLEncoder.encode(spaceReference.getName(), XWiki.DEFAULT_ENCODING));
+                stringBuilder.append('/');
+            }
+            stringBuilder.append("pages/");
+            stringBuilder.append(URLEncoder.encode(documentReference.getName(), XWiki.DEFAULT_ENCODING));
+            stringBuilder.append("/xpoll");
+            return stringBuilder.toString();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(String.format("Failed to retrieve the REST URL of the document: [%s]",
+                documentReference), e);
+        }
+    }
+
+    @Override
+    public Map<String, Integer> getVoteResults(DocumentReference documentReference)
+    {
         XWikiContext context = contextProvider.get();
         try {
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
@@ -110,7 +130,7 @@ public class DefaultXPollManager implements XPollManager
             List<String> proposals = xpollObj.getListValue(PROPOSALS);
             return getXPollResults(xpollVotes, proposals);
         } catch (XWikiException e) {
-            e.printStackTrace();
+            logger.warn("Failed to retrieve the document: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
         return new HashMap<>();
     }

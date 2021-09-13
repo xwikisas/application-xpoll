@@ -32,12 +32,15 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.internal.resources.pages.ModifiablePageResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
 import com.xwiki.xpoll.rest.XPollResource;
+
 /**
  * Default implementation of {@link XPollResource}.
  *
@@ -55,14 +58,21 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
     @Named("compactwiki")
     private EntityReferenceSerializer<String> serializer;
 
-    @Override public Response saveXPollAnswers(String wikiName, String spaces, String pageName)
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @Override
+    public Response saveXPollAnswers(String wikiName, String spaces, String pageName)
     {
         // We should seriously consider to stop using Restlet, because the @FormParam attribute does not work.
         // See: https://github.com/restlet/restlet-framework-java/issues/1120
         // That's why we need to use this workaround: manually getting the POST params in the request object.
+        if (!contextualAuthorizationManager.hasAccess(Right.EDIT)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
         XWikiContext context = getXWikiContext();
         XWikiRequest request = context.getRequest();
-        // check if the user has edit right
         try {
             DocumentReference documentReference = new DocumentReference(wikiName, Arrays.asList(spaces.split("/")),
                 pageName);
@@ -70,10 +80,9 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             String userIdentifier = this.serializer.serialize(userReference, new WikiReference(wikiName));
             List<String> votedProposals = Arrays.asList(request.getParameterValues(userIdentifier));
             xPollManager.vote(documentReference, userReference, votedProposals);
-
-        } catch (XWikiException e) {
+            return Response.ok().build();
+        } catch (XPollException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.ok().build();
     }
 }
