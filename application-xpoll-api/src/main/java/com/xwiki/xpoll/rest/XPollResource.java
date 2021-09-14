@@ -45,7 +45,7 @@ public interface XPollResource
      * @param spaces the spaces of the page
      * @param pageName the name of the page
      * @return returns 404 if the page doesn't exist or doesn't have a XPollClass object, 200 otherwise
-     * @throws XWikiRestException bcs things
+     * @throws XWikiRestException when failing to find the document or the document is missing the poll
      */
     @PUT
     Response saveXPollAnswers(
