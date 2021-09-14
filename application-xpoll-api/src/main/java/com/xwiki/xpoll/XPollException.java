@@ -19,11 +19,15 @@
  */
 package com.xwiki.xpoll;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Any exception raised when handling XPoll business.
  *
  * @version $Id$
+ * @since 2.1
  */
+@Unstable
 public class XPollException extends Exception
 {
     /**

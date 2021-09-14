@@ -25,6 +25,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.xwiki.rest.XWikiRestException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -38,17 +39,18 @@ import org.xwiki.stability.Unstable;
 public interface XPollResource
 {
     /**
-     *  Used to create/modify a user's votes and to determine the winning proposal whenever a vote is cast.
+     * Used to create/modify a user's votes and to determine the winning proposal whenever a vote is cast.
      *
      * @param wikiName the name of the wiki in which the page resides
      * @param spaces the spaces of the page
      * @param pageName the name of the page
      * @return returns 404 if the page doesn't exist or doesn't have a XPollClass object, 200 otherwise
+     * @throws XWikiRestException bcs things
      */
     @PUT
     Response saveXPollAnswers(
         @PathParam("wikiName") String wikiName,
         @PathParam("spaceName") @Encoded String spaces,
         @PathParam("pageName") String pageName
-    );
+    ) throws XWikiRestException;
 }

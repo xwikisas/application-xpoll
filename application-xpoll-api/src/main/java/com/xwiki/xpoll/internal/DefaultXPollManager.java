@@ -47,6 +47,12 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
 
+/**
+ * Provides methods to interact with the polls of a XWiki page.
+ *
+ * @version $Id$
+ * @since 2.1
+ */
 @Component
 @Singleton
 public class DefaultXPollManager implements XPollManager
@@ -88,7 +94,8 @@ public class DefaultXPollManager implements XPollManager
             setUserVotes(votedProposals, context, document, user);
             updateWinner(context, document);
         } catch (XWikiException e) {
-            throw new XPollException("Failed to do a document specific operation: ", e);
+            throw new XPollException(String.format("Failed to vote for [%s] on behalf of [%s].", docReference, user),
+                e);
         }
     }
 
@@ -103,13 +110,11 @@ public class DefaultXPollManager implements XPollManager
             stringBuilder.append("/rest/wikis/");
             stringBuilder
                 .append(URLEncoder.encode(documentReference.getWikiReference().getName(), XWiki.DEFAULT_ENCODING));
-            stringBuilder.append("/spaces/");
-
             for (SpaceReference spaceReference : documentReference.getSpaceReferences()) {
+                stringBuilder.append("/spaces/");
                 stringBuilder.append(URLEncoder.encode(spaceReference.getName(), XWiki.DEFAULT_ENCODING));
-                stringBuilder.append('/');
             }
-            stringBuilder.append("pages/");
+            stringBuilder.append("/pages/");
             stringBuilder.append(URLEncoder.encode(documentReference.getName(), XWiki.DEFAULT_ENCODING));
             stringBuilder.append("/xpoll");
             return stringBuilder.toString();
@@ -130,9 +135,10 @@ public class DefaultXPollManager implements XPollManager
             List<String> proposals = xpollObj.getListValue(PROPOSALS);
             return getXPollResults(xpollVotes, proposals);
         } catch (XWikiException e) {
-            logger.warn("Failed to retrieve the document: [{}]", ExceptionUtils.getRootCauseMessage(e));
+            logger.warn("Failed to retrieve the vote results for poll [{}]. Root cause: [{}].", documentReference,
+                ExceptionUtils.getRootCauseMessage(e));
+            return new HashMap<>();
         }
-        return new HashMap<>();
     }
 
     private void setUserVotes(List<String> votedProposals, XWikiContext context, XWikiDocument doc,
