@@ -32,6 +32,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
+import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
 
 /**
@@ -64,7 +65,7 @@ public class XPollScriptService implements ScriptService
      * @return a map that has the XPoll proposals as keys and the scores as values. The function returns an empty map if
      *     the document doesn't have an XPollObject
      */
-    public Map<String, Integer> getVoteResults(DocumentReference documentReference)
+    public Map<String, Integer> getVoteResults(DocumentReference documentReference) throws XPollException
     {
         if (contextualAuthorizationManager.hasAccess(Right.VIEW)) {
             return pollManager.getVoteResults(documentReference);

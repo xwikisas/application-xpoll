@@ -21,14 +21,16 @@ package com.xwiki.xpoll.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -39,9 +41,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xwiki.xpoll.XPollException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -51,43 +53,38 @@ import static org.mockito.Mockito.when;
  * @since 2.1
  */
 @ComponentTest
-public class DefaultXPollManagerTest
+class DefaultXPollManagerTest
 {
-    private static final String XPOLL_SPACE_NAME = "XPoll";
-
-    private static final LocalDocumentReference XPOLL_CLASS_REFERENCE =
-        new LocalDocumentReference(XPOLL_SPACE_NAME, "XPollClass");
-
-    private static final LocalDocumentReference XPOLL_VOTES_CLASS_REFERENCE =
-        new LocalDocumentReference(XPOLL_SPACE_NAME, "XPollVoteClass");
-
     @InjectMockComponents
     private DefaultXPollManager manager;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
 
+    @Mock
     private XWikiContext xWikiContext;
 
+    @Mock
     private XWikiRequest request;
 
+    @Mock
     private XWiki wiki;
 
+    @Mock
     private XWikiDocument document;
 
+    @Mock
     private BaseObject xpollObj;
 
     @BeforeEach
     void setup()
     {
-        this.xWikiContext = mock(XWikiContext.class);
         when(this.contextProvider.get()).thenReturn(this.xWikiContext);
     }
 
     @Test
     void urlMultipleSpaces()
     {
-        this.request = mock(XWikiRequest.class);
         when(this.xWikiContext.getRequest()).thenReturn(this.request);
         when(this.request.getContextPath()).thenReturn("xwiki");
 
@@ -99,23 +96,20 @@ public class DefaultXPollManagerTest
     }
 
     @Test
-    void getVoteResults() throws XWikiException
+    void getVoteResults() throws XWikiException, XPollException
     {
-        this.xpollObj = mock(BaseObject.class);
-        this.document = mock(XWikiDocument.class);
-        this.wiki = mock(XWiki.class);
-
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
 
         when(this.xWikiContext.getWiki()).thenReturn(this.wiki);
         when(this.wiki.getDocument(docRef, this.xWikiContext)).thenReturn(this.document);
-        when(this.document.getXObject(XPOLL_CLASS_REFERENCE)).thenReturn(this.xpollObj);
-        when(this.xpollObj.getListValue("proposals")).thenReturn(Arrays.asList("Proposal1", "Proposal2", "Proposal3"));
-        when(this.document.getXObjects(XPOLL_VOTES_CLASS_REFERENCE)).thenReturn(new ArrayList<>());
+        when(this.document.getXObject(DefaultXPollManager.XPOLL_CLASS_REFERENCE)).thenReturn(this.xpollObj);
+        when(this.xpollObj.getListValue(DefaultXPollManager.PROPOSALS)).thenReturn(Arrays.asList("Proposal1",
+            "Proposal2", "Proposal3"));
+        when(this.document.getXObjects(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE)).thenReturn(new ArrayList<>());
 
         Map<String, Integer> results = manager.getVoteResults(docRef);
 
         assertEquals(3, results.size());
-        assertEquals(0, results.values().stream().reduce(0, Integer::sum));
+        assertEquals(new HashSet<>(Collections.singletonList(0)), new HashSet<>(results.values()));
     }
 }

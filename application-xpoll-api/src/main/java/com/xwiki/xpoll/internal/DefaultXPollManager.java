@@ -57,21 +57,21 @@ import com.xwiki.xpoll.XPollManager;
 @Singleton
 public class DefaultXPollManager implements XPollManager
 {
-    private static final String XPOLL_SPACE_NAME = "XPoll";
+    static final String XPOLL_SPACE_NAME = "XPoll";
 
-    private static final LocalDocumentReference XPOLL_CLASS_REFERENCE =
+    static final LocalDocumentReference XPOLL_CLASS_REFERENCE =
         new LocalDocumentReference(XPOLL_SPACE_NAME, "XPollClass");
 
-    private static final LocalDocumentReference XPOLL_VOTES_CLASS_REFERENCE =
+    static final LocalDocumentReference XPOLL_VOTES_CLASS_REFERENCE =
         new LocalDocumentReference(XPOLL_SPACE_NAME, "XPollVoteClass");
 
-    private static final String PROPOSALS = "proposals";
+    static final String PROPOSALS = "proposals";
 
-    private static final String VOTES = "votes";
+    static final String VOTES = "votes";
 
-    private static final String WINNER = "winner";
+    static final String WINNER = "winner";
 
-    private static final String USER = "user";
+    static final String USER = "user";
 
     @Inject
     private Logger logger;
@@ -125,19 +125,23 @@ public class DefaultXPollManager implements XPollManager
     }
 
     @Override
-    public Map<String, Integer> getVoteResults(DocumentReference documentReference)
+    public Map<String, Integer> getVoteResults(DocumentReference documentReference) throws XPollException
     {
         XWikiContext context = contextProvider.get();
         try {
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASS_REFERENCE);
             BaseObject xpollObj = doc.getXObject(XPOLL_CLASS_REFERENCE);
+            if (xpollObj == null) {
+                throw new XPollException(String.format("The document [%s] does not have a poll object.",
+                    documentReference));
+            }
             List<String> proposals = xpollObj.getListValue(PROPOSALS);
             return getXPollResults(xpollVotes, proposals);
         } catch (XWikiException e) {
-            logger.warn("Failed to retrieve the vote results for poll [{}]. Root cause: [{}].", documentReference,
-                ExceptionUtils.getRootCauseMessage(e));
-            return new HashMap<>();
+            throw new XPollException(String.format("Failed to retrieve the vote results for poll [%s]. Root cause: "
+                    + "[%s].", documentReference,
+                ExceptionUtils.getRootCauseMessage(e)));
         }
     }
 
@@ -156,9 +160,13 @@ public class DefaultXPollManager implements XPollManager
         xpollVoteOfCUrrentUser.set(VOTES, votedProposals, context);
     }
 
-    private void updateWinner(XWikiContext context, XWikiDocument doc) throws XWikiException
+    private void updateWinner(XWikiContext context, XWikiDocument doc) throws XWikiException, XPollException
     {
         BaseObject xpollObj = doc.getXObject(XPOLL_CLASS_REFERENCE);
+        if (xpollObj == null) {
+            throw new XPollException(String.format("The document [%s] does not have a poll object.",
+                doc.getDocumentReference()));
+        }
         List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASS_REFERENCE);
 
         List<String> proposals = xpollObj.getListValue(PROPOSALS);

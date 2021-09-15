@@ -58,5 +58,5 @@ public interface XPollManager
      * @return a map that has the XPoll proposals as keys and the scores as values. The function returns an empty map if
      *     the document doesn't have an XPollObject
      */
-    Map<String, Integer> getVoteResults(DocumentReference documentReference);
+    Map<String, Integer> getVoteResults(DocumentReference documentReference) throws XPollException;
 }

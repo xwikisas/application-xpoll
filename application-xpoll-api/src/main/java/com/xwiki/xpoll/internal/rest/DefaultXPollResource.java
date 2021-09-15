@@ -63,7 +63,7 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Override
-    public Response saveXPollAnswers(String wikiName, String spaces, String pageName)
+    public Response saveXPollAnswers(String wikiName, String spaces, String pageName) throws XWikiRestException
     {
         if (!contextualAuthorizationManager.hasAccess(Right.EDIT)) {
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -80,7 +80,7 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             List<String> votedProposals = Arrays.asList(request.getParameterValues(userIdentifier));
             xPollManager.vote(documentReference, userReference, votedProposals);
             return Response.ok().build();
-        } catch (XPollException | XWikiRestException e) {
+        } catch (XPollException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
