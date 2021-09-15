@@ -32,7 +32,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -73,8 +72,7 @@ public class DefaultXPollManager implements XPollManager
 
     static final String USER = "user";
 
-    @Inject
-    private Logger logger;
+    private static final String MISSING_XPOLL_OBJECT_MESSAGE = "The document [%s] does not have a poll object.";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -133,15 +131,15 @@ public class DefaultXPollManager implements XPollManager
             List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASS_REFERENCE);
             BaseObject xpollObj = doc.getXObject(XPOLL_CLASS_REFERENCE);
             if (xpollObj == null) {
-                throw new XPollException(String.format("The document [%s] does not have a poll object.",
+                throw new XPollException(String.format(MISSING_XPOLL_OBJECT_MESSAGE,
                     documentReference));
             }
             List<String> proposals = xpollObj.getListValue(PROPOSALS);
             return getXPollResults(xpollVotes, proposals);
         } catch (XWikiException e) {
-            throw new XPollException(String.format("Failed to retrieve the vote results for poll [%s]. Root cause: "
-                    + "[%s].", documentReference,
-                ExceptionUtils.getRootCauseMessage(e)));
+            throw new XPollException(String
+                .format("Failed to retrieve the vote results for poll [%s]. Root cause: [%s].", documentReference,
+                    ExceptionUtils.getRootCauseMessage(e)));
         }
     }
 
@@ -164,7 +162,7 @@ public class DefaultXPollManager implements XPollManager
     {
         BaseObject xpollObj = doc.getXObject(XPOLL_CLASS_REFERENCE);
         if (xpollObj == null) {
-            throw new XPollException(String.format("The document [%s] does not have a poll object.",
+            throw new XPollException(String.format(MISSING_XPOLL_OBJECT_MESSAGE,
                 doc.getDocumentReference()));
         }
         List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASS_REFERENCE);

@@ -62,13 +62,17 @@ public class XPollScriptService implements ScriptService
     /**
      * @param documentReference the reference of the document that represents the poll (i.e. the document that holds
      *     the poll options and their votes)
-     * @return a map that has the XPoll proposals as keys and the scores as values. The function returns an empty map if
-     *     the document doesn't have an XPollObject
+     * @return a map that has the XPoll proposals as keys and the scores as values. The map is empty if the access
+     *     requirements are not met or if any exception is thrown.
      */
-    public Map<String, Integer> getVoteResults(DocumentReference documentReference) throws XPollException
+    public Map<String, Integer> getVoteResults(DocumentReference documentReference)
     {
         if (contextualAuthorizationManager.hasAccess(Right.VIEW)) {
-            return pollManager.getVoteResults(documentReference);
+            try {
+                return pollManager.getVoteResults(documentReference);
+            } catch (XPollException e) {
+                return new HashMap<>();
+            }
         } else {
             return new HashMap<>();
         }
