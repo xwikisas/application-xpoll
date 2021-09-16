@@ -19,6 +19,7 @@
  */
 package com.xwiki.xpoll.script;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,11 +71,9 @@ public class XPollScriptService implements ScriptService
         if (contextualAuthorizationManager.hasAccess(Right.VIEW)) {
             try {
                 return pollManager.getVoteResults(documentReference);
-            } catch (XPollException e) {
-                return new HashMap<>();
+            } catch (XPollException ignored) {
             }
-        } else {
-            return new HashMap<>();
         }
+        return Collections.emptyMap();
     }
 }

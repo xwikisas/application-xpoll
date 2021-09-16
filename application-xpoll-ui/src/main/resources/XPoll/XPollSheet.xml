@@ -93,9 +93,9 @@
         #if($isChecked)X#end
       #else
         &lt;label&gt;
-            &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-    #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
-    $disabled /&gt;
+          &lt;input type="#if($isRadio)radio#{else}checkbox#end"
+            #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
+            $disabled /&gt;
         &lt;/label&gt;
       #end
     &lt;/td&gt;
@@ -187,6 +187,12 @@
       #set ($usersCountActive = $usersCountActive + 1)
     #end
   #end
+  ## Votes count.
+  #set ($totalVotesCount = 0)
+  #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
+  #foreach ($key in $voteCount.keySet())
+    #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
+  #end
   #if ($status == 'active')
     #set ($restURL = $services.xpoll.url($doc.documentReference))
 
@@ -241,12 +247,6 @@
           #end
           &lt;/tbody&gt;
 
-          ## Votes count.
-          #set ($totalVotesCount = 0)
-          #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
-          #foreach ($key in $voteCount.keySet())
-            #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
-          #end
           &lt;tfoot&gt;
             &lt;tr&gt;
               &lt;td&gt;
@@ -293,12 +293,6 @@
           &lt;/tr&gt;
         #end
 
-        ## Votes count.
-          #set ($totalVotesCount = 0)
-          #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
-          #foreach ($key in $voteCount.keySet())
-            #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
-          #end
         &lt;tr&gt;
           &lt;td&gt;
             $services.localization.render('contrib.xpoll.numberVotes')
