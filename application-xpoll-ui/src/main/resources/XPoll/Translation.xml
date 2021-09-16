@@ -52,6 +52,7 @@ contrib.xpoll.vote.guest.submit=Save
 contrib.xpoll.vote.user.submit=Save
 contrib.xpoll.vote.saved=Saved
 contrib.xpoll.vote.saving=Saving...
+contrib.xpoll.vote.select=Select a value
 contrib.xpoll.WebHome.description=Welcome to the XWiki Poll Application. You can create a poll for your internal needs.
 contrib.xpoll.WebHome.name=Name
 contrib.xpoll.WebHome.status=Status
@@ -71,6 +72,7 @@ XPoll.XPollClass_status_inpreparation=In preparation
 XPoll.XPollClass_type_hint=A poll can be configured to require only one or multiple values
 XPoll.XPollClass_type_0=Allow multiple options
 XPoll.XPollClass_type_1=Can select a single option
+XPoll.XPollClass_type_2=Allow multiple options in order
 
 ## Livetable
 xpoll.livetable._actions=Actions

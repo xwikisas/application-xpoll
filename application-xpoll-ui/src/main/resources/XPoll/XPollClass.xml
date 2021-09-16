@@ -47,9 +47,11 @@
     <nameField/>
     <validationScript/>
     <description>
+      <contenttype>---</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>Wysiwyg</editor>
+      <hint/>
       <name>description</name>
       <number>2</number>
       <picker>0</picker>
@@ -64,6 +66,7 @@
     <name>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>name</name>
       <number>1</number>
       <picker>0</picker>
@@ -77,8 +80,12 @@
     <proposals>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>input</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
       <multiSelect>1</multiSelect>
       <name>proposals</name>
       <number>4</number>
@@ -98,8 +105,12 @@
     <status>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>select</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>status</name>
       <number>3</number>
@@ -117,22 +128,34 @@
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </status>
     <type>
+      <cache>0</cache>
       <customDisplay/>
-      <defaultValue>0</defaultValue>
+      <defaultValue/>
       <disabled>0</disabled>
-      <displayFormType>select</displayFormType>
-      <displayType>1/0</displayType>
+      <displayType>select</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
       <name>type</name>
       <number>6</number>
+      <picker>1</picker>
       <prettyName>Type</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      <values>2|1|0</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </type>
     <winner>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>winner</name>
       <number>5</number>
       <picker>0</picker>

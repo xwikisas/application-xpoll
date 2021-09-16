@@ -93,9 +93,38 @@
         #if($isChecked)X#end
       #else
         &lt;label&gt;
-          &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-            #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
-            $disabled /&gt;
+         ## condorcet method
+         #if ($pollObj.getValue('type') == '2')
+           #set ($indexOfProposal = $votes.indexOf($proposal) + 1)
+           #set ($noOption = '')
+           #if ($indexOfProposal &lt;  1)
+             #set ($noOption = 'selected')
+           #end
+
+           #if ($isCurrentUser &amp;&amp; $pollObj.getValue('status') == 'active')
+             &lt;select class="xpollSelect" proposal="$proposal"&gt;
+               &lt;option disabled $noOption value&gt;$services.localization.render('contrib.xpoll.vote.select')&lt;/option&gt;
+               #foreach ($nr in $proposals)
+                 &lt;option value="$foreach.count" #if($foreach.count ==$indexOfProposal)selected#end&gt;
+                   #$foreach.count
+                 &lt;/option&gt;
+               #end
+             &lt;/select&gt;
+             ## hidden inputs
+             &lt;input class="xpollHiddenInput" hidden id="option$foreach.count" name="$user"
+                type="hidden"&gt;&lt;/input&gt;
+           #else
+             &lt;input type="checkbox" name="$user" $checked $disabled /&gt;
+             #if ($indexOfProposal &gt; 0)
+               &lt;span class="label label-primary"&gt;#$indexOfProposal&lt;/span&gt;
+             #end
+           #end
+         ## single option / multiple options
+         #else
+           &lt;input type="#if($isRadio)radio#{else}checkbox#end"
+           #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
+           $disabled /&gt;
+         #end
         &lt;/label&gt;
       #end
     &lt;/td&gt;
