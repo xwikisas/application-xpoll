@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -23,39 +22,38 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xwiki.parent</groupId>
-    <artifactId>xwikisas-parent-platform</artifactId>
-    <version>11.10</version>
+    <groupId>com.xwiki.xpoll</groupId>
+    <artifactId>application-xpoll</artifactId>
+    <version>2.0.5-SNAPSHOT</version>
   </parent>
-  <groupId>com.xwiki.xpoll</groupId>
-  <artifactId>application-xpoll</artifactId>
-  <version>2.0.5-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>XPoll Application (Pro) Parent POM</name>
-  <description>XWiki Simple Poll Application - Doodle like</description>
-  <properties>
-    <licensing.version>1.19</licensing.version>
-  </properties>
-  <issueManagement>
-    <system>GitHub</system>
-    <url>https://github.com/xwikisas/application-xpoll/issues</url>
-  </issueManagement>
-  <scm>
-    <connection>scm:git:git://github.com/xwikisas/application-xpoll.git</connection>
-    <developerConnection>scm:git:git@github.com:xwikisas/application-xpoll.git</developerConnection>
-    <url>https://github.com/xwikisas/application-xpoll/tree/master</url>
-    <tag>HEAD</tag>
-  </scm>
-  <modules>
-    <module>application-xpoll-ui</module>
-    <module>application-xpoll-api</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>application-xpoll-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>application-xpoll-api</artifactId>
+  <packaging>jar</packaging>
+  <name>XPoll Application (Pro) API</name>
+  <description>Provides the Java APIs needed by the XPoll Application.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
