@@ -182,48 +182,7 @@ xcontext.method.output.value = [new DocumentCreatingEvent(), new DocumentUpdatin
     <property>
       <code>{{groovy}}
 def docSource = xcontext.method.input.get(1);
-def xwikiContext = xcontext.method.input.get(2);
-def pollObject = docSource.getObject('XPoll.XPollClass');
-// This EventListener is applied only for pages that have a XPollClass object.
-if (pollObject != null) {
-  def proposals = pollObject.get('proposals').value;
-  def voteCount = [:];
-  // voteCount will hold the number of votes for each proposal.
-  for (proposal in proposals) {
-    voteCount.put(proposal, 0);
-  }
-  def maxvote = 0;
-  def currentWinners = [];
-  def isProposal;
-  // Determine the winners.
-  for(voteObject in docSource.getObjects('XPoll.XPollVoteClass')) {
-    def votes = voteObject.get('votes').value;
-    for (vote in votes) {
-      isProposal = false;
-      for (proposal in proposals) {
-        if (vote == proposal) {
-          isProposal = true;
-          break;
-        }
-      }
-      // If the vote is among proposals the number will be updated in voteCount
-      // and the winners are calculated.
-      if(isProposal == true) {
-        nbvotes = voteCount.get(vote);
-        nbvotes = nbvotes + 1;
-        voteCount.put(vote, nbvotes);
-        if (nbvotes == maxvote) {
-          currentWinners.add(vote);
-        } else if (nbvotes &gt; maxvote) {
-          currentWinners = [];
-          currentWinners.add(vote);
-          maxvote = nbvotes;
-        }
-      }
-      pollObject.set('winner', currentWinners.join(','), xwikiContext);
-    }
-  }
-}
+services.xpoll.updateWinner(docSource.getDocumentReference());
 {{/groovy}}</code>
     </property>
     <property>

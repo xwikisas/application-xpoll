@@ -22,9 +22,9 @@ package com.xwiki.xpoll.internal;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -71,6 +71,8 @@ public class DefaultXPollManager implements XPollManager
     static final String WINNER = "winner";
 
     static final String USER = "user";
+
+    static final String XPOLL_TYPE = "type";
 
     private static final String MISSING_XPOLL_OBJECT_MESSAGE = "The document [%s] does not have a poll object.";
 
@@ -135,11 +137,25 @@ public class DefaultXPollManager implements XPollManager
                     documentReference));
             }
             List<String> proposals = xpollObj.getListValue(PROPOSALS);
-            return getXPollResults(xpollVotes, proposals);
+            String pollType = xpollObj.getStringValue(XPOLL_TYPE);
+
+            return getXPollResults(xpollVotes, proposals, pollType);
         } catch (XWikiException e) {
             throw new XPollException(String
                 .format("Failed to retrieve the vote results for poll [%s]. Root cause: [%s].", documentReference,
                     ExceptionUtils.getRootCauseMessage(e)));
+        }
+    }
+
+    @Override
+    public void determineWinner(DocumentReference documentReference) throws XPollException
+    {
+        try {
+            XWikiContext context = contextProvider.get();
+            XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
+            updateWinner(context, doc);
+        } catch (XWikiException e) {
+            throw new XPollException(String.format(MISSING_XPOLL_OBJECT_MESSAGE, documentReference));
         }
     }
 
@@ -154,8 +170,10 @@ public class DefaultXPollManager implements XPollManager
             xpollVoteOfCUrrentUser = doc.newXObject(XPOLL_VOTES_CLASS_REFERENCE, context);
         }
 
+        List<String> filteredProposals = votedProposals.stream().filter(p -> !p.isEmpty()).collect(Collectors.toList());
+
         xpollVoteOfCUrrentUser.set(USER, currentUserName, context);
-        xpollVoteOfCUrrentUser.set(VOTES, votedProposals, context);
+        xpollVoteOfCUrrentUser.set(VOTES, filteredProposals, context);
     }
 
     private void updateWinner(XWikiContext context, XWikiDocument doc) throws XWikiException, XPollException
@@ -169,13 +187,13 @@ public class DefaultXPollManager implements XPollManager
 
         List<String> proposals = xpollObj.getListValue(PROPOSALS);
 
-        Map<String, Integer> voteCount = getXPollResults(xpollVotes, proposals);
+        String pollType = xpollObj.getStringValue(XPOLL_TYPE);
+
+        Map<String, Integer> voteCount = getXPollResults(xpollVotes, proposals, pollType);
 
         List<String> currentWinners = findWinner(voteCount);
 
         xpollObj.set(WINNER, String.join(",", currentWinners), context);
-        doc.setAuthorReference(context.getAuthorReference());
-        context.getWiki().saveDocument(doc, "New Vote", context);
     }
 
     private List<String> findWinner(Map<String, Integer> voteCount)
@@ -195,21 +213,11 @@ public class DefaultXPollManager implements XPollManager
         return currentWinners;
     }
 
-    private Map<String, Integer> getXPollResults(List<BaseObject> xpollVotes, List<String> proposals)
+    private Map<String, Integer> getXPollResults(List<BaseObject> xpollVotes, List<String> proposals, String pollType)
     {
-        Map<String, Integer> voteCount = new HashMap<>();
-        for (String proposal : proposals) {
-            voteCount.put(proposal, 0);
+        if ("2".equals(pollType)) {
+            return new CondorcetResultsCalculator().getResults(xpollVotes, proposals);
         }
-        for (BaseObject xpollVote : xpollVotes) {
-            List<String> currentVotes = xpollVote.getListValue(VOTES);
-            for (String currentVote : currentVotes) {
-                if (proposals.contains(currentVote)) {
-                    int nbvotes = voteCount.get(currentVote) + 1;
-                    voteCount.put(currentVote, nbvotes);
-                }
-            }
-        }
-        return voteCount;
+        return new PluralityResultsCalculator().getResults(xpollVotes, proposals);
     }
 }

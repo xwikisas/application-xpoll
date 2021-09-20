@@ -75,4 +75,20 @@ public class XPollScriptService implements ScriptService
         }
         return Collections.emptyMap();
     }
+
+    /**
+     * Calculates the winner of the XPoll present in the document and saves it.
+     *
+     * @param documentReference a document reference
+     */
+    public void updateWinner(DocumentReference documentReference)
+    {
+        if (contextualAuthorizationManager.hasAccess(Right.EDIT)) {
+            try {
+                pollManager.determineWinner(documentReference);
+            } catch (XPollException ignored) {
+
+            }
+        }
+    }
 }

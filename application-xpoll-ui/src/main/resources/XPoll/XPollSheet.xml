@@ -102,7 +102,7 @@
            #end
 
            #if ($isCurrentUser &amp;&amp; $pollObj.getValue('status') == 'active')
-             &lt;select class="xpollSelect" proposal="$proposal"&gt;
+             &lt;select class="xpollSelect" data-proposal="$proposal"&gt;
                &lt;option disabled $noOption value&gt;$services.localization.render('contrib.xpoll.vote.select')&lt;/option&gt;
                #foreach ($nr in $proposals)
                  &lt;option value="$foreach.count" #if($foreach.count ==$indexOfProposal)selected#end&gt;
@@ -111,8 +111,8 @@
                #end
              &lt;/select&gt;
              ## hidden inputs
-             &lt;input class="xpollHiddenInput" hidden id="option$foreach.count" name="$user"
-                type="hidden"&gt;&lt;/input&gt;
+             &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$user"
+                type="hidden"/&gt;
            #else
              &lt;input type="checkbox" name="$user" $checked $disabled /&gt;
              #if ($indexOfProposal &gt; 0)

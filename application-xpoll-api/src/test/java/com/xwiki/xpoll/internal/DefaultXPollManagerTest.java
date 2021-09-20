@@ -44,6 +44,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.xpoll.XPollException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -96,7 +97,7 @@ class DefaultXPollManagerTest
     }
 
     @Test
-    void getVoteResults() throws XWikiException, XPollException
+    void getVoteResultsWithEmptyTypeAndNoVotes() throws XWikiException, XPollException
     {
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
 
@@ -111,5 +112,48 @@ class DefaultXPollManagerTest
 
         assertEquals(3, results.size());
         assertEquals(new HashSet<>(Collections.singletonList(0)), new HashSet<>(results.values()));
+    }
+
+    @Test
+    void getVoteResultsWithCondorcetType() throws XWikiException, XPollException
+    {
+        DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
+        when(this.xWikiContext.getWiki()).thenReturn(this.wiki);
+        when(this.wiki.getDocument(docRef, this.xWikiContext)).thenReturn(this.document);
+        when(this.document.getXObject(DefaultXPollManager.XPOLL_CLASS_REFERENCE)).thenReturn(this.xpollObj);
+        when(this.xpollObj.getStringValue(DefaultXPollManager.XPOLL_TYPE)).thenReturn("2");
+
+        String proposal1 = "Proposal1";
+        String proposal2 = "Proposal2";
+        String proposal3 = "Proposal3";
+
+        when(this.xpollObj.getListValue(DefaultXPollManager.PROPOSALS)).thenReturn(Arrays.asList(proposal1,
+            proposal2, proposal3));
+
+        BaseObject ballot1 = mock(BaseObject.class);
+        BaseObject ballot2 = mock(BaseObject.class);
+        BaseObject ballot3 = mock(BaseObject.class);
+        BaseObject ballot4 = mock(BaseObject.class);
+        BaseObject ballot5 = mock(BaseObject.class);
+
+        when(this.document.getXObjects(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE))
+            .thenReturn(Arrays.asList(ballot1, ballot2, ballot3, ballot4, ballot5));
+
+        when(ballot1.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal1, proposal3, proposal2));
+        when(ballot2.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
+        when(ballot3.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
+        when(ballot4.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
+        when(ballot5.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal3, proposal1, proposal2));
+
+        Map<String, Integer> results = manager.getVoteResults(docRef);
+
+        assertEquals(1, results.get(proposal1));
+        assertEquals(2, results.get(proposal2));
+        assertEquals(0, results.get(proposal3));
     }
 }

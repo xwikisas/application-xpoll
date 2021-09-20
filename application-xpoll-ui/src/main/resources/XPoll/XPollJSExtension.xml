@@ -154,12 +154,13 @@
     $('.xpollSelect').change(function() {
       var changedElement = $(this);
       $('.xpollSelect').each(function() {
-        if ($(this).attr('proposal') != changedElement.attr('proposal') &amp;&amp; $(this).val() == changedElement.val())
+        if ($(this).data('proposal') != changedElement.data('proposal') &amp;&amp; $(this).val() ==
+        changedElement.val())
           $(this).find('option:eq(0)').prop('selected', true);
       });
 
       var hiddenField = '#option' + $(this).val();
-      var proposal = $(this).attr('proposal');
+      var proposal = $(this).data('proposal');
       $('.xpollHiddenInput').each(function() {
         if ($(this).val() == proposal)
           $(this).val('');
