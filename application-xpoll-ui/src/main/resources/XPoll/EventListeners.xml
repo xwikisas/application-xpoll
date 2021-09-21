@@ -182,7 +182,23 @@ xcontext.method.output.value = [new DocumentCreatingEvent(), new DocumentUpdatin
     <property>
       <code>{{groovy}}
 def docSource = xcontext.method.input.get(1);
-services.xpoll.updateWinner(docSource.getDocumentReference());
+def xwikiContext = xcontext.method.input.get(2);
+def pollObject = docSource.getObject('XPoll.XPollClass');
+if (pollObject != null) {
+  def voteResults = services.xpoll.getVoteResults(docSource.getDocumentReference());
+  def maxVotes = 0;
+  def currentWinners = [];
+  for (proposal in voteResults.entrySet()) {
+    if (proposal.getValue() == maxVotes) {
+      currentWinners.add(proposal.getKey());
+    } else if (proposal.getValue() > maxVotes) {
+      currentWinners.clear();
+      currentWinners.add(proposal.getKey());
+      maxVotes = proposal.getValue();
+    }
+  }
+  pollObject.set('winner', currentWinners.join(','), xwikiContext);
+}
 {{/groovy}}</code>
     </property>
     <property>
