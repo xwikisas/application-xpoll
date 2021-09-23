@@ -191,7 +191,7 @@ if (pollObject != null) {
   for (proposal in voteResults.entrySet()) {
     if (proposal.getValue() == maxVotes) {
       currentWinners.add(proposal.getKey());
-    } else if (proposal.getValue() > maxVotes) {
+    } else if (proposal.getValue() &gt; maxVotes) {
       currentWinners.clear();
       currentWinners.add(proposal.getKey());
       maxVotes = proposal.getValue();
