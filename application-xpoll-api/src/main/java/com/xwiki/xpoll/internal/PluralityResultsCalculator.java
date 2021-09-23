@@ -25,6 +25,13 @@ import java.util.Map;
 
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Calculates the results of a poll using the plurality method. The score of an entry is equal to the number of votes it
+ * got. The winner is the one with the most votes.
+ *
+ * @version $Id$
+ * @since 2.1
+ */
 public class PluralityResultsCalculator implements PollResultsCalculator
 {
     @Override

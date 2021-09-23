@@ -26,6 +26,14 @@ import java.util.Map;
 
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Calculates the result of a poll in a condorcet way. The Schulze algorithm is used to rank the entries of the poll.
+ * The winners of the poll are the entries satisfy the relation: p[E,X] >= p[X,E] where E is the winning entry, X any
+ * other entry and p[A,B] equals to the number of voters who prefer the entry A over B.
+ *
+ * @version $Id$
+ * @since 2.1
+ */
 public class CondorcetResultsCalculator implements PollResultsCalculator
 {
     @Override
