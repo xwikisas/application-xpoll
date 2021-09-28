@@ -128,7 +128,7 @@
       ; &lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;
       : #displayPollTitle()
     #end
-    (% class="row" %)
+    (% class="row inline-input-row" %)
     (((
     (% class="col-xs-12 col-sm-4" %)
       (((
@@ -483,6 +483,27 @@
 
 .count {
   color: $theme.textSecondaryColor;
+}
+@media (min-width: 768px) {
+  .inline-input-row>.col-sm-4>dl {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .inline-input-row>.col-sm-4 {
+    float: none;
+    height: 100%;
+    display: table-cell;
+    vertical-align: top;
+    padding-bottom: 1em;
+  }
+
+  .inline-input-row {
+    height: 100%;
+    display: table;
+  }
 }</code>
     </property>
     <property>
