@@ -151,12 +151,14 @@
         }
       });
     });
+    // Make sure the other proposals don't use the same value (index).
     $('.xpollSelect').change(function() {
       var changedElement = $(this);
       $('.xpollSelect').each(function() {
-        if ($(this).data('proposal') != changedElement.data('proposal') &amp;&amp; $(this).val() ==
-        changedElement.val())
-          $(this).find('option:eq(0)').prop('selected', true);
+        if ($(this).data('proposal') != changedElement.data('proposal') &amp;&amp; $(this).val() == changedElement.val()) {
+        // Reset the value because we can't have two proposals with the same value (index).
+          $(this).val('');
+        }
       });
 
       var hiddenField = '#option' + $(this).val();

@@ -154,7 +154,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>0=Allow multiple options|1=Can select a single option|2=Allow multiple options in order</values>
+        <values>multi=Allow multiple options|single=Can select a single option|condorcet=Allow multiple options in order</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
       <winner>

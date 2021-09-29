@@ -24,6 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -34,48 +39,53 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 2.1
  */
-public class CondorcetResultsCalculator implements PollResultsCalculator
+@Component
+@Named("condorcet")
+@Singleton
+public class CondorcetPollResultsCalculator extends AbstractPollResultsCalculator
 {
     @Override
-    public Map<String, Integer> getResults(List<BaseObject> xpollVotes,
+    public Map<String, Integer> calculateResults(List<BaseObject> xpollVotes,
         List<String> proposals)
     {
-        Map<String, Map<String, Integer>> ballotsMatrix = new HashMap<>();
-
-        for (String proposal : proposals) {
-            ballotsMatrix.put(proposal, new HashMap<>());
-            for (String s : proposals) {
-                ballotsMatrix.get(proposal).put(s, 0);
-            }
-        }
+        Map<String, Map<String, Integer>> ballotsMatrix = initializeProposalsMap(proposals);
 
         computeProposalWeights(xpollVotes, ballotsMatrix, proposals);
 
-        Map<String, Map<String, Integer>> p = new HashMap<>();
-        for (String proposal : proposals) {
-            p.put(proposal, new HashMap<>());
-            for (String s : proposals) {
-                p.get(proposal).put(s, 0);
-            }
-        }
+        Map<String, Map<String, Integer>> computedPreferences = initializeProposalsMap(proposals);
 
-        computeProposalStronghestPaths(proposals, ballotsMatrix, p);
+        computeProposalStronghestPaths(proposals, ballotsMatrix, computedPreferences);
 
         Map<String, Integer> scores = new HashMap<>();
         // E wins since p[E,X] >= p[X,E] for every other candidate X.
-        for (String p1 : p.keySet()) {
-            for (String p2 : p.get(p1).keySet()) {
-                int value = scores.getOrDefault(p1, 0);
-                if (!p1.equals(p2)) {
-                    if (p.get(p1).getOrDefault(p2, 0) >= p.get(p2).getOrDefault(p1, 0)) {
-                        scores.put(p1, ++value);
+        for (String preference1 : computedPreferences.keySet()) {
+            for (String preference2 : computedPreferences.get(preference1).keySet()) {
+                int value = scores.getOrDefault(preference1, 0);
+                if (!preference1.equals(preference2)) {
+                    if (computedPreferences.get(preference1).get(preference2) >= computedPreferences
+                        .get(preference2).get(preference1))
+                    {
+                        scores.put(preference1, ++value);
                     } else {
-                        scores.put(p1, value);
+                        scores.put(preference1, value);
                     }
                 }
             }
         }
         return scores;
+    }
+
+    private Map<String, Map<String, Integer>> initializeProposalsMap(List<String> proposals)
+    {
+        Map<String, Map<String, Integer>> map = new HashMap<>();
+
+        for (String proposal : proposals) {
+            map.put(proposal, new HashMap<>());
+            for (String otherProposal : proposals) {
+                map.get(proposal).put(otherProposal, 0);
+            }
+        }
+        return map;
     }
 
     private void computeProposalStronghestPaths(List<String> proposals, Map<String, Map<String, Integer>> ballotsMatrix,

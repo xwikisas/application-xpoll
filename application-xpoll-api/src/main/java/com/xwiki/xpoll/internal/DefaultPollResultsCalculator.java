@@ -23,6 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -32,10 +36,12 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 2.1
  */
-public class PluralityResultsCalculator implements PollResultsCalculator
+@Component
+@Singleton
+public class DefaultPollResultsCalculator extends AbstractPollResultsCalculator
 {
     @Override
-    public Map<String, Integer> getResults(List<BaseObject> xpollVotes, List<String> proposals)
+    public Map<String, Integer> calculateResults(List<BaseObject> xpollVotes, List<String> proposals)
     {
         Map<String, Integer> voteCount = new HashMap<>();
         for (String proposal : proposals) {

@@ -33,6 +33,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -43,6 +45,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xwiki.xpoll.PollResultsCalculator;
 import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
 
@@ -74,7 +77,7 @@ public class DefaultXPollManager implements XPollManager
 
     static final String XPOLL_TYPE = "type";
 
-    private static final String MISSING_XPOLL_OBJECT_MESSAGE = "The document [%s] does not have a poll object.";
+    static final String MISSING_XPOLL_OBJECT_MESSAGE = "The document [%s] does not have a poll object.";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -83,12 +86,15 @@ public class DefaultXPollManager implements XPollManager
     @Named("compactwiki")
     private EntityReferenceSerializer<String> serializer;
 
+    @Inject
+    private ComponentManager componentManager;
+
     @Override
     public void vote(DocumentReference docReference, DocumentReference user, List<String> votedProposals)
         throws XPollException
     {
         XWikiContext context = contextProvider.get();
-        XWikiDocument document = null;
+        XWikiDocument document;
         try {
             document = context.getWiki().getDocument(docReference, context);
             setUserVotes(votedProposals, context, document, user);
@@ -130,32 +136,18 @@ public class DefaultXPollManager implements XPollManager
         XWikiContext context = contextProvider.get();
         try {
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
-            List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASS_REFERENCE);
             BaseObject xpollObj = doc.getXObject(XPOLL_CLASS_REFERENCE);
             if (xpollObj == null) {
                 throw new XPollException(String.format(MISSING_XPOLL_OBJECT_MESSAGE,
                     documentReference));
             }
-            List<String> proposals = xpollObj.getListValue(PROPOSALS);
             String pollType = xpollObj.getStringValue(XPOLL_TYPE);
 
-            return getXPollResults(xpollVotes, proposals, pollType);
+            return getXPollResults(documentReference, pollType);
         } catch (XWikiException e) {
             throw new XPollException(String
                 .format("Failed to retrieve the vote results for poll [%s]. Root cause: [%s].", documentReference,
                     ExceptionUtils.getRootCauseMessage(e)));
-        }
-    }
-
-    @Override
-    public void determineWinner(DocumentReference documentReference) throws XPollException
-    {
-        try {
-            XWikiContext context = contextProvider.get();
-            XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
-            updateWinner(context, doc);
-        } catch (XWikiException e) {
-            throw new XPollException(String.format(MISSING_XPOLL_OBJECT_MESSAGE, documentReference));
         }
     }
 
@@ -183,13 +175,10 @@ public class DefaultXPollManager implements XPollManager
             throw new XPollException(String.format(MISSING_XPOLL_OBJECT_MESSAGE,
                 doc.getDocumentReference()));
         }
-        List<BaseObject> xpollVotes = doc.getXObjects(XPOLL_VOTES_CLASS_REFERENCE);
-
-        List<String> proposals = xpollObj.getListValue(PROPOSALS);
 
         String pollType = xpollObj.getStringValue(XPOLL_TYPE);
 
-        Map<String, Integer> voteCount = getXPollResults(xpollVotes, proposals, pollType);
+        Map<String, Integer> voteCount = getXPollResults(doc.getDocumentReference(), pollType);
 
         List<String> currentWinners = findWinner(voteCount);
 
@@ -213,11 +202,15 @@ public class DefaultXPollManager implements XPollManager
         return currentWinners;
     }
 
-    private Map<String, Integer> getXPollResults(List<BaseObject> xpollVotes, List<String> proposals, String pollType)
+    private Map<String, Integer> getXPollResults(DocumentReference documentReference, String pollType)
+        throws XPollException
     {
-        if ("2".equals(pollType)) {
-            return new CondorcetResultsCalculator().getResults(xpollVotes, proposals);
+        try {
+            PollResultsCalculator calculator = componentManager.getInstance(PollResultsCalculator.class, pollType);
+            return calculator.getResults(documentReference);
+        } catch (ComponentLookupException e) {
+            throw new XPollException(String.format(
+                "The results could not be calculated because the poll type [%s] lacks an implementation.", pollType));
         }
-        return new PluralityResultsCalculator().getResults(xpollVotes, proposals);
     }
 }

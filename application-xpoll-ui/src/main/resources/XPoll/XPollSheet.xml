@@ -94,7 +94,7 @@
       #else
         &lt;label&gt;
          ## condorcet method
-         #if ($pollObj.getValue('type') == '2')
+         #if ($pollObj.getValue('type') == 'condorcet')
            #set ($indexOfProposal = $votes.indexOf($proposal) + 1)
            #set ($noOption = '')
            #if ($indexOfProposal &lt;  1)
@@ -103,16 +103,18 @@
 
            #if ($isCurrentUser &amp;&amp; $pollObj.getValue('status') == 'active')
              &lt;select class="xpollSelect" data-proposal="$proposal"&gt;
-               &lt;option disabled $noOption value&gt;$services.localization.render('contrib.xpoll.vote.select')&lt;/option&gt;
-               #foreach ($nr in $proposals)
-                 &lt;option value="$foreach.count" #if($foreach.count ==$indexOfProposal)selected#end&gt;
-                   #$foreach.count
+               &lt;option disabled $noOption value=""&gt;
+                 $services.localization.render('contrib.xpoll.vote.select')
+               &lt;/option&gt;
+               #foreach ($index in [1..$proposals.size()])
+                 &lt;option value="$index" #if($index == $indexOfProposal)selected#end&gt;
+                   #$index
                  &lt;/option&gt;
                #end
              &lt;/select&gt;
              ## hidden inputs
              &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$user"
-                type="hidden"/&gt;
+               type="hidden"/&gt;
            #else
              &lt;input type="checkbox" name="$user" $checked $disabled /&gt;
              #if ($indexOfProposal &gt; 0)
@@ -122,8 +124,8 @@
          ## single option / multiple options
          #else
            &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-           #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
-           $disabled /&gt;
+             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
+             $disabled /&gt;
          #end
         &lt;/label&gt;
       #end
@@ -145,7 +147,7 @@
   #end
 #end
 ## Flag to know wheter the options must be displayed as checkbox or radio inputs.
-#set ($isRadio = $pollObj.getProperty('type').value == 1)
+#set ($isRadio = $pollObj.getProperty('type').value == 'single')
 #if ($xcontext.action == 'edit' || $status == 'inpreparation')
   {{html wiki='true' clean='false'}}
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))

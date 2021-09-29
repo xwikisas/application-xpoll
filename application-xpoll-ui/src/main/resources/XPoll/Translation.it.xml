@@ -63,8 +63,8 @@ XPoll.XPollClass_status_active=Attivo
 XPoll.XPollClass_status_finished=Finito
 XPoll.XPollClass_status_inpreparation=In preparazione
 XPoll.XPollClass_type_hint=Un sondaggio può essere configurato per richiedere solo uno o più valori
-XPoll.XPollClass_type_0=Consenti più opzioni
-XPoll.XPollClass_type_1=È possibile selezionare una singola opzione
+XPoll.XPollClass_type_multi=Consenti più opzioni
+XPoll.XPollClass_type_single=È possibile selezionare una singola opzione
 
 ## Livetable
 xpoll.livetable._actions=Azioni

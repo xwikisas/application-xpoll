@@ -30,6 +30,8 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -41,6 +43,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xwiki.xpoll.PollResultsCalculator;
 import com.xwiki.xpoll.XPollException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,8 +62,13 @@ class DefaultXPollManagerTest
     @InjectMockComponents
     private DefaultXPollManager manager;
 
+    @InjectMockComponents
+    private CondorcetPollResultsCalculator calculator;
+
     @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    @MockComponent ComponentManager componentManager;
 
     @Mock
     private XWikiContext xWikiContext;
@@ -78,9 +86,10 @@ class DefaultXPollManagerTest
     private BaseObject xpollObj;
 
     @BeforeEach
-    void setup()
+    void setup() throws ComponentLookupException
     {
         when(this.contextProvider.get()).thenReturn(this.xWikiContext);
+        when(this.componentManager.getInstance(PollResultsCalculator.class, "condorcet")).thenReturn(calculator);
     }
 
     @Test
@@ -97,7 +106,7 @@ class DefaultXPollManagerTest
     }
 
     @Test
-    void getVoteResultsWithEmptyTypeAndNoVotes() throws XWikiException, XPollException
+    void getVoteResultsWithNoVotes() throws XWikiException, XPollException
     {
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
 
@@ -107,11 +116,12 @@ class DefaultXPollManagerTest
         when(this.xpollObj.getListValue(DefaultXPollManager.PROPOSALS)).thenReturn(Arrays.asList("Proposal1",
             "Proposal2", "Proposal3"));
         when(this.document.getXObjects(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE)).thenReturn(new ArrayList<>());
+        when(this.xpollObj.getStringValue(DefaultXPollManager.XPOLL_TYPE)).thenReturn("condorcet");
 
         Map<String, Integer> results = manager.getVoteResults(docRef);
 
         assertEquals(3, results.size());
-        assertEquals(new HashSet<>(Collections.singletonList(0)), new HashSet<>(results.values()));
+        assertEquals(new HashSet<>(Collections.singletonList(2)), new HashSet<>(results.values()));
     }
 
     @Test
@@ -121,7 +131,7 @@ class DefaultXPollManagerTest
         when(this.xWikiContext.getWiki()).thenReturn(this.wiki);
         when(this.wiki.getDocument(docRef, this.xWikiContext)).thenReturn(this.document);
         when(this.document.getXObject(DefaultXPollManager.XPOLL_CLASS_REFERENCE)).thenReturn(this.xpollObj);
-        when(this.xpollObj.getStringValue(DefaultXPollManager.XPOLL_TYPE)).thenReturn("2");
+        when(this.xpollObj.getStringValue(DefaultXPollManager.XPOLL_TYPE)).thenReturn("condorcet");
 
         String proposal1 = "Proposal1";
         String proposal2 = "Proposal2";

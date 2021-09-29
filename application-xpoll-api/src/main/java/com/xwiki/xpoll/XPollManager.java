@@ -59,12 +59,5 @@ public interface XPollManager
      * @throws XPollException thrown if the document is missing or if it lacks a poll.
      */
     Map<String, Integer> getVoteResults(DocumentReference documentReference) throws XPollException;
-
-    /**
-     * Calculates the winner of the XPoll present in the document and saves it.
-     *
-     * @param documentReference a document reference
-     * @throws XPollException thrown if the document is missing or if it lacks a poll.
-     */
-    void determineWinner(DocumentReference documentReference) throws XPollException;
+    
 }

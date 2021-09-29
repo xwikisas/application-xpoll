@@ -17,24 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xwiki.xpoll.internal;
+package com.xwiki.xpoll;
 
-import java.util.List;
 import java.util.Map;
 
-import com.xpn.xwiki.objects.BaseObject;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 /**
  * Provides a method for getting the results of a poll.
  *
  * @version $Id$
  * @since 2.1
  */
+@Role
+@Unstable
 public interface PollResultsCalculator
 {
     /**
-     * @param xpollVotes a list of ballots (the users and their voted proposals)
-     * @param proposals a list of all the proposals available
+     * @param documentReference a document containing a poll
      * @return a map containing each proposal and it's score
+     * @throws XPollException if the document doesn't exist or it doesn't contain a poll
      */
-    Map<String, Integer> getResults(List<BaseObject> xpollVotes, List<String> proposals);
+    Map<String, Integer> getResults(DocumentReference documentReference) throws XPollException;
 }
