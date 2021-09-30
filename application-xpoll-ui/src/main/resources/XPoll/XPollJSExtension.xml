@@ -138,12 +138,12 @@
           this.progressNotification = new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saving')", 'inprogress');
         },
         complete:function() {
-          // disable inprogress notification widget
+          // Disable inprogress notification widget.
           this.progressNotification.hide();
         },
         success: function(data) {
           new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saved')", 'done');
-          //reload just the form with the id="xpollSaveForm" which contains the table
+          // Reload just the form with the id="xpollSaveForm" which contains the table.
           $('#xpollSaveForm').load(XWiki.currentDocument.getURL('get') +  ' #xpollSaveForm&gt;*');
         },
         error: function(data) {
@@ -156,7 +156,7 @@
       var changedElement = $(this);
       $('.xpollSelect').each(function() {
         if ($(this).data('proposal') != changedElement.data('proposal') &amp;&amp; $(this).val() == changedElement.val()) {
-        // Reset the value because we can't have two proposals with the same value (index).
+          // Reset the value because we can't have two proposals with the same value (index).
           $(this).val('');
         }
       });
@@ -164,8 +164,9 @@
       var hiddenField = '#option' + $(this).val();
       var proposal = $(this).data('proposal');
       $('.xpollHiddenInput').each(function() {
-        if ($(this).val() == proposal)
+        if ($(this).val() == proposal) {
           $(this).val('');
+        }
       });
 
       $(hiddenField).val(proposal);

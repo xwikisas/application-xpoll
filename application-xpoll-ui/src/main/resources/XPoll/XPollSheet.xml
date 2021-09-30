@@ -93,11 +93,11 @@
         #if($isChecked)X#end
       #else
         &lt;label&gt;
-         ## condorcet method
+         ## Display the inputs for the condorcet polls.
          #if ($pollObj.getValue('type') == 'condorcet')
            #set ($indexOfProposal = $votes.indexOf($proposal) + 1)
            #set ($noOption = '')
-           #if ($indexOfProposal &lt;  1)
+           #if ($indexOfProposal &lt; 1)
              #set ($noOption = 'selected')
            #end
 
@@ -112,7 +112,7 @@
                  &lt;/option&gt;
                #end
              &lt;/select&gt;
-             ## hidden inputs
+             ## The hidden inputs that will have the values sent by the form.
              &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$user"
                type="hidden"/&gt;
            #else
@@ -121,7 +121,7 @@
                &lt;span class="label label-primary"&gt;#$indexOfProposal&lt;/span&gt;
              #end
            #end
-         ## single option / multiple options
+         ## Display the inputs for the normal polls.
          #else
            &lt;input type="#if($isRadio)radio#{else}checkbox#end"
              #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
