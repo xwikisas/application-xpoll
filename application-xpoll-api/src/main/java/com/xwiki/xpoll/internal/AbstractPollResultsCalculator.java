@@ -63,8 +63,8 @@ public abstract class AbstractPollResultsCalculator implements PollResultsCalcul
 
             return calculateResults(xpollVotes, proposals);
         } catch (XWikiException e) {
-            throw new XPollException(String.format(DefaultXPollManager.MISSING_XPOLL_OBJECT_MESSAGE, documentReference),
-                e);
+            throw new XPollException(String.format("Failed to compute the results for the poll [%s].",
+                documentReference), e);
         }
     }
 

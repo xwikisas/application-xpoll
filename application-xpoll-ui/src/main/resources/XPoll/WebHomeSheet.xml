@@ -37,6 +37,22 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set($oldPolls = $services.query.xwql('where doc.object(XPoll.XPollClass).type in (:types)').bindValue('types', ['0', '1']).setLimit(1).execute())
+#set($needsMigration = $oldPolls.size() &gt; 0)
+
+#if ($needsMigration)
+  {{warning cssClass='xpoll-migration-warning'}}
+    $escapetool.xml($services.localization.render('polls.migration.shouldmigrate'))
+    #if($hasAdmin)
+      $escapetool.xml($services.localization.render('xpoll.migration.migrate'))
+      [[$escapetool.xml($services.localization.render('xpoll.migration.linktext'))&gt;&gt;||]]
+      #set ($discard = $xwiki.jsx.use('XPoll.XPollMigration'))
+    #else
+      $escapetool.xml($services.localization.render('xpoll.migration.notifyadmin'))
+    #end
+  {{/warning}}
+#end
+
 $services.localization.render('contrib.xpoll.WebHome.description')
 #set($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', 'true'))
 #set($docextras = [])

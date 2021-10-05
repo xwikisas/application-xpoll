@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +69,12 @@ class DefaultXPollManagerTest
     @MockComponent
     private Provider<XWikiContext> contextProvider;
 
-    @MockComponent ComponentManager componentManager;
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @MockComponent
+    private ComponentManager componentManager;
 
     @Mock
     private XWikiContext xWikiContext;
@@ -89,7 +95,8 @@ class DefaultXPollManagerTest
     void setup() throws ComponentLookupException
     {
         when(this.contextProvider.get()).thenReturn(this.xWikiContext);
-        when(this.componentManager.getInstance(PollResultsCalculator.class, "condorcet")).thenReturn(calculator);
+        when(this.componentManagerProvider.get()).thenReturn(this.componentManager);
+        when(this.componentManager.getInstance(PollResultsCalculator.class, "condorcet")).thenReturn(this.calculator);
     }
 
     @Test

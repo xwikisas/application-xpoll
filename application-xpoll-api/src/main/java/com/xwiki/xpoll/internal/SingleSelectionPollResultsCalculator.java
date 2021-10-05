@@ -25,6 +25,11 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 
 /**
+ * An empty implementation of the DefaultPollResultsCalculator with the sole purpose of mapping the type of a poll
+ * (Single option, Multiple Option, Condorcet Poll) with a way to calculate its results. Since the Multiple Option and
+ * Single Option polls have their winner calculated in the same manner, they will inherit the behaviour of a common
+ * parent.
+ *
  * @version $Id$
  * @since 2.1
  */

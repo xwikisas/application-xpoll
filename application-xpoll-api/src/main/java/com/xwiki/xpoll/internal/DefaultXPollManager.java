@@ -87,7 +87,8 @@ public class DefaultXPollManager implements XPollManager
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Override
     public void vote(DocumentReference docReference, DocumentReference user, List<String> votedProposals)
@@ -206,7 +207,9 @@ public class DefaultXPollManager implements XPollManager
         throws XPollException
     {
         try {
-            PollResultsCalculator calculator = componentManager.getInstance(PollResultsCalculator.class, pollType);
+            ComponentManager componentManager = componentManagerProvider.get();
+            PollResultsCalculator calculator = componentManager.getInstance(PollResultsCalculator.class,
+                pollType);
             return calculator.getResults(documentReference);
         } catch (ComponentLookupException e) {
             throw new XPollException(String.format(

@@ -102,9 +102,9 @@
            #end
 
            #if ($isCurrentUser &amp;&amp; $pollObj.getValue('status') == 'active')
-             &lt;select class="xpollSelect" data-proposal="$proposal"&gt;
+             &lt;select class="xpollSelect" data-proposal="$escapetool.xml($proposal)"&gt;
                &lt;option disabled $noOption value=""&gt;
-                 $services.localization.render('contrib.xpoll.vote.select')
+                 $escapetool.xml($services.localization.render('contrib.xpoll.vote.select'))
                &lt;/option&gt;
                #foreach ($index in [1..$proposals.size()])
                  &lt;option value="$index" #if($index == $indexOfProposal)selected#end&gt;
@@ -113,10 +113,10 @@
                #end
              &lt;/select&gt;
              ## The hidden inputs that will have the values sent by the form.
-             &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$user"
+             &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$escapetool.xml($user)"
                type="hidden"/&gt;
            #else
-             &lt;input type="checkbox" name="$user" $checked $disabled /&gt;
+             &lt;input type="checkbox" name="$escapetool.xml($user)" $checked $disabled /&gt;
              #if ($indexOfProposal &gt; 0)
                &lt;span class="label label-primary"&gt;#$indexOfProposal&lt;/span&gt;
              #end
@@ -124,7 +124,8 @@
          ## Display the inputs for the normal polls.
          #else
            &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
+             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$escapetool.xml($user)"
+             value="$escapetool.xml($proposal)" $checked
              $disabled /&gt;
          #end
         &lt;/label&gt;
@@ -139,6 +140,36 @@
 #set ($status = $pollObj.getValue('status'))
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
+## Check if the document needs migration
+
+#set($type = $pollObj.getValue('type'))
+#set ($types = {
+  '0': 'multi',
+  '1': 'single'
+})
+#set ($canMigrate = $hasEdit || $hasAdmin)
+#if ($types.get($type))
+  #if ($request.migrate &amp;&amp; $canMigrate)
+      #set ($discard = $doc.use($pollObj))
+      $doc.set('type', $types.get($type))
+      $xwiki.getXWiki().saveDocument($doc, $services.localization.render('xpoll.migration.migrated'), $xcontext.context)
+  #else
+    {{warning}}
+    $escapetool.xml($services.localization.render('xpoll.migration.shouldmigrate'))
+    #if ($canMigrate)
+        $escapetool.xml($services.localization.render('xpoll.migration.migrate'))
+        #set ($queryString = $escapetool.url({
+          'migrate': 'true'
+        }))
+        [[$escapetool.xml($services.localization.render('xpoll.migration.linktext'))&gt;&gt;||queryString="$queryString"]]
+    #else
+      $escapetool.xml($services.localization.render('xpoll.migration.notifyAdmin'))
+    #end
+    {{/warning}}
+  #end
+#end
+
+## End
 #if ($xcontext.action == 'view' &amp;&amp; $status == 'inpreparation')
   #if ($hasEdit)
     $services.localization.render('contrib.xpoll.preparation.hasRight')

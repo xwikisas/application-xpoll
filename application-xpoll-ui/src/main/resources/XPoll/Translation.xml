@@ -74,6 +74,17 @@ XPoll.XPollClass_type_multi=Allow multiple options
 XPoll.XPollClass_type_single=Can select a single option
 XPoll.XPollClass_type_condorcet=Allow multiple options in order
 
+## Migration
+
+xpoll.migration.shouldmigrate=This poll is incompatible with the new version of the XWiki Poll Application.
+xpoll.migration.migrate=If you wish to fix this issue, follow the link below.
+xpoll.migration.notifyAdmin=Please notify the administrator with regards to this issue.
+xpoll.migration.linktext=Click here to migrate.
+xpoll.migration.migrated=Migrated
+
+polls.migration.shouldmigrate=There are polls that are incompatible with the new version of the XWiki Poll Application.
+polls.migration.failed=Migration Failed!
+
 ## Livetable
 xpoll.livetable._actions=Actions
 xpoll.livetable.emptyvalue=-
