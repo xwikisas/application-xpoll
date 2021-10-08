@@ -42,13 +42,13 @@
 
 #if ($needsMigration)
   {{warning cssClass='xpoll-migration-warning'}}
-    $escapetool.xml($services.localization.render('polls.migration.shouldmigrate'))
+    {{translation key="xpoll.migration.shouldMigrateAll" /}}
     #if($hasAdmin)
-      $escapetool.xml($services.localization.render('xpoll.migration.migrate'))
-      [[$escapetool.xml($services.localization.render('xpoll.migration.linktext'))&gt;&gt;||]]
+      {{translation key="xpoll.migration.migrate" /}}
+      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;||]]
       #set ($discard = $xwiki.jsx.use('XPoll.XPollMigration'))
     #else
-      $escapetool.xml($services.localization.render('xpoll.migration.notifyadmin'))
+      {{translation key="xpoll.migration.notifyAdmin" /}}
     #end
   {{/warning}}
 #end

@@ -79,7 +79,7 @@
 #end
 #macro(displayInput $votes $isCurrentUser $user)
   #set ($disabled = '')
-  #if (!$isCurrentUser)
+  #if (!$isCurrentUser || $pollObj.getValue('status') != 'active')
     #set ($disabled = 'disabled')
   #end
   #foreach ($proposal in $proposals)
@@ -101,7 +101,7 @@
              #set ($noOption = 'selected')
            #end
 
-           #if ($isCurrentUser &amp;&amp; $pollObj.getValue('status') == 'active')
+           #if (!$disabled)
              &lt;select class="xpollSelect" data-proposal="$escapetool.xml($proposal)"&gt;
                &lt;option disabled $noOption value=""&gt;
                  $escapetool.xml($services.localization.render('contrib.xpoll.vote.select'))
@@ -142,34 +142,30 @@
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
 ## Check if the document needs migration
 
-#set($type = $pollObj.getValue('type'))
+#set ($type = $pollObj.getValue('type'))
 #set ($types = {
   '0': 'multi',
   '1': 'single'
 })
 #set ($canMigrate = $hasEdit || $hasAdmin)
-#if ($types.get($type))
+#if ($types.containsKey($type))
   #if ($request.migrate &amp;&amp; $canMigrate)
       #set ($discard = $doc.use($pollObj))
-      $doc.set('type', $types.get($type))
-      $xwiki.getXWiki().saveDocument($doc, $services.localization.render('xpoll.migration.migrated'), $xcontext.context)
+      #set ($discard = $doc.set('type', $types.get($type)))
+      #set ($discard = $doc.save($services.localization.render('xpoll.migration.migrated')))
   #else
     {{warning}}
-    $escapetool.xml($services.localization.render('xpoll.migration.shouldmigrate'))
+    {{translation key="xpoll.migration.shouldMigrateOne" /}}
     #if ($canMigrate)
-        $escapetool.xml($services.localization.render('xpoll.migration.migrate'))
-        #set ($queryString = $escapetool.url({
-          'migrate': 'true'
-        }))
-        [[$escapetool.xml($services.localization.render('xpoll.migration.linktext'))&gt;&gt;||queryString="$queryString"]]
+      {{translation key="xpoll.migration.migrate" /}}
+      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;||queryString="migrate=true"]]
     #else
-      $escapetool.xml($services.localization.render('xpoll.migration.notifyAdmin'))
+      {{translation key="xpoll.migration.notifyAdmin" /}}
     #end
     {{/warning}}
   #end
 #end
 
-## End
 #if ($xcontext.action == 'view' &amp;&amp; $status == 'inpreparation')
   #if ($hasEdit)
     $services.localization.render('contrib.xpoll.preparation.hasRight')

@@ -156,17 +156,17 @@ public class DefaultXPollManager implements XPollManager
         DocumentReference user) throws XWikiException
     {
         String currentUserName = serializer.serialize(user, doc.getDocumentReference().getWikiReference().getName());
-        BaseObject xpollVoteOfCUrrentUser = doc.getXObject(XPOLL_VOTES_CLASS_REFERENCE, USER,
+        BaseObject xpollVoteOfCurrentUser = doc.getXObject(XPOLL_VOTES_CLASS_REFERENCE, USER,
             currentUserName, false);
 
-        if (xpollVoteOfCUrrentUser == null) {
-            xpollVoteOfCUrrentUser = doc.newXObject(XPOLL_VOTES_CLASS_REFERENCE, context);
+        if (xpollVoteOfCurrentUser == null) {
+            xpollVoteOfCurrentUser = doc.newXObject(XPOLL_VOTES_CLASS_REFERENCE, context);
         }
 
         List<String> filteredProposals = votedProposals.stream().filter(p -> !p.isEmpty()).collect(Collectors.toList());
 
-        xpollVoteOfCUrrentUser.set(USER, currentUserName, context);
-        xpollVoteOfCUrrentUser.set(VOTES, filteredProposals, context);
+        xpollVoteOfCurrentUser.set(USER, currentUserName, context);
+        xpollVoteOfCurrentUser.set(VOTES, filteredProposals, context);
     }
 
     private void updateWinner(XWikiContext context, XWikiDocument doc) throws XWikiException, XPollException
@@ -184,6 +184,8 @@ public class DefaultXPollManager implements XPollManager
         List<String> currentWinners = findWinner(voteCount);
 
         xpollObj.set(WINNER, String.join(",", currentWinners), context);
+        doc.setAuthorReference(context.getAuthorReference());
+        context.getWiki().saveDocument(doc, "New Vote", context);
     }
 
     private List<String> findWinner(Map<String, Integer> voteCount)

@@ -37,20 +37,19 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($hasAdmin)
+#if ($hasAdmin &amp;&amp; $request.migrate &amp;&amp; $services.csrf.isTokenValid($request.token))
   #set ($xpollPages = $services.query.xwql('where doc.object(XPoll.XPollClass).type in (:types)').bindValue('types', ['0', '1']).execute())
   #set ($types = {
     '0': 'multi',
     '1': 'single'
   })
   #foreach ($item in $xpollPages)
-    #set($docRef = $services.model.resolveDocument($item))
-    #set($document = $xwiki.getDocument($docRef))
-    #set($xpollObj = $document.getObject('XPoll.XPollClass'))
-    #set($pollType = $xpollObj.getValue('type'))
+    #set ($document = $xwiki.getDocument($item))
+    #set ($xpollObj = $document.getObject('XPoll.XPollClass'))
+    #set ($pollType = $xpollObj.getValue('type'))
     #set ($discard = $document.use($pollObj))
-    $document.set('type', $types.get($pollType))
-    $xwiki.getXWiki().saveDocument($document, $services.localization.render('xpoll.migration.migrated'), $xcontext.context)
+    #set ($discard = $document.set('type', $types.get($pollType)))
+    #set ($discard = $document.save($services.localization.render('xpoll.migration.migrated')))
   #end
 #end
 {{/velocity}}</content>
@@ -145,18 +144,21 @@
   $(document).ready(function() {
     $('.xpoll-migration-warning a').click(function(event) {
       event.preventDefault();
-      var loadingElement = $(this);
-      $(this).addClass('loading');
-      $.post("$xwiki.getURL($services.model.resolveDocument('XPoll.XPollMigration'))")
+      var warningDiv = $('.xpoll-migration-warning');
+      var progressNotification = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.inProgress')), 'inprogress');
+
+      warningDiv.hide();
+      $.post(new XWiki.Document('XPollMigration', 'XPoll').getURL('get', 'migrate=true&amp;token=$services.csrf.getToken()'))
         .done(function() {
-          new XWiki.widgets.Notification("$services.localization.render('xpoll.migration.migrated')", 'done');
-          $('.xpoll-migration-warning').remove();
+          new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.migrated')), 'done');
+          warningDiv.remove();
         })
         .fail(function(e) {
-          new XWiki.widgets.Notification("$services.localization.render('polls.migration.failed', 'HTTP Error')", 'error');
+          new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.failed')), 'error');
+          warningDiv.show();
         })
         .always(function() {
-          loadingElement.removeClass('loading');
+          progressNotification.hide();
         });
     });
 
@@ -170,7 +172,7 @@
       <parse>1</parse>
     </property>
     <property>
-      <use/>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

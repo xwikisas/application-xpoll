@@ -161,14 +161,13 @@
         }
       });
 
-      var hiddenField = '#option' + $(this).val();
       var proposal = $(this).data('proposal');
       $('.xpollHiddenInput').each(function() {
         if ($(this).val() == proposal) {
           $(this).val('');
         }
       });
-
+      var hiddenField = '#option' + $(this).val();
       $(hiddenField).val(proposal);
     });
   });
