@@ -47,8 +47,7 @@
     #set ($document = $xwiki.getDocument($item))
     #set ($xpollObj = $document.getObject('XPoll.XPollClass'))
     #set ($pollType = $xpollObj.getValue('type'))
-    #set ($discard = $document.use($pollObj))
-    #set ($discard = $document.set('type', $types.get($pollType)))
+    #set ($discard = $xpollObj.set('type', $types.get($pollType)))
     #set ($discard = $document.save($services.localization.render('xpoll.migration.migrated')))
   #end
 #end

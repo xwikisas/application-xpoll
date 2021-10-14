@@ -97,7 +97,7 @@ public class DefaultXPollManager implements XPollManager
         XWikiContext context = contextProvider.get();
         XWikiDocument document;
         try {
-            document = context.getWiki().getDocument(docReference, context);
+            document = context.getWiki().getDocument(docReference, context).clone();
             setUserVotes(votedProposals, context, document, user);
             updateWinner(context, document);
         } catch (XWikiException e) {
