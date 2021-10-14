@@ -83,7 +83,7 @@ xpoll.migration.linkText=Click here to migrate.
 xpoll.migration.migrated=Migrated
 xpoll.migration.shouldMigrateAll=There are polls that are incompatible with the new version of the XWiki Poll Application.
 xpoll.migration.failed=Migration Failed!
-xpoll.migration.inProgress=MIgrating
+xpoll.migration.inProgress=Migrating
 
 ## Livetable
 xpoll.livetable._actions=Actions

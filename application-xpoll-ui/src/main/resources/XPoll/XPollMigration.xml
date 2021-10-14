@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($hasAdmin &amp;&amp; $request.migrate &amp;&amp; $services.csrf.isTokenValid($request.token))
+#if ($hasAdmin &amp;&amp; $request.migrate &amp;&amp; $services.csrf.isTokenValid($request.form_token))
   #set ($xpollPages = $services.query.xwql('where doc.object(XPoll.XPollClass).type in (:types)').bindValue('types', ['0', '1']).execute())
   #set ($types = {
     '0': 'multi',
@@ -140,25 +140,22 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function ($) {
-  $(document).ready(function() {
+      <code>require(['jquery', 'xwiki-meta'], function ($, xwikiMeta) {
+  $(function() {
     $('.xpoll-migration-warning a').click(function(event) {
       event.preventDefault();
       var warningDiv = $('.xpoll-migration-warning');
       var progressNotification = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.inProgress')), 'inprogress');
 
       warningDiv.hide();
-      $.post(new XWiki.Document('XPollMigration', 'XPoll').getURL('get', 'migrate=true&amp;token=$services.csrf.getToken()'))
+      $.post(new XWiki.Document('XPollMigration', 'XPoll').getURL('get', 'migrate=true&amp;form_token=' + xwikiMeta.form_token))
         .done(function() {
-          new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.migrated')), 'done');
+          progressNotification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.migrated')), 'done'));
           warningDiv.remove();
         })
         .fail(function(e) {
-          new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.failed')), 'error');
+          progressNotification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.failed')), 'error'));
           warningDiv.show();
-        })
-        .always(function() {
-          progressNotification.hide();
         });
     });
 

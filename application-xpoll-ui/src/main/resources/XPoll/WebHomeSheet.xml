@@ -45,7 +45,9 @@
     {{translation key="xpoll.migration.shouldMigrateAll" /}}
     #if($hasAdmin)
       {{translation key="xpoll.migration.migrate" /}}
-      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;||]]
+      #set ($migrationDoc = $xwiki.getDocument($services.model.resolveDocument('XPoll.XPollMigration')))
+      #set ($migrationURL = $migrationDoc.getExternalURL('get', "migrate=true&amp;form_token=$services.csrf.getToken()"))
+      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;XPoll.XPollMigration||queryString="migrate=true&amp;form_token=$services.csrf.getToken()"]]
       #set ($discard = $xwiki.jsx.use('XPoll.XPollMigration'))
     #else
       {{translation key="xpoll.migration.notifyAdmin" /}}

@@ -101,7 +101,7 @@
              #set ($noOption = 'selected')
            #end
 
-           #if (!$disabled)
+           #if ($disabled.isEmpty())
              &lt;select class="xpollSelect" data-proposal="$escapetool.xml($proposal)"&gt;
                &lt;option disabled $noOption value=""&gt;
                  $escapetool.xml($services.localization.render('contrib.xpoll.vote.select'))
@@ -149,7 +149,7 @@
 })
 #set ($canMigrate = $hasEdit || $hasAdmin)
 #if ($types.containsKey($type))
-  #if ($request.migrate &amp;&amp; $canMigrate)
+  #if ($request.migrate &amp;&amp; $canMigrate &amp;&amp; $services.csrf.isTokenValid($request.form_token))
       #set ($discard = $doc.use($pollObj))
       #set ($discard = $doc.set('type', $types.get($type)))
       #set ($discard = $doc.save($services.localization.render('xpoll.migration.migrated')))
@@ -158,7 +158,7 @@
     {{translation key="xpoll.migration.shouldMigrateOne" /}}
     #if ($canMigrate)
       {{translation key="xpoll.migration.migrate" /}}
-      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;||queryString="migrate=true"]]
+      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;||queryString="migrate=true&amp;form_token=$services.csrf.getToken()"]]
     #else
       {{translation key="xpoll.migration.notifyAdmin" /}}
     #end
