@@ -495,7 +495,7 @@
     padding-bottom: 1em;
   }
 
-  .inline-input-row>.col-sm-4>dl {
+  .inline-input-row > .col-sm-4 > dl {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
