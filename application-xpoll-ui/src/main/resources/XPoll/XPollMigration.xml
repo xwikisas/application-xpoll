@@ -20,28 +20,43 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XPoll.XPollJSExtension" locale="">
+<xwikidoc version="1.3" reference="XPoll.XPollMigration" locale="">
   <web>XPoll</web>
-  <name>XPollJSExtension</name>
+  <name>XPollMigration</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XPoll.WebHome</parent>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Polls JS Extension</title>
+  <title>XPollMigration</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
+  <content>{{velocity}}
+#if ($hasAdmin &amp;&amp; $request.migrate &amp;&amp; $services.csrf.isTokenValid($request.form_token))
+  #set ($xpollPages = $services.query.xwql('where doc.object(XPoll.XPollClass).type in (:types)').bindValue('types', ['0', '1']).execute())
+  #set ($types = {
+    '0': 'multi',
+    '1': 'single'
+  })
+  #foreach ($item in $xpollPages)
+    #set ($document = $xwiki.getDocument($item))
+    #set ($xpollObj = $document.getObject('XPoll.XPollClass'))
+    #set ($pollType = $xpollObj.getValue('type'))
+    #set ($discard = $xpollObj.set('type', $types.get($pollType)))
+    #set ($discard = $document.save($services.localization.render('xpoll.migration.migrated')))
+  #end
+#end
+{{/velocity}}</content>
   <object>
-    <name>XPoll.XPollJSExtension</name>
+    <name>XPoll.XPollMigration</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>7ffbc575-1431-4180-9c12-0f058588e186</guid>
+    <guid>73a6d1f1-a8c0-407d-9d1b-325be2548fa1</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -124,57 +139,30 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function ($) {
-  $(document).ready(function() {
-    var saveForm = $('#xpollSaveForm');
-    var submitInput = saveForm.find("input[type='submit']");
-    saveForm.submit(function(event) {
+      <code>require(['jquery', 'xwiki-meta'], function ($, xwikiMeta) {
+  $(function() {
+    $('.xpoll-migration-warning a').click(function(event) {
       event.preventDefault();
-      $.ajax({
-        type: $(this).attr('method'),
-        url : $(this).attr('action'),
-        data: $(this).serialize(),
-        beforeSend: function() {
-          this.progressNotification = new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saving')", 'inprogress');
-        },
-        complete:function() {
-          // Disable inprogress notification widget.
-          this.progressNotification.hide();
-        },
-        success: function(data) {
-          new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saved')", 'done');
-          // Reload just the form with the id="xpollSaveForm" which contains the table.
-          $('#xpollSaveForm').load(XWiki.currentDocument.getURL('get') +  ' #xpollSaveForm&gt;*');
-        },
-        error: function(data) {
-          new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error');
-        }
-      });
-    });
-    // Make sure the other proposals don't use the same value (index).
-    $('.xpollSelect').change(function() {
-      var changedElement = $(this);
-      $('.xpollSelect').each(function() {
-        if ($(this).data('proposal') != changedElement.data('proposal') &amp;&amp; $(this).val() == changedElement.val()) {
-          // Reset the value because we can't have two proposals with the same value (index).
-          $(this).val('');
-        }
-      });
+      var warningDiv = $('.xpoll-migration-warning');
+      var progressNotification = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.inProgress')), 'inprogress');
 
-      var proposal = $(this).data('proposal');
-      $('.xpollHiddenInput').each(function() {
-        if ($(this).val() == proposal) {
-          $(this).val('');
-        }
-      });
-      var hiddenField = '#option' + $(this).val();
-      $(hiddenField).val(proposal);
+      warningDiv.hide();
+      $.post(new XWiki.Document('XPollMigration', 'XPoll').getURL('get', 'migrate=true&amp;form_token=' + xwikiMeta.form_token))
+        .done(function() {
+          progressNotification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.migrated')), 'done'));
+          warningDiv.remove();
+        })
+        .fail(function(e) {
+          progressNotification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render('xpoll.migration.failed')), 'error'));
+          warningDiv.show();
+        });
     });
+
   });
 });</code>
     </property>
     <property>
-      <name>XPoll JS Extension</name>
+      <name/>
     </property>
     <property>
       <parse>1</parse>

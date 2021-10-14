@@ -79,7 +79,7 @@
 #end
 #macro(displayInput $votes $isCurrentUser $user)
   #set ($disabled = '')
-  #if (!$isCurrentUser)
+  #if (!$isCurrentUser || $pollObj.getValue('status') != 'active')
     #set ($disabled = 'disabled')
   #end
   #foreach ($proposal in $proposals)
@@ -93,9 +93,41 @@
         #if($isChecked)X#end
       #else
         &lt;label&gt;
-          &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-            #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$user" value="$proposal" $checked
-            $disabled /&gt;
+         ## Display the inputs for the condorcet polls.
+         #if ($pollObj.getValue('type') == 'condorcet')
+           #set ($indexOfProposal = $votes.indexOf($proposal) + 1)
+           #set ($noOption = '')
+           #if ($indexOfProposal &lt; 1)
+             #set ($noOption = 'selected')
+           #end
+
+           #if ($disabled.isEmpty())
+             &lt;select class="xpollSelect" data-proposal="$escapetool.xml($proposal)"&gt;
+               &lt;option disabled $noOption value=""&gt;
+                 $escapetool.xml($services.localization.render('contrib.xpoll.vote.select'))
+               &lt;/option&gt;
+               #foreach ($index in [1..$proposals.size()])
+                 &lt;option value="$index" #if($index == $indexOfProposal)selected#end&gt;
+                   #$index
+                 &lt;/option&gt;
+               #end
+             &lt;/select&gt;
+             ## The hidden inputs that will have the values sent by the form.
+             &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$escapetool.xml($user)"
+               type="hidden"/&gt;
+           #else
+             &lt;input type="checkbox" name="$escapetool.xml($user)" $checked $disabled /&gt;
+             #if ($indexOfProposal &gt; 0)
+               &lt;span class="label label-primary"&gt;#$indexOfProposal&lt;/span&gt;
+             #end
+           #end
+         ## Display the inputs for the normal polls.
+         #else
+           &lt;input type="#if($isRadio)radio#{else}checkbox#end"
+             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$escapetool.xml($user)"
+             value="$escapetool.xml($proposal)" $checked
+             $disabled /&gt;
+         #end
         &lt;/label&gt;
       #end
     &lt;/td&gt;
@@ -108,6 +140,31 @@
 #set ($status = $pollObj.getValue('status'))
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
+## Check if the document needs migration
+
+#set ($type = $pollObj.getValue('type'))
+#set ($types = {
+  '0': 'multi',
+  '1': 'single'
+})
+#set ($canMigrate = $hasEdit || $hasAdmin)
+#if ($types.containsKey($type))
+  #if ($request.migrate &amp;&amp; $canMigrate &amp;&amp; $services.csrf.isTokenValid($request.form_token))
+      #set ($discard = $pollObj.set('type', $types.get($pollType)))
+      #set ($discard = $doc.save($services.localization.render('xpoll.migration.migrated')))
+  #else
+    {{warning}}
+    {{translation key="xpoll.migration.shouldMigrateOne" /}}
+    #if ($canMigrate)
+      {{translation key="xpoll.migration.migrate" /}}
+      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;||queryString="migrate=true&amp;form_token=$services.csrf.getToken()"]]
+    #else
+      {{translation key="xpoll.migration.notifyAdmin" /}}
+    #end
+    {{/warning}}
+  #end
+#end
+
 #if ($xcontext.action == 'view' &amp;&amp; $status == 'inpreparation')
   #if ($hasEdit)
     $services.localization.render('contrib.xpoll.preparation.hasRight')
@@ -116,7 +173,7 @@
   #end
 #end
 ## Flag to know wheter the options must be displayed as checkbox or radio inputs.
-#set ($isRadio = $pollObj.getProperty('type').value == 1)
+#set ($isRadio = $pollObj.getProperty('type').value == 'single')
 #if ($xcontext.action == 'edit' || $status == 'inpreparation')
   {{html wiki='true' clean='false'}}
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
@@ -282,7 +339,7 @@
         ## Users and their votes.
         #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
           #set ($user = $voteObj.user)
-          #set ($votes = $voteObj.votes)
+          #set ($votes = $voteObj.getValue('votes'))
           #set ($isCurrentUser = $user == $xcontext.user)
           &lt;tr #if($isCurrentUser)class="active"#end&gt;
             &lt;td&gt;

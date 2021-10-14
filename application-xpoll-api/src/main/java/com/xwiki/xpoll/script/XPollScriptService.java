@@ -75,4 +75,5 @@ public class XPollScriptService implements ScriptService
         }
         return Collections.emptyMap();
     }
+
 }

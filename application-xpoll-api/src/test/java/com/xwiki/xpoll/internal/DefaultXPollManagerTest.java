@@ -25,11 +25,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -41,9 +44,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xwiki.xpoll.PollResultsCalculator;
 import com.xwiki.xpoll.XPollException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -58,8 +63,18 @@ class DefaultXPollManagerTest
     @InjectMockComponents
     private DefaultXPollManager manager;
 
+    @InjectMockComponents
+    private CondorcetPollResultsCalculator calculator;
+
     @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @MockComponent
+    private ComponentManager componentManager;
 
     @Mock
     private XWikiContext xWikiContext;
@@ -77,9 +92,11 @@ class DefaultXPollManagerTest
     private BaseObject xpollObj;
 
     @BeforeEach
-    void setup()
+    void setup() throws ComponentLookupException
     {
         when(this.contextProvider.get()).thenReturn(this.xWikiContext);
+        when(this.componentManagerProvider.get()).thenReturn(this.componentManager);
+        when(this.componentManager.getInstance(PollResultsCalculator.class, "condorcet")).thenReturn(this.calculator);
     }
 
     @Test
@@ -96,7 +113,7 @@ class DefaultXPollManagerTest
     }
 
     @Test
-    void getVoteResults() throws XWikiException, XPollException
+    void getVoteResultsWithNoVotes() throws XWikiException, XPollException
     {
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
 
@@ -106,10 +123,54 @@ class DefaultXPollManagerTest
         when(this.xpollObj.getListValue(DefaultXPollManager.PROPOSALS)).thenReturn(Arrays.asList("Proposal1",
             "Proposal2", "Proposal3"));
         when(this.document.getXObjects(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE)).thenReturn(new ArrayList<>());
+        when(this.xpollObj.getStringValue(DefaultXPollManager.XPOLL_TYPE)).thenReturn("condorcet");
 
         Map<String, Integer> results = manager.getVoteResults(docRef);
 
         assertEquals(3, results.size());
-        assertEquals(new HashSet<>(Collections.singletonList(0)), new HashSet<>(results.values()));
+        assertEquals(new HashSet<>(Collections.singletonList(2)), new HashSet<>(results.values()));
+    }
+
+    @Test
+    void getVoteResultsWithCondorcetType() throws XWikiException, XPollException
+    {
+        DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
+        when(this.xWikiContext.getWiki()).thenReturn(this.wiki);
+        when(this.wiki.getDocument(docRef, this.xWikiContext)).thenReturn(this.document);
+        when(this.document.getXObject(DefaultXPollManager.XPOLL_CLASS_REFERENCE)).thenReturn(this.xpollObj);
+        when(this.xpollObj.getStringValue(DefaultXPollManager.XPOLL_TYPE)).thenReturn("condorcet");
+
+        String proposal1 = "Proposal1";
+        String proposal2 = "Proposal2";
+        String proposal3 = "Proposal3";
+
+        when(this.xpollObj.getListValue(DefaultXPollManager.PROPOSALS)).thenReturn(Arrays.asList(proposal1,
+            proposal2, proposal3));
+
+        BaseObject ballot1 = mock(BaseObject.class);
+        BaseObject ballot2 = mock(BaseObject.class);
+        BaseObject ballot3 = mock(BaseObject.class);
+        BaseObject ballot4 = mock(BaseObject.class);
+        BaseObject ballot5 = mock(BaseObject.class);
+
+        when(this.document.getXObjects(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE))
+            .thenReturn(Arrays.asList(ballot1, ballot2, ballot3, ballot4, ballot5));
+
+        when(ballot1.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal1, proposal3, proposal2));
+        when(ballot2.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
+        when(ballot3.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
+        when(ballot4.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
+        when(ballot5.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal3, proposal1, proposal2));
+
+        Map<String, Integer> results = manager.getVoteResults(docRef);
+
+        assertEquals(1, results.get(proposal1));
+        assertEquals(2, results.get(proposal2));
+        assertEquals(0, results.get(proposal3));
     }
 }

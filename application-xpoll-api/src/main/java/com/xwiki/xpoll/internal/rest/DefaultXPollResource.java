@@ -20,6 +20,7 @@
 package com.xwiki.xpoll.internal.rest;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -77,7 +78,13 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             DocumentReference documentReference = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
             DocumentReference userReference = context.getUserReference();
             String userIdentifier = this.serializer.serialize(userReference, new WikiReference(wikiName));
-            List<String> votedProposals = Arrays.asList(request.getParameterValues(userIdentifier));
+            String[] proposalsArray = request.getParameterValues(userIdentifier);
+            List<String> votedProposals;
+            if (proposalsArray == null) {
+                votedProposals = Collections.emptyList();
+            } else {
+                votedProposals = Arrays.asList(proposalsArray);
+            }
             xPollManager.vote(documentReference, userReference, votedProposals);
             return Response.ok().build();
         } catch (XPollException e) {

@@ -59,4 +59,5 @@ public interface XPollManager
      * @throws XPollException thrown if the document is missing or if it lacks a poll.
      */
     Map<String, Integer> getVoteResults(DocumentReference documentReference) throws XPollException;
+    
 }

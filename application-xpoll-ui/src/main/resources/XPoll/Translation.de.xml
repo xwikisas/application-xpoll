@@ -69,8 +69,8 @@ XPoll.XPollClass_status_finished=Beendet
 XPoll.XPollClass_status_hint=Zeigt die Phase dieser Umfrage an
 XPoll.XPollClass_status_inpreparation=In Vorbereitung
 XPoll.XPollClass_type_hint=Eine Umfrage kann so konfiguriert werden, dass nur ein oder mehrere Werte erforderlich sind
-XPoll.XPollClass_type_0=Erlaube mehrere Optionen
-XPoll.XPollClass_type_1=Kann eine einzelne Option auswählen
+XPoll.XPollClass_type_multi=Erlaube mehrere Optionen
+XPoll.XPollClass_type_single=Kann eine einzelne Option auswählen
 
 ## Livetable
 xpoll.livetable._actions=Aktionen
