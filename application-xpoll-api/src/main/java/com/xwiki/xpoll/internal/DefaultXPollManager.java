@@ -167,6 +167,8 @@ public class DefaultXPollManager implements XPollManager
 
         xpollVoteOfCurrentUser.set(USER, currentUserName, context);
         xpollVoteOfCurrentUser.set(VOTES, filteredProposals, context);
+        // Saving the document so the
+        context.getWiki().saveDocument(doc, "New Vote", context);
     }
 
     private void updateWinner(XWikiContext context, XWikiDocument doc) throws XWikiException, XPollException
@@ -185,7 +187,8 @@ public class DefaultXPollManager implements XPollManager
 
         xpollObj.set(WINNER, String.join(",", currentWinners), context);
         doc.setAuthorReference(context.getAuthorReference());
-        context.getWiki().saveDocument(doc, "New Vote", context);
+        // Saving the document that has updated the winner.
+        context.getWiki().saveDocument(doc, "Updated winner", context);
     }
 
     private List<String> findWinner(Map<String, Integer> voteCount)
@@ -201,6 +204,9 @@ public class DefaultXPollManager implements XPollManager
                 currentWinners.add(proposal.getKey());
                 maxVotes = proposal.getValue();
             }
+        }
+        if (maxVotes == 0) {
+            currentWinners.clear();
         }
         return currentWinners;
     }
