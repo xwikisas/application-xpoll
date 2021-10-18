@@ -167,7 +167,9 @@ public class DefaultXPollManager implements XPollManager
 
         xpollVoteOfCurrentUser.set(USER, currentUserName, context);
         xpollVoteOfCurrentUser.set(VOTES, filteredProposals, context);
-        // Saving the document so the
+        // Saving the document so the results calculator will also take the last vote into account.
+        // The results calculator will retrieve the document using the reference rather than using the already
+        // fetched document.
         context.getWiki().saveDocument(doc, "New Vote", context);
     }
 
