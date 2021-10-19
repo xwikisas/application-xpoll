@@ -152,7 +152,7 @@
       });
     });
     // Make sure the other proposals don't use the same value (index).
-    $('.xpollSelect').change(function() {
+    $('#xpollSaveForm').on('change', '.xpollSelect', function() {
       var changedElement = $(this);
       $('.xpollSelect').each(function() {
         if ($(this).data('proposal') != changedElement.data('proposal') &amp;&amp; $(this).val() == changedElement.val()) {

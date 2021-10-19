@@ -114,6 +114,7 @@
              &lt;/select&gt;
              ## The hidden inputs that will have the values sent by the form.
              &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$escapetool.xml($user)"
+              #if ($votes.size() > $foreach.index)value="$escapetool.xml($votes.get($foreach.index))"#end
                type="hidden"/&gt;
            #else
              &lt;input type="checkbox" name="$escapetool.xml($user)" $checked $disabled /&gt;
@@ -253,7 +254,7 @@
   #if ($status == 'active')
     #set ($restURL = $services.xpoll.url($doc.documentReference))
 
-    {{html wiki='true'}}
+    {{html wiki='true' clean='false'}}
       &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
         &lt;table class='xpoll medium-avatars table table-bordered'&gt;
           ## Table header row.
@@ -324,7 +325,7 @@
     {{/html}}
   #elseif ($status == 'finished')
 
-    {{html wiki='true'}}
+    {{html wiki='true' clean='false'}}
       $services.localization.render('contrib.xpoll.finish.message')
       &lt;table class='xpoll medium-avatars table table-bordered'&gt;
         ## Table header row.
