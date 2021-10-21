@@ -99,7 +99,7 @@ public class DefaultXPollManager implements XPollManager
         try {
             document = context.getWiki().getDocument(docReference, context).clone();
             setUserVotes(votedProposals, context, document, user);
-            updateWinner(context, document);
+//            updateWinner(context, document);
         } catch (XWikiException e) {
             throw new XPollException(String.format("Failed to vote for [%s] on behalf of [%s].", docReference, user),
                 e);

@@ -114,7 +114,7 @@
              &lt;/select&gt;
              ## The hidden inputs that will have the values sent by the form.
              &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$escapetool.xml($user)"
-              #if ($votes.size() > $foreach.index)value="$escapetool.xml($votes.get($foreach.index))"#end
+              #if ($votes.size() &gt; $foreach.index)value="$escapetool.xml($votes.get($foreach.index))"#end
                type="hidden"/&gt;
            #else
              &lt;input type="checkbox" name="$escapetool.xml($user)" $checked $disabled /&gt;
@@ -549,11 +549,11 @@
     flex-direction: row;
   }
 
-  .inline-input-row > .col-sm-4 {
+  .inline-input-row &gt; .col-sm-4 {
     padding-bottom: 1em;
   }
 
-  .inline-input-row > .col-sm-4 > dl {
+  .inline-input-row &gt; .col-sm-4 &gt; dl {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
