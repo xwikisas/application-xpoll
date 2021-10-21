@@ -186,7 +186,8 @@ def xwikiContext = xcontext.method.input.get(2);
 def pollObject = docSource.getObject('XPoll.XPollClass');
 if (pollObject != null) {
   def winner = '';
-  if (!pollObject.getStringValue('status').equals('inpreparation')) {
+  def status = pollObject.getStringValue('status');
+  if (status.equals('active') || status.equals('finished')) {
     def voteResults = services.xpoll.getVoteResults(docSource.getDocumentReference());
     def maxVotes = 0;
     def currentWinners = [];
