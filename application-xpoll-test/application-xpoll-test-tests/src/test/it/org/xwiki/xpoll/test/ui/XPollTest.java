@@ -22,8 +22,9 @@ package org.xwiki.xpoll.test.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.BeforeClass;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.panels.test.po.ApplicationsPanel;
@@ -162,4 +163,16 @@ public class XPollTest extends AbstractTest
         xpollEditPage.clickSaveAndView();
     }
 
+    @After
+    public void tearDown()
+    {
+        validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "TLS certificate errors will be ignored for this session",
+            "Failed to find a Converter to convert from [java.lang.String] to [org.xwiki.observation.event.Event]"
+        );
+        validateConsole.getLogCaptureConfiguration().registerExpected(
+            "The Licensor API extension (com.xwiki.licensing:application-licensing-licensor-api) " +
+                "is not installed on the root namespace as it should."
+        );
+    }
 }

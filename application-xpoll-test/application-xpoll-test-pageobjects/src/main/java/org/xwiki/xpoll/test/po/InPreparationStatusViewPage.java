@@ -28,7 +28,7 @@ public class InPreparationStatusViewPage extends ViewPage
     @FindBy(xpath = "//div[@class = 'xform']/dl/dd")
     public WebElement pollDescription;
 
-    @FindBy(xpath = "//div[@class = 'xform']//div[@class='row']//div[1]//dd")
+    @FindBy(xpath = "//div[@class = 'xform']//div[contains(@class,'row')]//div[1]//dd")
     public WebElement pollProposals;
 
     @FindBy(css = ".xform .label.label-warning")
