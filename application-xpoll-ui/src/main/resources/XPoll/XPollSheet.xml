@@ -151,7 +151,7 @@
 #set ($canMigrate = $hasEdit || $hasAdmin)
 #if ($types.containsKey($type))
   #if ($request.migrate &amp;&amp; $canMigrate &amp;&amp; $services.csrf.isTokenValid($request.form_token))
-      #set ($discard = $pollObj.set('type', $types.get($pollType)))
+      #set ($discard = $pollObj.set('type', $types.get($type)))
       #set ($discard = $doc.save($services.localization.render('xpoll.migration.migrated')))
   #else
     {{warning}}
