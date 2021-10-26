@@ -26,7 +26,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -63,9 +62,6 @@ public class UpdatePollWinnersListener implements EventListener
     private XPollManager xPollManager;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
-
-    @Inject
     private Logger logger;
 
     private final List<Event> eventsList = Collections.singletonList(new DocumentUpdatedEvent());
@@ -73,7 +69,7 @@ public class UpdatePollWinnersListener implements EventListener
     @Override
     public String getName()
     {
-        return "com.xwiki.xpoll.UpdatePollWinners";
+        return "update-poll-winners";
     }
 
     @Override
@@ -85,7 +81,7 @@ public class UpdatePollWinnersListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        XWikiContext context = contextProvider.get();
+        XWikiContext context = (XWikiContext) data;
 
         XWikiDocument doc = (XWikiDocument) source;
         BaseObject pollObject = doc.getXObject(DefaultXPollManager.XPOLL_CLASS_REFERENCE);
@@ -93,7 +89,7 @@ public class UpdatePollWinnersListener implements EventListener
             String winner = "";
             String status = pollObject.getStringValue("status");
             if ("active".equals(status) || "finished".equals(status)) {
-                Map<String, Integer> voteResults = null;
+                Map<String, Integer> voteResults;
                 try {
                     DocumentReference docRef = doc.getDocumentReference();
                     voteResults = xPollManager.getVoteResults(docRef);
@@ -105,7 +101,8 @@ public class UpdatePollWinnersListener implements EventListener
                 winner = String.join(",", currentWinners);
             }
             String oldWinner = pollObject.getStringValue(XPOLL_WINNER_FIELD);
-
+            // We don't want to display the winner if the status is In Preparation or unselected, thus we set it as
+            // empty.
             if (!oldWinner.equals(winner)) {
                 pollObject.set(XPOLL_WINNER_FIELD, winner, context);
                 try {

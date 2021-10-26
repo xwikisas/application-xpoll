@@ -55,9 +55,6 @@ public class UpdatePollWinnersListenerTest
     @InjectMockComponents
     private UpdatePollWinnersListener listener;
 
-    @MockComponent
-    private Provider<XWikiContext> contextProvider;
-
     @Mock
     private XWikiContext xWikiContext;
 
@@ -76,7 +73,6 @@ public class UpdatePollWinnersListenerTest
     @Test
     void onEvent() throws XPollException, XWikiException
     {
-        when(this.contextProvider.get()).thenReturn(this.xWikiContext);
         when(this.document.getXObject(DefaultXPollManager.XPOLL_CLASS_REFERENCE)).thenReturn(this.xpollObject);
 
         when(this.xWikiContext.get("updatingWinner")).thenReturn(null);
@@ -93,7 +89,7 @@ public class UpdatePollWinnersListenerTest
         when(this.xpollObject.getStringValue("winner")).thenReturn("");
         when(this.xWikiContext.getWiki()).thenReturn(this.wiki);
 
-        this.listener.onEvent(new DocumentUpdatedEvent(), this.document, null);
+        this.listener.onEvent(new DocumentUpdatedEvent(), this.document, this.xWikiContext);
 
 
         verify(this.xpollObject).set("winner", "Proposal1", xWikiContext);
