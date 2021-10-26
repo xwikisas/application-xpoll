@@ -30,9 +30,9 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -55,7 +55,6 @@ import com.xwiki.xpoll.XPollManager;
 @Singleton
 public class UpdatePollWinnersListener implements EventListener
 {
-
     private static final String XPOLL_WINNER_FIELD = "winner";
 
     private static final String UPDATING_FLAG = "updatingWinner";
@@ -71,43 +70,53 @@ public class UpdatePollWinnersListener implements EventListener
 
     private final List<Event> eventsList = Collections.singletonList(new DocumentUpdatedEvent());
 
-    @Override public String getName()
+    @Override
+    public String getName()
     {
         return "com.xwiki.xpoll.UpdatePollWinners";
     }
 
-    @Override public List<Event> getEvents()
+    @Override
+    public List<Event> getEvents()
     {
         return eventsList;
     }
 
-    @Override public void onEvent(Event event, Object source, Object data)
+    @Override
+    public void onEvent(Event event, Object source, Object data)
     {
         XWikiContext context = contextProvider.get();
-        DocumentModelBridge document = (DocumentModelBridge) source;
-        try {
-            XWikiDocument doc = context.getWiki().getDocument(document.getDocumentReference(), context);
-            BaseObject pollObject = doc.getXObject(DefaultXPollManager.XPOLL_CLASS_REFERENCE);
-            if (pollObject != null && context.get(UPDATING_FLAG) == null) {
-                String winner = "";
-                String status = pollObject.getStringValue("status");
-                if ("active".equals(status) || "finished".equals(status)) {
-                    Map<String, Integer> voteResults = xPollManager.getVoteResults(doc.getDocumentReference());
-                    List<String> currentWinners = getWinners(voteResults);
-                    winner = String.join(",", currentWinners);
-                }
-                String oldWinner = pollObject.getStringValue(XPOLL_WINNER_FIELD);
 
-                if (!oldWinner.equals(winner)) {
-                    pollObject.set(XPOLL_WINNER_FIELD, winner, context);
+        XWikiDocument doc = (XWikiDocument) source;
+        BaseObject pollObject = doc.getXObject(DefaultXPollManager.XPOLL_CLASS_REFERENCE);
+        if (pollObject != null && context.get(UPDATING_FLAG) == null) {
+            String winner = "";
+            String status = pollObject.getStringValue("status");
+            if ("active".equals(status) || "finished".equals(status)) {
+                Map<String, Integer> voteResults = null;
+                try {
+                    DocumentReference docRef = doc.getDocumentReference();
+                    voteResults = xPollManager.getVoteResults(docRef);
+                } catch (XPollException e) {
+                    logger.warn(e.getMessage(), e);
+                    return;
+                }
+                List<String> currentWinners = getWinners(voteResults);
+                winner = String.join(",", currentWinners);
+            }
+            String oldWinner = pollObject.getStringValue(XPOLL_WINNER_FIELD);
+
+            if (!oldWinner.equals(winner)) {
+                pollObject.set(XPOLL_WINNER_FIELD, winner, context);
+                try {
                     context.put(UPDATING_FLAG, true);
                     context.getWiki().saveDocument(doc, "Updated winner", context);
+                } catch (XWikiException e) {
+                    logger.warn(e.getMessage(), e);
+                } finally {
+                    context.put(UPDATING_FLAG, null);
                 }
             }
-        } catch (XWikiException | XPollException e) {
-            logger.warn(e.getMessage(), e);
-        } finally {
-            context.put(UPDATING_FLAG, null);
         }
     }
 
@@ -118,7 +127,7 @@ public class UpdatePollWinnersListener implements EventListener
         for (Map.Entry<String, Integer> proposal : voteResults.entrySet()) {
             if (proposal.getValue() == maxVotes) {
                 currentWinners.add(proposal.getKey());
-            } else if (proposal.getValue() < maxVotes) {
+            } else if (proposal.getValue() > maxVotes) {
                 currentWinners.clear();
                 currentWinners.add(proposal.getKey());
                 maxVotes = proposal.getValue();
