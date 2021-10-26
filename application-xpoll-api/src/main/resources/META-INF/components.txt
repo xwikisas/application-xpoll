@@ -3,4 +3,5 @@ com.xwiki.xpoll.internal.rest.DefaultXPollResource
 com.xwiki.xpoll.internal.CondorcetPollResultsCalculator
 com.xwiki.xpoll.internal.MultiSelectionPollResultsCalculator
 com.xwiki.xpoll.internal.SingleSelectionPollResultsCalculator
+com.xwiki.xpoll.internal.UpdatePollWinnersListener
 com.xwiki.xpoll.script.XPollScriptService

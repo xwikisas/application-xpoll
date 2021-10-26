@@ -54,7 +54,8 @@ import com.xwiki.xpoll.rest.XPollResource;
 @Singleton
 public class DefaultXPollResource extends ModifiablePageResource implements XPollResource
 {
-    @Inject private XPollManager xPollManager;
+    @Inject
+    private XPollManager xPollManager;
 
     @Inject
     @Named("compactwiki")

@@ -21,7 +21,6 @@ package com.xwiki.xpoll.internal;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -71,8 +70,6 @@ public class DefaultXPollManager implements XPollManager
 
     static final String VOTES = "votes";
 
-    static final String WINNER = "winner";
-
     static final String USER = "user";
 
     static final String XPOLL_TYPE = "type";
@@ -99,7 +96,6 @@ public class DefaultXPollManager implements XPollManager
         try {
             document = context.getWiki().getDocument(docReference, context).clone();
             setUserVotes(votedProposals, context, document, user);
-            updateWinner(context, document);
         } catch (XWikiException e) {
             throw new XPollException(String.format("Failed to vote for [%s] on behalf of [%s].", docReference, user),
                 e);
@@ -167,51 +163,13 @@ public class DefaultXPollManager implements XPollManager
 
         xpollVoteOfCurrentUser.set(USER, currentUserName, context);
         xpollVoteOfCurrentUser.set(VOTES, filteredProposals, context);
-        // Saving the document so the results calculator will also take the last vote into account.
-        // The results calculator will retrieve the document using the reference rather than using the already
-        // fetched document.
+
         context.getWiki().saveDocument(doc, "New Vote", context);
     }
 
-    private void updateWinner(XWikiContext context, XWikiDocument doc) throws XWikiException, XPollException
-    {
-        BaseObject xpollObj = doc.getXObject(XPOLL_CLASS_REFERENCE);
-        if (xpollObj == null) {
-            throw new XPollException(String.format(MISSING_XPOLL_OBJECT_MESSAGE,
-                doc.getDocumentReference()));
-        }
 
-        String pollType = xpollObj.getStringValue(XPOLL_TYPE);
 
-        Map<String, Integer> voteCount = getXPollResults(doc.getDocumentReference(), pollType);
 
-        List<String> currentWinners = findWinner(voteCount);
-
-        xpollObj.set(WINNER, String.join(",", currentWinners), context);
-        doc.setAuthorReference(context.getAuthorReference());
-        // Saving the document that has updated the winner.
-        context.getWiki().saveDocument(doc, "Updated winner", context);
-    }
-
-    private List<String> findWinner(Map<String, Integer> voteCount)
-    {
-        List<String> currentWinners = new ArrayList<>();
-
-        int maxVotes = 0;
-        for (Map.Entry<String, Integer> proposal : voteCount.entrySet()) {
-            if (proposal.getValue() == maxVotes) {
-                currentWinners.add(proposal.getKey());
-            } else if (proposal.getValue() > maxVotes) {
-                currentWinners.clear();
-                currentWinners.add(proposal.getKey());
-                maxVotes = proposal.getValue();
-            }
-        }
-        if (maxVotes == 0) {
-            currentWinners.clear();
-        }
-        return currentWinners;
-    }
 
     private Map<String, Integer> getXPollResults(DocumentReference documentReference, String pollType)
         throws XPollException
