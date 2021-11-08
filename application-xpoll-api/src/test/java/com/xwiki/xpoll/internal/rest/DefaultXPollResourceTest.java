@@ -73,7 +73,6 @@ public class DefaultXPollResourceTest
     private MockitoComponentManager componentManager;
 
     @MockComponent
-    @Named("compactwiki")
     private EntityReferenceSerializer<String> serializer;
 
     @MockComponent
@@ -104,8 +103,7 @@ public class DefaultXPollResourceTest
     @Test
     void saveXPollAnswersTest() throws XWikiRestException, XPollException
     {
-        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT)).thenReturn(true);
-        when(this.xcontextProvider.get()).thenReturn(this.xWikiContext);
+        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, null)).thenReturn(true);
         when(this.xWikiContext.getRequest()).thenReturn(this.request);
 
         when(this.serializer.serialize(null, new WikiReference("wiki"))).thenReturn("userIdentifier");
@@ -128,8 +126,7 @@ public class DefaultXPollResourceTest
     @Test
     void saveXPollAnswersWithoutEditRightTest2() throws XPollException, XWikiRestException
     {
-        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT)).thenReturn(true);
-        when(this.xcontextProvider.get()).thenReturn(this.xWikiContext);
+        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, null)).thenReturn(true);
         when(this.xWikiContext.getRequest()).thenReturn(this.request);
         when(this.serializer.serialize(null, new WikiReference("wiki"))).thenReturn("userIdentifier");
 

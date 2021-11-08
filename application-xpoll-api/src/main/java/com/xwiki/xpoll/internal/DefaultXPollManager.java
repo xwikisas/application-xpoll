@@ -80,7 +80,7 @@ public class DefaultXPollManager implements XPollManager
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    @Named("compactwiki")
+    @Named("local")
     private EntityReferenceSerializer<String> serializer;
 
     @Inject

@@ -58,7 +58,7 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
     private XPollManager xPollManager;
 
     @Inject
-    @Named("compactwiki")
+    @Named("local")
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
@@ -67,7 +67,7 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
     @Override
     public Response saveXPollAnswers(String wikiName, String spaces, String pageName) throws XWikiRestException
     {
-        if (!contextualAuthorizationManager.hasAccess(Right.EDIT)) {
+        if (!contextualAuthorizationManager.hasAccess(Right.EDIT, getXWikiContext().getUserReference())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         XWikiContext context = getXWikiContext();

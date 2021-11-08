@@ -143,6 +143,7 @@ public class CondorcetPollResultsCalculator extends AbstractPollResultsCalculato
                     line.put(notVotedProposal, value + 1);
                 }
             }
+            notVotedProposals.clear();
             notVotedProposals.addAll(proposals);
         }
     }

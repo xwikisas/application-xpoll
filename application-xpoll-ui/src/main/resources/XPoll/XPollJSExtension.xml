@@ -147,7 +147,12 @@
           $('#xpollSaveForm').load(XWiki.currentDocument.getURL('get') +  ' #xpollSaveForm&gt;*');
         },
         error: function(data) {
-          new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error');
+          if (data.status == 403) {
+            new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.forbidden')", 'error');
+          }
+          else {
+            new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error');
+          }
         }
       });
     });
