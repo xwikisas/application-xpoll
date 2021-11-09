@@ -284,7 +284,6 @@
               #if ($isCurrentUser)
                 #set ($foundUser = true)
               #end
-              ## We check if the saved user exists locally in the subwiki or is a global user
               #if ($xwiki.exists($user))
                 &lt;td&gt;
                   #displayUser($user)
