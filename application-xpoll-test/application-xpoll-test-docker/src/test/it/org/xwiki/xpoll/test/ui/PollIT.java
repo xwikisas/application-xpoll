@@ -22,14 +22,12 @@ package org.xwiki.xpoll.test.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.panels.test.po.ApplicationsPanel;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -39,16 +37,17 @@ import org.xwiki.xpoll.test.po.InPreparationStatusViewPage;
 import org.xwiki.xpoll.test.po.XPollEditPage;
 import org.xwiki.xpoll.test.po.XPollHomePage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
+ * Functional tests for the Poll Application.
+ * 
  * @version $Id$
- * @since 1.6.4
+ * @since 2.2
  */
-
-public class XPollTest extends AbstractTest
+@UITest
+class PollIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     public static final String pollName = "Poll 1";
 
     public static final String pollDescription = "Poll 1 Description";
@@ -63,50 +62,52 @@ public class XPollTest extends AbstractTest
 
     public ArrayList<String> proposals = new ArrayList<String>(Arrays.asList(pollProposals.split(",")));
 
-    @BeforeClass
-    public static void createUsers()
+    @BeforeAll
+    static void createUsers(TestUtils setup)
     {
-        getUtil().createUser("JaneDoe", "pass", getUtil().getURLToNonExistentPage(), "first_name", "Jane", "last_name", "Doe");
+        setup.createUser("JaneDoe", "pass", setup.getURLToNonExistentPage(), "first_name", "Jane", "last_name", "Doe");
+    }
+    
+    @BeforeEach
+    void setUp(TestUtils setup) {
+        setup.login("JaneDoe", "pass");
     }
 
     @Test
-    public void appEntryRedirectsToHomePage()
+    void appEntryRedirectsToHomePage()
     {
-        getUtil().login("JaneDoe", "pass");
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
         ViewPage vp = applicationPanel.clickApplication("Polls");
-        Assert.assertEquals(XPollHomePage.getSpace(), vp.getMetaDataValue("space"));
-        Assert.assertEquals(XPollHomePage.getPage(), vp.getMetaDataValue("page"));
+        assertEquals(XPollHomePage.getSpace(), vp.getMetaDataValue("space"));
+        assertEquals(XPollHomePage.getPage(), vp.getMetaDataValue("page"));
     }
 
     @Test
-    public void createNewEntryWithInPreparationStatus()
+    void createNewEntryWithInPreparationStatus()
     {
-        getUtil().login("JaneDoe", "pass");
         String status = statusInPreparation;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
         CreatePagePage createPage = createPage(xpollHomePage);
 
         XPollEditPage xpollEditPage = new XPollEditPage();
-        Assert.assertEquals(pollName, xpollEditPage.getName());
+        assertEquals(pollName, xpollEditPage.getName());
         xpollEditPage.setDescription(pollDescription);
         xpollEditPage.setStatus(status);
         xpollEditPage.setProposals(pollProposals);
         xpollEditPage.clickSaveAndView();
 
         InPreparationStatusViewPage inPreparationStatusViewPage = new InPreparationStatusViewPage();
-        Assert.assertEquals(pollDescription, inPreparationStatusViewPage.getPollDescription());
-        Assert.assertEquals(xpollEditPage.getStatusInPreparation(), inPreparationStatusViewPage.getPollStatus());
-        Assert.assertEquals(pollProposals, inPreparationStatusViewPage.getPollProposals());
+        assertEquals(pollDescription, inPreparationStatusViewPage.getPollDescription());
+        assertEquals(xpollEditPage.getStatusInPreparation(), inPreparationStatusViewPage.getPollStatus());
+        assertEquals(pollProposals, inPreparationStatusViewPage.getPollProposals());
         ConfirmationPage deletePage = createPage.delete();
         deletePage.clickYes();
     }
 
     @Test
-    public void createNewEntryWithActiveStatus()
+    void createNewEntryWithActiveStatus()
     {
-        getUtil().login("JaneDoe", "pass");
         String status = statusActive;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
@@ -115,19 +116,18 @@ public class XPollTest extends AbstractTest
         editPage(status);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        Assert.assertEquals(pollName, activeStatusViewPage.getDocumentTitle());
-        Assert.assertEquals(pollDescription, activeStatusViewPage.getDescription());
+        assertEquals(pollName, activeStatusViewPage.getDocumentTitle());
+        assertEquals(pollDescription, activeStatusViewPage.getDescription());
 
         activeStatusViewPage.getProposals();
-        Assert.assertEquals(this.proposals, activeStatusViewPage.pollProposals);
+        assertEquals(this.proposals, activeStatusViewPage.pollProposals);
         ConfirmationPage deletePage = createPage.delete();
         deletePage.clickYes();
     }
 
     @Test
-    public void createNewEntryWithFinishedStatus()
+    void createNewEntryWithFinishedStatus()
     {
-        getUtil().login("JaneDoe", "pass");
         String status = statusFinished;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
         CreatePagePage createPage = createPage(xpollHomePage);
@@ -135,11 +135,11 @@ public class XPollTest extends AbstractTest
         editPage(status);
 
         FinishedStatusViewPage finishedStatusViewPage = new FinishedStatusViewPage();
-        Assert.assertEquals(pollName, finishedStatusViewPage.getDocumentTitle());
-        Assert.assertEquals(pollDescription, finishedStatusViewPage.getDescription());
+        assertEquals(pollName, finishedStatusViewPage.getDocumentTitle());
+        assertEquals(pollDescription, finishedStatusViewPage.getDescription());
 
         finishedStatusViewPage.getProposals();
-        Assert.assertEquals(this.proposals, finishedStatusViewPage.pollProposals);
+        assertEquals(this.proposals, finishedStatusViewPage.pollProposals);
         ConfirmationPage deletePage = createPage.delete();
         deletePage.clickYes();
     }
@@ -156,23 +156,10 @@ public class XPollTest extends AbstractTest
     private void editPage(String status)
     {
         XPollEditPage xpollEditPage = new XPollEditPage();
-        Assert.assertEquals(pollName, xpollEditPage.getName());
+        assertEquals(pollName, xpollEditPage.getName());
         xpollEditPage.setDescription(pollDescription);
         xpollEditPage.setStatus(status);
         xpollEditPage.setProposals(pollProposals);
         xpollEditPage.clickSaveAndView();
-    }
-
-    @After
-    public void tearDown()
-    {
-        validateConsole.getLogCaptureConfiguration().registerExcludes(
-            "TLS certificate errors will be ignored for this session",
-            "Failed to find a Converter to convert from [java.lang.String] to [org.xwiki.observation.event.Event]"
-        );
-        validateConsole.getLogCaptureConfiguration().registerExpected(
-            "The Licensor API extension (com.xwiki.licensing:application-licensing-licensor-api) " +
-                "is not installed on the root namespace as it should."
-        );
     }
 }
