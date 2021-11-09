@@ -149,8 +149,7 @@
         error: function(data) {
           if (data.status == 403) {
             new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.forbidden')", 'error');
-          }
-          else {
+          } else {
             new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error');
           }
         }

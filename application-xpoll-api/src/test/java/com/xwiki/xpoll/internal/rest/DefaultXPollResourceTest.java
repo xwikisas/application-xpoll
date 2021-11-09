@@ -103,12 +103,12 @@ public class DefaultXPollResourceTest
     @Test
     void saveXPollAnswersTest() throws XWikiRestException, XPollException
     {
-        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, null)).thenReturn(true);
+        DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
+        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, docRef)).thenReturn(true);
         when(this.xWikiContext.getRequest()).thenReturn(this.request);
 
         when(this.serializer.serialize(null, new WikiReference("wiki"))).thenReturn("userIdentifier");
 
-        DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
         Response response = resource.saveXPollAnswers("xwiki", "Main", "WebHome");
 
         verify(this.xPollManager).vote(docRef, null, Collections.emptyList());
@@ -119,18 +119,18 @@ public class DefaultXPollResourceTest
     void saveXPollAnswersWithoutEditRightTest() throws XWikiRestException
     {
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT)).thenReturn(false);
-        Response response = this.resource.saveXPollAnswers("", "", "");
+        Response response = this.resource.saveXPollAnswers("wiki", "space", "page");
         assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
     }
 
     @Test
     void saveXPollAnswersWithoutEditRightTest2() throws XPollException, XWikiRestException
     {
-        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, null)).thenReturn(true);
+        DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
+        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, docRef)).thenReturn(true);
         when(this.xWikiContext.getRequest()).thenReturn(this.request);
         when(this.serializer.serialize(null, new WikiReference("wiki"))).thenReturn("userIdentifier");
 
-        DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
 
         doThrow(new XPollException("Message")).when(this.xPollManager).vote(docRef, null, Collections.emptyList());
         Response response = resource.saveXPollAnswers("xwiki", "Main", "WebHome");

@@ -241,7 +241,7 @@
   ## This is needed to update the number of user when the status is active and the deleted users are hidden.
   #set ($usersCountActive = 0)
   #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
-    #if ($xwiki.exists($services.model.resolveDocument($user)) || $xwiki.exists("$xcontext.mainWikiName:$user"))
+    #if ($xwiki.exists($obj.user))
       #set ($usersCountActive = $usersCountActive + 1)
     #end
   #end
@@ -278,23 +278,16 @@
           #set ($foundUser = false)
           #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
             #set ($user = $voteObj.user)
-            #set ($isCurrentUser = $user == $services.model.serialize($services.model.resolveDocument($xcontext.user), 'local'))
+            #set ($isCurrentUser = $user.equals($xcontext.user))
             #set ($votes = $voteObj.getValue('votes'))
             &lt;tr #if($isCurrentUser)class="active"#end&gt;
               #if ($isCurrentUser)
                 #set ($foundUser = true)
               #end
               ## We check if the saved user exists locally in the subwiki or is a global user
-              #set($tmp = $services.model.serialize($services.model.resolveDocument($user)))
-              #set($completeUser = '')
-              #if ($xwiki.exists($tmp))
-                #set ($completeUser = $tmp)
-              #elseif ($xwiki.exists("$xcontext.mainWikiName:$user"))
-                #set ($completeUser = "$xcontext.mainWikiName:$user")
-              #end
-              #if ($completeUser != '')
+              #if ($xwiki.exists($user))
                 &lt;td&gt;
-                  #displayUser($completeUser)
+                  #displayUser($user)
                 &lt;/td&gt;
                 #displayInput($votes $isCurrentUser $user)
               #end
@@ -308,7 +301,7 @@
                 #displayUser($xcontext.user)
               &lt;/td&gt;
               ## The 3rd parameter is true in order to not disable the input for current user.
-              #displayInput([] true $services.model.serialize($services.model.resolveDocument($xcontext.user), 'local'))
+              #displayInput([] true $xcontext.user)
             &lt;/tr&gt;
           #end
           &lt;/tbody&gt;

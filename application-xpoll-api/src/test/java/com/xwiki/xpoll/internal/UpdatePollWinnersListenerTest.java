@@ -91,7 +91,6 @@ public class UpdatePollWinnersListenerTest
 
         this.listener.onEvent(new DocumentUpdatedEvent(), this.document, this.xWikiContext);
 
-
         verify(this.xpollObject).set("winner", "Proposal1", xWikiContext);
         verify(this.wiki).saveDocument(this.document, "Updated winner", this.xWikiContext);
     }

@@ -19,9 +19,12 @@
  */
 package com.xwiki.xpoll.internal.script;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -57,25 +60,37 @@ public class XPollScriptServiceTest
     private ContextualAuthorizationManager authorizationManager;
 
     @Test
-    void urlTest() {
-        scriptService.url(null);
-        verify(manager).getRestURL(null);
+    void urlTest()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "name");
+        String urlResult = "output";
+
+        when(manager.getRestURL(documentReference)).thenReturn(urlResult);
+
+        assertEquals(urlResult, scriptService.url(documentReference));
     }
 
     @Test
     void getVoteResultsWithAuthorizationTest() throws XPollException
     {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "name");
+        Map<String, Integer> results = Collections.emptyMap();
+
         when(this.authorizationManager.hasAccess(Right.VIEW)).thenReturn(true);
-        scriptService.getVoteResults(null);
-        verify(this.manager).getVoteResults(null);
+        when(this.manager.getVoteResults(documentReference)).thenReturn(results);
+
+        assertEquals(results, scriptService.getVoteResults(documentReference));
     }
 
     @Test
     void getVoteResultsWithAuthorizationAndThrownExceptionTest() throws XPollException
     {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "name");
+
         when(this.authorizationManager.hasAccess(Right.VIEW)).thenReturn(true);
-        when(manager.getVoteResults(null)).thenThrow(XPollException.class);
-        Map<String, Integer> result = scriptService.getVoteResults(null);
+        when(manager.getVoteResults(documentReference)).thenThrow(XPollException.class);
+
+        Map<String, Integer> result = scriptService.getVoteResults(documentReference);
         assertEquals(0, result.size());
     }
 }

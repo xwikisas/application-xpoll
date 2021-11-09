@@ -125,9 +125,9 @@ public class CondorcetPollResultsCalculator extends AbstractPollResultsCalculato
     private void computeProposalWeights(List<BaseObject> xpollVotes, Map<String, Map<String, Integer>> ballotsMatrix,
         List<String> proposals)
     {
-        List<String> notVotedProposals = new ArrayList<>(proposals);
 
         for (BaseObject xpollVote : xpollVotes) {
+            List<String> notVotedProposals = new ArrayList<>(proposals);
             List<String> currentVotes = xpollVote.getListValue(DefaultXPollManager.VOTES);
 
             notVotedProposals.removeAll(currentVotes);
@@ -143,8 +143,6 @@ public class CondorcetPollResultsCalculator extends AbstractPollResultsCalculato
                     line.put(notVotedProposal, value + 1);
                 }
             }
-            notVotedProposals.clear();
-            notVotedProposals.addAll(proposals);
         }
     }
 }

@@ -80,7 +80,7 @@ public class DefaultXPollManager implements XPollManager
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    @Named("local")
+    @Named("compactwiki")
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
@@ -151,7 +151,7 @@ public class DefaultXPollManager implements XPollManager
     private void setUserVotes(List<String> votedProposals, XWikiContext context, XWikiDocument doc,
         DocumentReference user) throws XWikiException
     {
-        String currentUserName = serializer.serialize(user, doc.getDocumentReference().getWikiReference().getName());
+        String currentUserName = serializer.serialize(user, doc.getDocumentReference().getWikiReference());
         BaseObject xpollVoteOfCurrentUser = doc.getXObject(XPOLL_VOTES_CLASS_REFERENCE, USER,
             currentUserName, false);
 
