@@ -48,6 +48,7 @@ contrib.xpoll.status.finished=Finished
 contrib.xpoll.status.inPreparation=In preparation
 contrib.xpoll.user=Users
 contrib.xpoll.vote.failed=Failed to save the document. Reason: {0}
+contrib.xpoll.vote.failed.forbidden=Not allowed to vote!
 contrib.xpoll.vote.guest.submit=Save
 contrib.xpoll.vote.user.submit=Save
 contrib.xpoll.vote.saved=Saved

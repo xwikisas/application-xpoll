@@ -67,7 +67,9 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
     @Override
     public Response saveXPollAnswers(String wikiName, String spaces, String pageName) throws XWikiRestException
     {
-        if (!contextualAuthorizationManager.hasAccess(Right.EDIT)) {
+        DocumentReference documentReference = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
+
+        if (!contextualAuthorizationManager.hasAccess(Right.EDIT, documentReference)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         XWikiContext context = getXWikiContext();
@@ -76,7 +78,6 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
         // That's why we need to use this workaround: manually getting the POST params in the request object.
         XWikiRequest request = context.getRequest();
         try {
-            DocumentReference documentReference = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
             DocumentReference userReference = context.getUserReference();
             String userIdentifier = this.serializer.serialize(userReference, new WikiReference(wikiName));
             String[] proposalsArray = request.getParameterValues(userIdentifier);

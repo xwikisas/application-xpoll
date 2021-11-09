@@ -137,17 +137,17 @@
         beforeSend: function() {
           this.progressNotification = new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saving')", 'inprogress');
         },
-        complete:function() {
-          // Disable inprogress notification widget.
-          this.progressNotification.hide();
-        },
         success: function(data) {
-          new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saved')", 'done');
+          this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saved')", 'done'));
           // Reload just the form with the id="xpollSaveForm" which contains the table.
           $('#xpollSaveForm').load(XWiki.currentDocument.getURL('get') +  ' #xpollSaveForm&gt;*');
         },
         error: function(data) {
-          new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error');
+          if (data.status == 403) {
+            this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.forbidden')", 'error'));
+          } else {
+            this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error'));
+          }
         }
       });
     });

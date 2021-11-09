@@ -30,6 +30,10 @@
   <packaging>jar</packaging>
   <name>XPoll Application (Pro) API</name>
   <description>Provides the Java APIs needed by the XPoll Application.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
