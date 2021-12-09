@@ -526,6 +526,9 @@
 .xpollSelect {
   width: 100%;
 }
+.xpollSaveForm {
+   overflow-x: scroll;
+}
 .avatar {
   float: left;
   margin-right: 10px;
