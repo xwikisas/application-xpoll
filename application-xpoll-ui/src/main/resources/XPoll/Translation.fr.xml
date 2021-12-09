@@ -39,6 +39,7 @@
   <content>contrib.xpoll.app.title=Sondage
 contrib.xpoll.finish.message=Le vote est terminé. Voici les résultats :
 contrib.xpoll.home.title=Sondages
+contrib.xpoll.notVoted=Vous n'avez pas encore voté
 contrib.xpoll.numberVotes=Nombre de votes
 contrib.xpoll.preparation.hasRight=Ce sondage est actuellement en préparation, cliquez sur "éditer" pour le modifier et l'activer.
 contrib.xpoll.preparation.noRight=Ce sondage est actuellement en préparation, vous n'avez pas le droit de le modifier.
@@ -47,10 +48,12 @@ contrib.xpoll.status.finished=Terminé
 contrib.xpoll.status.inPreparation=En cours de préparation
 contrib.xpoll.user=Utilisateur
 contrib.xpoll.vote.failed=Une erreur est survenue pendant pendant l'enregistrement du document. Raison: {0}
+contrib.xpoll.vote.failed.forbidden=Vous n'êtes pas autorisé à voter!
 contrib.xpoll.vote.guest.submit=Sauvegarder
+contrib.xpoll.vote.user.submit=Sauvegarder
 contrib.xpoll.vote.saved=Enregistré
 contrib.xpoll.vote.saving=Enregistrement en cours...
-contrib.xpoll.vote.user.submit=Sauvegarder
+contrib.xpoll.vote.select=Sélectionnez une valeur
 contrib.xpoll.WebHome.description=Bienvenue sur l'application Sondage. Vous pouvez créer un sondage en fonction de vos besoins.
 contrib.xpoll.WebHome.name=Nom
 contrib.xpoll.WebHome.status=Statut
@@ -70,6 +73,16 @@ XPoll.XPollClass_status_inpreparation=En cours de préparation
 XPoll.XPollClass_type_hint=Un sondage peut être configuré pour ne nécessiter qu'une ou plusieurs valeurs
 XPoll.XPollClass_type_multi=Autoriser plusieurs options
 XPoll.XPollClass_type_single=Peut sélectionner une seule option
+XPoll.XPollClass_type_condorcet=Autoriser plusieurs options dans l'ordre
+
+xpoll.migration.shouldMigrateOne=Ce sondage est incompatible avec la nouvelle version de l'application de sondage XWiki.
+xpoll.migration.migrate=Si vous souhaitez résoudre ce problème, suivez le lien ci-dessous.
+xpoll.migration.notifyAdmin=Veuillez informer l'administrateur de ce problème.
+xpoll.migration.linkText=Cliquez ici pour migrer.
+xpoll.migration.migrated=Migration réussie
+xpoll.migration.shouldMigrateAll=Certains sondages sont incompatibles avec la nouvelle version de l'application de sondage XWiki.
+xpoll.migration.failed=Échec de la migration
+xpoll.migration.inProgress=Migration en cours
 
 ## Livetable
 xpoll.livetable._actions=Actions

@@ -520,7 +520,12 @@
   clear: both;
   visibility: hidden;
 }
-
+.clearfix {
+  display: flex;
+}
+.xpollSelect {
+  width: 100%;
+}
 .avatar {
   float: left;
   margin-right: 10px;
