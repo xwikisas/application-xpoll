@@ -170,6 +170,22 @@
       var hiddenField = '#option' + $(this).val();
       $(hiddenField).val(proposal);
     });
+    // Sticky header for Internet Explorer 9+
+    var val = $('.xpoll th:lt(1)');
+    var posVal = val.css('position');
+    if (posVal != 'sticky') {
+      var wrapper = $('#xpollTableWrapper');
+      var table = $(wrapper).find('table');
+      var height = Math.min(table.height(), $(window).height());
+      wrapper.css('overflow-y', 'auto');
+      wrapper.css('height', height);
+      $(wrapper).scroll(function(){
+        var translate = "translate(0,"+this.scrollTop+"px)";
+        $(this).find('th').each(function() {
+          this.style.transform = translate;
+        });
+      });
+    }
   });
 });</code>
     </property>
