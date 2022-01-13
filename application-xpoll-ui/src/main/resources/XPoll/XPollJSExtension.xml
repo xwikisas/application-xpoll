@@ -170,15 +170,18 @@
       var hiddenField = '#option' + $(this).val();
       $(hiddenField).val(proposal);
     });
-    // Sticky header for Internet Explorer 9+
-    var val = $('.xpoll th:lt(1)');
+    // #87: The "sticky" header isn't working on IE 11
+    // We check to see if 'position: sticky;' of the table header is present, thus supported on the browser.
+    var val = $('.xpoll th:first');
     var posVal = val.css('position');
     if (posVal != 'sticky') {
+      // We need a fixed height for the table parent so we can scroll through it.
       var wrapper = $('#xpollTableWrapper');
       var table = $(wrapper).find('table');
       var height = Math.min(table.height(), $(window).height());
       wrapper.css('overflow-y', 'auto');
       wrapper.css('height', height);
+      // When scrolling in the table parent, we offset the table header cells by the amount that has been scrolled.
       $(wrapper).scroll(function(){
         var translate = "translate(0,"+this.scrollTop+"px)";
         $(this).find('th').each(function() {
