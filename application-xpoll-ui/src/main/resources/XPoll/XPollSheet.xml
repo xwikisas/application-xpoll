@@ -256,65 +256,67 @@
 
     {{html wiki='true' clean='false'}}
       &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
-        &lt;table class='xpoll medium-avatars table table-bordered'&gt;
-          ## Table header row.
-          &lt;thead&gt;
-            &lt;tr&gt;
-              &lt;th&gt;
-                $services.localization.render('contrib.xpoll.user')
-                &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
-              &lt;/th&gt;
-              #foreach($proposal in $proposals)
+        &lt;div id="xpollTableWrapper"&gt;
+          &lt;table class='xpoll medium-avatars table table-bordered'&gt;
+            ## Table header row.
+            &lt;thead&gt;
+              &lt;tr&gt;
                 &lt;th&gt;
-                  &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
-                    $proposal
-                  &lt;/label&gt;
+                  $services.localization.render('contrib.xpoll.user')
+                  &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
                 &lt;/th&gt;
-              #end
-            &lt;/tr&gt;
-          &lt;/thead&gt;
-          ## Users and their votes.
-          &lt;tbody&gt;
-          #set ($foundUser = false)
-          #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
-            #set ($user = $voteObj.user)
-            #set ($isCurrentUser = $user.equals($xcontext.user))
-            #set ($votes = $voteObj.getValue('votes'))
-            &lt;tr #if($isCurrentUser)class="active"#end&gt;
-              #if ($isCurrentUser)
-                #set ($foundUser = true)
-              #end
-              #if ($xwiki.exists($user))
+                #foreach($proposal in $proposals)
+                  &lt;th&gt;
+                    &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
+                      $proposal
+                    &lt;/label&gt;
+                  &lt;/th&gt;
+                #end
+              &lt;/tr&gt;
+            &lt;/thead&gt;
+            ## Users and their votes.
+            &lt;tbody&gt;
+            #set ($foundUser = false)
+            #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+              #set ($user = $voteObj.user)
+              #set ($isCurrentUser = $user.equals($xcontext.user))
+              #set ($votes = $voteObj.getValue('votes'))
+              &lt;tr #if($isCurrentUser)class="active"#end&gt;
+                #if ($isCurrentUser)
+                  #set ($foundUser = true)
+                #end
+                #if ($xwiki.exists($user))
+                  &lt;td&gt;
+                    #displayUser($user)
+                  &lt;/td&gt;
+                  #displayInput($votes $isCurrentUser $user)
+                #end
+              &lt;/tr&gt;
+            #end
+
+            ## Display the current user if he hasn't voted yet.
+            #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
+              &lt;tr class="active"&gt;
                 &lt;td&gt;
-                  #displayUser($user)
+                  #displayUser($xcontext.user)
                 &lt;/td&gt;
-                #displayInput($votes $isCurrentUser $user)
-              #end
-            &lt;/tr&gt;
-          #end
+                ## The 3rd parameter is true in order to not disable the input for current user.
+                #displayInput([] true $xcontext.user)
+              &lt;/tr&gt;
+            #end
+            &lt;/tbody&gt;
 
-          ## Display the current user if he hasn't voted yet.
-          #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
-            &lt;tr class="active"&gt;
-              &lt;td&gt;
-                #displayUser($xcontext.user)
-              &lt;/td&gt;
-              ## The 3rd parameter is true in order to not disable the input for current user.
-              #displayInput([] true $xcontext.user)
-            &lt;/tr&gt;
-          #end
-          &lt;/tbody&gt;
-
-          &lt;tfoot&gt;
-            &lt;tr&gt;
-              &lt;td&gt;
-                $services.localization.render('contrib.xpoll.numberVotes')
-                &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
-              &lt;/td&gt;
-              #foreach ($proposal in $proposals) &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt; #end
-            &lt;/tr&gt;
-          &lt;/tfoot&gt;
-        &lt;/table&gt;
+            &lt;tfoot&gt;
+              &lt;tr&gt;
+                &lt;td&gt;
+                  $services.localization.render('contrib.xpoll.numberVotes')
+                  &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
+                &lt;/td&gt;
+                #foreach ($proposal in $proposals) &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt; #end
+              &lt;/tr&gt;
+            &lt;/tfoot&gt;
+          &lt;/table&gt;
+        &lt;/div&gt;
         #if ($xcontext.user != 'XWiki.XWikiGuest')
           &lt;div class='save'&gt;
             &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")"
