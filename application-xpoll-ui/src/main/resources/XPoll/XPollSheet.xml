@@ -48,35 +48,6 @@
   #end
   $doc.display('name')
 #end
-#macro (displayUser $userName)
-  #set ($userReference = $services.model.resolveDocument($userName))
-  #set ($userDoc = $xwiki.getDocumentAsAuthor($userReference))
-  {{html wiki='true' clean='false'}}
-    &lt;div class='clearfix xpollUser'&gt;
-      &lt;span id="avatar_$userDoc.fullName" class='avatar user-avatar-wrapper'&gt;
-        &lt;span class="user-avatar"&gt;
-          #if ($xwiki.exists($userReference))
-            {{useravatar username="$userDoc.prefixedFullName" width='40' height='40'/}}
-          #else
-            &lt;img alt="Picture of $userReference.name" src="$xwiki.getSkinFile('icons/xwiki/noavatar.png')"
-              title="$userReference.name" width="40" height="40"&gt;
-          #end
-        &lt;/span&gt;
-      &lt;/span&gt;
-      &lt;span class='info'&gt;
-        #if ($xwiki.exists($userReference))
-          #set ($username = "$!userDoc.getValue('first_name') $!userDoc.getValue('last_name')")
-          #if ("$!username.trim()" == '')
-            #set ($username = $userDoc.documentReference.name)
-          #end
-          [[$username&gt;&gt;$userDoc.prefixedFullName]]
-          &lt;br/&gt;
-        #end
-        &lt;span class="user-alias"&gt;$userDoc.documentReference.name&lt;/span&gt;
-      &lt;/span&gt;
-    &lt;/div&gt;
-  {{/html}}
-#end
 #macro(displayInput $votes $isCurrentUser $user)
   #set ($disabled = '')
   #if (!$isCurrentUser || $pollObj.getValue('status') != 'active')
@@ -513,33 +484,8 @@
 .save {
   text-align: left;
 }
-
-.xpollUser:after
-{
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-.xpollUser {
-  display: flex;
-}
 .xpollSelect {
   width: 100%;
-}
-.avatar {
-  float: left;
-  margin-right: 10px;
-}
-
-.xpollUser .user-avatar-wrapper {
-  position: relative;
-}
-
-.info
-{
-  float: left;
 }
 
 .active {
