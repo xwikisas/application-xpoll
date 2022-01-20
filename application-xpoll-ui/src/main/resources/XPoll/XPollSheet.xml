@@ -52,7 +52,7 @@
   #set ($userReference = $services.model.resolveDocument($userName))
   #set ($userDoc = $xwiki.getDocumentAsAuthor($userReference))
   {{html wiki='true' clean='false'}}
-    &lt;div class='clearfix user'&gt;
+    &lt;div class='clearfix xpollUser'&gt;
       &lt;span id="avatar_$userDoc.fullName" class='avatar user-avatar-wrapper'&gt;
         &lt;span class="user-avatar"&gt;
           #if ($xwiki.exists($userReference))
@@ -514,7 +514,7 @@
   text-align: left;
 }
 
-.clearfix:after
+.xpollUser:after
 {
   content: ".";
   display: block;
@@ -522,7 +522,7 @@
   clear: both;
   visibility: hidden;
 }
-.clearfix {
+.xpollUser {
   display: flex;
 }
 .xpollSelect {
@@ -533,7 +533,7 @@
   margin-right: 10px;
 }
 
-.user .user-avatar-wrapper {
+.xpollUser .user-avatar-wrapper {
   position: relative;
 }
 
