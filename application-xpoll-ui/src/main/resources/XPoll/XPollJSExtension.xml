@@ -177,8 +177,7 @@
     if (posVal != 'sticky') {
       // We need a fixed height for the table parent so we can scroll through it.
       var wrapper = $('#xpollTableWrapper');
-      var table = $(wrapper).find('table');
-      var height = Math.min(table.height(), $(window).height());
+      var height = Math.min(wrapper.height(), $(window).height());
       wrapper.css('overflow-y', 'auto');
       wrapper.css('height', height);
       // When scrolling in the table parent, we offset the table header cells by the amount that has been scrolled.
