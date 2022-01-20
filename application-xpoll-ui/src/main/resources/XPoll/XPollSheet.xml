@@ -528,8 +528,8 @@
 .xpollSelect {
   width: 100%;
 }
-.xpollSaveForm {
-   overflow-x: scroll;
+#xpollTableWrapper {
+  overflow-x: scroll;
 }
 .avatar {
   float: left;
