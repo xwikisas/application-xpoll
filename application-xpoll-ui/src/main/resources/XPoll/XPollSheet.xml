@@ -48,35 +48,6 @@
   #end
   $doc.display('name')
 #end
-#macro (displayUser $userName)
-  #set ($userReference = $services.model.resolveDocument($userName))
-  #set ($userDoc = $xwiki.getDocumentAsAuthor($userReference))
-  {{html wiki='true' clean='false'}}
-    &lt;div class='clearfix user'&gt;
-      &lt;span id="avatar_$userDoc.fullName" class='avatar user-avatar-wrapper'&gt;
-        &lt;span class="user-avatar"&gt;
-          #if ($xwiki.exists($userReference))
-            {{useravatar username="$userDoc.prefixedFullName" width='40' height='40'/}}
-          #else
-            &lt;img alt="Picture of $userReference.name" src="$xwiki.getSkinFile('icons/xwiki/noavatar.png')"
-              title="$userReference.name" width="40" height="40"&gt;
-          #end
-        &lt;/span&gt;
-      &lt;/span&gt;
-      &lt;span class='info'&gt;
-        #if ($xwiki.exists($userReference))
-          #set ($username = "$!userDoc.getValue('first_name') $!userDoc.getValue('last_name')")
-          #if ("$!username.trim()" == '')
-            #set ($username = $userDoc.documentReference.name)
-          #end
-          [[$username&gt;&gt;$userDoc.prefixedFullName]]
-          &lt;br/&gt;
-        #end
-        &lt;span class="user-alias"&gt;$userDoc.documentReference.name&lt;/span&gt;
-      &lt;/span&gt;
-    &lt;/div&gt;
-  {{/html}}
-#end
 #macro(displayInput $votes $isCurrentUser $user)
   #set ($disabled = '')
   #if (!$isCurrentUser || $pollObj.getValue('status') != 'active')
@@ -287,7 +258,7 @@
                 #end
                 #if ($xwiki.exists($user))
                   &lt;td&gt;
-                    #displayUser($user)
+                    #displayUser($user, {'wrapAvatar': true})
                   &lt;/td&gt;
                   #displayInput($votes $isCurrentUser $user)
                 #end
@@ -298,7 +269,7 @@
             #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
               &lt;tr class="active"&gt;
                 &lt;td&gt;
-                  #displayUser($xcontext.user)
+                  #displayUser($xcontext.user, {'wrapAvatar': true})
                 &lt;/td&gt;
                 ## The 3rd parameter is true in order to not disable the input for current user.
                 #displayInput([] true $xcontext.user)
@@ -346,7 +317,7 @@
           #set ($isCurrentUser = $user == $xcontext.user)
           &lt;tr #if($isCurrentUser)class="active"#end&gt;
             &lt;td&gt;
-              #displayUser($user)
+              #displayUser($user, {'wrapAvatar': true})
             &lt;/td&gt;
             ## The 3rd parameter is false in order to disable the input when the poll is finished.
             #displayInput($votes false $user)
@@ -513,28 +484,8 @@
 .save {
   text-align: left;
 }
-
-.clearfix:after
-{
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-
-.avatar {
-  float: left;
-  margin-right: 10px;
-}
-
-.user .user-avatar-wrapper {
-  position: relative;
-}
-
-.info
-{
-  float: left;
+.xpollSelect {
+  width: 100%;
 }
 
 .active {
