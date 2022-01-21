@@ -258,7 +258,7 @@
                 #end
                 #if ($xwiki.exists($user))
                   &lt;td&gt;
-                    #displayUser($user)
+                    #displayUser($user, {'wrapAvatar': true})
                   &lt;/td&gt;
                   #displayInput($votes $isCurrentUser $user)
                 #end
@@ -269,7 +269,7 @@
             #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
               &lt;tr class="active"&gt;
                 &lt;td&gt;
-                  #displayUser($xcontext.user)
+                  #displayUser($xcontext.user, {'wrapAvatar': true})
                 &lt;/td&gt;
                 ## The 3rd parameter is true in order to not disable the input for current user.
                 #displayInput([] true $xcontext.user)
@@ -317,7 +317,7 @@
           #set ($isCurrentUser = $user == $xcontext.user)
           &lt;tr #if($isCurrentUser)class="active"#end&gt;
             &lt;td&gt;
-              #displayUser($user)
+              #displayUser($user, {'wrapAvatar': true})
             &lt;/td&gt;
             ## The 3rd parameter is false in order to disable the input when the poll is finished.
             #displayInput($votes false $user)
