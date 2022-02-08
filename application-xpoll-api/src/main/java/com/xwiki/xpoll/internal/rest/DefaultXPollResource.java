@@ -21,6 +21,7 @@ package com.xwiki.xpoll.internal.rest;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -86,9 +87,12 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             String[] proposalsArray = request.getParameterValues(userIdentifier);
             List<String> votedProposals;
             if (proposalsArray == null) {
+                String paramsMap = request.getParameterMap().keySet().stream()
+                    .map(key -> key + "=" + Arrays.toString(request.getParameterMap().get(key)))
+                    .collect(Collectors.joining(", ", "{", "}"));
                 String error = String
                     .format("Missing request parameter with the name [%s]. Received parameters are [%s]",
-                        userIdentifier, request.getParameterMap());
+                        userIdentifier, paramsMap);
                 return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
             } else {
                 votedProposals = Arrays.asList(proposalsArray);

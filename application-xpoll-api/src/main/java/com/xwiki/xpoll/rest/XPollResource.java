@@ -20,7 +20,7 @@
 package com.xwiki.xpoll.rest;
 
 import javax.ws.rs.Encoded;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -47,7 +47,7 @@ public interface XPollResource
      * @return returns 404 if the page doesn't exist or doesn't have a XPollClass object, 200 otherwise
      * @throws XWikiRestException when failing to find the document or the document is missing the poll
      */
-    @PUT
+    @POST
     Response saveXPollAnswers(
         @PathParam("wikiName") String wikiName,
         @PathParam("spaceName") @Encoded String spaces,
