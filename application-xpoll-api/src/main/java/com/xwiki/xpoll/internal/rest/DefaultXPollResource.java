@@ -20,7 +20,6 @@
 package com.xwiki.xpoll.internal.rest;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -54,6 +54,9 @@ import com.xwiki.xpoll.rest.XPollResource;
 @Singleton
 public class DefaultXPollResource extends ModifiablePageResource implements XPollResource
 {
+    @Inject
+    protected Logger logger;
+
     @Inject
     private XPollManager xPollManager;
 
@@ -83,14 +86,20 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             String[] proposalsArray = request.getParameterValues(userIdentifier);
             List<String> votedProposals;
             if (proposalsArray == null) {
-                votedProposals = Collections.emptyList();
+                String error = String
+                    .format("No request parameter with the name [%s]. Received parameters are [%s]", userIdentifier,
+                        request.getParameterMap());
+                return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
             } else {
                 votedProposals = Arrays.asList(proposalsArray);
+                logger.debug(String
+                    .format("For the key [%s] the following votes were retrieved [%s]", userIdentifier,
+                        votedProposals));
             }
             xPollManager.vote(documentReference, userReference, votedProposals);
             return Response.ok().build();
         } catch (XPollException e) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.NOT_FOUND).entity(e).build();
         }
     }
 }

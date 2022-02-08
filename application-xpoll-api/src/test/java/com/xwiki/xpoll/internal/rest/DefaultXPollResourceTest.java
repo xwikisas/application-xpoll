@@ -101,7 +101,7 @@ public class DefaultXPollResourceTest
     }
 
     @Test
-    void saveXPollAnswersTest() throws XWikiRestException, XPollException
+    void saveXPollAnswersWithoutParamNameInRequestTest() throws XWikiRestException, XPollException
     {
         DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, docRef)).thenReturn(true);
@@ -111,8 +111,7 @@ public class DefaultXPollResourceTest
 
         Response response = resource.saveXPollAnswers("xwiki", "Main", "WebHome");
 
-        verify(this.xPollManager).vote(docRef, null, Collections.emptyList());
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -134,6 +133,6 @@ public class DefaultXPollResourceTest
 
         doThrow(new XPollException("Message")).when(this.xPollManager).vote(docRef, null, Collections.emptyList());
         Response response = resource.saveXPollAnswers("xwiki", "Main", "WebHome");
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 }
