@@ -226,7 +226,7 @@
     #set ($restURL = $services.xpoll.url($doc.documentReference))
 
     {{html wiki='true' clean='false'}}
-      &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
+      &lt;form id="xpollSaveForm" action="$restURL" method="post"&gt;
         &lt;div id="xpollTableWrapper"&gt;
           &lt;table class='xpoll medium-avatars table table-bordered'&gt;
             ## Table header row.
