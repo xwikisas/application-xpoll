@@ -87,14 +87,12 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             List<String> votedProposals;
             if (proposalsArray == null) {
                 String error = String
-                    .format("No request parameter with the name [%s]. Received parameters are [%s]", userIdentifier,
-                        request.getParameterMap());
+                    .format("Missing request parameter with the name [%s]. Received parameters are [%s]",
+                        userIdentifier, request.getParameterMap());
                 return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
             } else {
                 votedProposals = Arrays.asList(proposalsArray);
-                logger.debug(String
-                    .format("For the key [%s] the following votes were retrieved [%s]", userIdentifier,
-                        votedProposals));
+                logger.debug("The user [{}] submitted the following votes [{}]", userIdentifier, votedProposals);
             }
             xPollManager.vote(documentReference, userReference, votedProposals);
             return Response.ok().build();
