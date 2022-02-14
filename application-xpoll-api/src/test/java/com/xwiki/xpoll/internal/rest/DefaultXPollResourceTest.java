@@ -21,7 +21,6 @@ package com.xwiki.xpoll.internal.rest;
 
 import java.util.Collections;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.core.Response;
 
@@ -47,11 +46,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
+import com.xwiki.xpoll.model.jaxb.Vote;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -83,9 +82,6 @@ public class DefaultXPollResourceTest
 
     private XWikiContext xWikiContext;
 
-    @Mock
-    private XWikiRequest request;
-
     @BeforeComponent
     public void configure() throws Exception
     {
@@ -101,38 +97,24 @@ public class DefaultXPollResourceTest
     }
 
     @Test
-    void saveXPollAnswersWithoutParamNameInRequestTest() throws XWikiRestException, XPollException
-    {
-        DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
-        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, docRef)).thenReturn(true);
-        when(this.xWikiContext.getRequest()).thenReturn(this.request);
-
-        when(this.serializer.serialize(null, new WikiReference("wiki"))).thenReturn("userIdentifier");
-
-        Response response = resource.saveXPollAnswers("xwiki", "Main", "WebHome");
-
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    }
-
-    @Test
     void saveXPollAnswersWithoutEditRightTest() throws XWikiRestException
     {
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT)).thenReturn(false);
-        Response response = this.resource.saveXPollAnswers("wiki", "space", "page");
+        Response response = this.resource.saveXPollAnswers("wiki", "space", "page", null);
         assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
     }
 
     @Test
-    void saveXPollAnswersWithoutEditRightTest2() throws XPollException, XWikiRestException
+    void saveXPollButManagerThrowsException() throws XPollException, XWikiRestException
     {
         DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, docRef)).thenReturn(true);
-        when(this.xWikiContext.getRequest()).thenReturn(this.request);
         when(this.serializer.serialize(null, new WikiReference("wiki"))).thenReturn("userIdentifier");
 
+        Vote vote = new Vote();
 
         doThrow(new XPollException("Message")).when(this.xPollManager).vote(docRef, null, Collections.emptyList());
-        Response response = resource.saveXPollAnswers("xwiki", "Main", "WebHome");
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Response response = resource.saveXPollAnswers("xwiki", "Main", "WebHome", vote);
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 }

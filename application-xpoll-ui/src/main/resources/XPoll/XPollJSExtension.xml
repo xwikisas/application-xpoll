@@ -130,10 +130,19 @@
     var submitInput = saveForm.find("input[type='submit']");
     saveForm.submit(function(event) {
       event.preventDefault();
+      // Transform the form data into a JSON so the Vote object can be deserialized properly server side.
+      var jsonForm = {};
+      $.map($(this).serializeArray(), function (n) {
+        if (!jsonForm[n['name']]) {
+          jsonForm[n['name']] = [];
+        }
+        jsonForm[n['name']].push(n['value']);
+      });
       $.ajax({
         type: $(this).attr('method'),
         url : $(this).attr('action'),
-        data: $(this).serialize(),
+        data: JSON.stringify(jsonForm),
+        contentType: "application/json; charset=utf-8",
         beforeSend: function() {
           this.progressNotification = new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.saving')", 'inprogress');
         },

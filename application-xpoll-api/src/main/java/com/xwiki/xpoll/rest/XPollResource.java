@@ -20,13 +20,15 @@
 package com.xwiki.xpoll.rest;
 
 import javax.ws.rs.Encoded;
-import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.stability.Unstable;
+
+import com.xwiki.xpoll.model.jaxb.Vote;
 
 /**
  * Provides the functionality of saving the user's votes and determining the winning proposal in a desired page.
@@ -44,13 +46,15 @@ public interface XPollResource
      * @param wikiName the name of the wiki in which the page resides
      * @param spaces the spaces of the page
      * @param pageName the name of the page
+     * @param vote the vote sent by the current user
      * @return returns 404 if the page doesn't exist or doesn't have a XPollClass object, 200 otherwise
      * @throws XWikiRestException when failing to find the document or the document is missing the poll
      */
-    @POST
+    @PUT
     Response saveXPollAnswers(
         @PathParam("wikiName") String wikiName,
         @PathParam("spaceName") @Encoded String spaces,
-        @PathParam("pageName") String pageName
+        @PathParam("pageName") String pageName,
+        Vote vote
     ) throws XWikiRestException;
 }
