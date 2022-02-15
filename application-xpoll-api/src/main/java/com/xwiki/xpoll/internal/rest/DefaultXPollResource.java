@@ -19,6 +19,11 @@
  */
 package com.xwiki.xpoll.internal.rest;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -71,5 +76,34 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
         } catch (XPollException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e).build();
         }
+    }
+
+    // This function is copied from the XWikiResource version 14.0 because it is needed to solve the following issue
+    // https://jira.xwiki.org/browse/XWIKI-18782 . The function shall be removed once we upgrade the parent to 13.10.
+    @Override
+    public List<String> parseSpaceSegments(String spaceSegments) throws XWikiRestException
+    {
+        // The URL format is: "spaces/A/spaces/B/spaces/C" to actually point to the space "A.B.C".
+        List<String> spaces = new ArrayList<>();
+        // We actually don't get the first "spaces/" segment so we start from the first space.
+        int i = 1;
+        for (String space : spaceSegments.split("/")) {
+            if (i++ % 2 == 0) {
+                // Every 2 segments, we should have "spaces". If not, the URL is malformed
+                if (!"spaces".equals(space)) {
+                    throw new XWikiRestException("Malformed URL: the spaces section is invalid.");
+                }
+            } else if (!space.isEmpty()) {
+                try {
+                    spaces.add(URLDecoder.decode(space, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    // Shouldn't happen.
+                    throw new XWikiRestException("Unable to decode space name.", e);
+                }
+            } else {
+                throw new XWikiRestException("Malformed URL: a space name cannot be empty.");
+            }
+        }
+        return spaces;
     }
 }

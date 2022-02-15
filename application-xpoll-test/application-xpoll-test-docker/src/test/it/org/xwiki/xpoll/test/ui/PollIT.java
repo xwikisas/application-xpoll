@@ -24,11 +24,12 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.xpoll.test.po.ActiveStatusViewPage;
@@ -71,9 +72,12 @@ class PollIT
     @BeforeEach
     void setUp(TestUtils setup) {
         setup.login("JaneDoe", "pass");
+        DocumentReference pageRef = new DocumentReference("xwiki", Arrays.asList("XPoll", pollName), "WebHome");
+        setup.deletePage(pageRef);
     }
 
     @Test
+    @Order(1)
     void appEntryRedirectsToHomePage()
     {
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
@@ -83,12 +87,13 @@ class PollIT
     }
 
     @Test
+    @Order(2)
     void createNewEntryWithInPreparationStatus()
     {
         String status = statusInPreparation;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
-        CreatePagePage createPage = createPage(xpollHomePage);
+        createPage(xpollHomePage);
 
         XPollEditPage xpollEditPage = new XPollEditPage();
         assertEquals(pollName, xpollEditPage.getName());
@@ -101,17 +106,16 @@ class PollIT
         assertEquals(pollDescription, inPreparationStatusViewPage.getPollDescription());
         assertEquals(xpollEditPage.getStatusInPreparation(), inPreparationStatusViewPage.getPollStatus());
         assertEquals(pollProposals, inPreparationStatusViewPage.getPollProposals());
-        ConfirmationPage deletePage = createPage.delete();
-        deletePage.clickYes();
     }
 
     @Test
+    @Order(3)
     void createNewEntryWithActiveStatus()
     {
         String status = statusActive;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
-        CreatePagePage createPage = createPage(xpollHomePage);
+        createPage(xpollHomePage);
 
         editPage(status);
 
@@ -121,16 +125,34 @@ class PollIT
 
         activeStatusViewPage.getProposals();
         assertEquals(this.proposals, activeStatusViewPage.pollProposals);
-        ConfirmationPage deletePage = createPage.delete();
-        deletePage.clickYes();
     }
 
     @Test
+    @Order(5)
+    void createNewEntryAndVoteProposal() {
+        String status = statusActive;
+        XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
+
+        createPage(xpollHomePage);
+        editPage(status);
+
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
+
+        activeStatusViewPage.voteProposal(1);
+
+        ActiveStatusViewPage viewPageAfterVote = new ActiveStatusViewPage();
+        String inputCheckAttribute = viewPageAfterVote.getVoteInput(1).getAttribute("checked");
+
+        assertEquals("true", inputCheckAttribute);
+    }
+
+    @Test
+    @Order(4)
     void createNewEntryWithFinishedStatus()
     {
         String status = statusFinished;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
-        CreatePagePage createPage = createPage(xpollHomePage);
+        createPage(xpollHomePage);
 
         editPage(status);
 
@@ -140,26 +162,25 @@ class PollIT
 
         finishedStatusViewPage.getProposals();
         assertEquals(this.proposals, finishedStatusViewPage.pollProposals);
-        ConfirmationPage deletePage = createPage.delete();
-        deletePage.clickYes();
     }
     
-    private CreatePagePage createPage(XPollHomePage xpollHomePage)
+    private void createPage(XPollHomePage xpollHomePage)
     {
         CreatePagePage createPage = xpollHomePage.createPage();
         createPage.getDocumentPicker().setTitle(pollName);
         createPage.setTemplate("XPoll.Code.XPollTemplateProvider");
         createPage.clickCreate();
-        return createPage;
     }
     
-    private void editPage(String status)
+    private XPollEditPage editPage(String status)
     {
         XPollEditPage xpollEditPage = new XPollEditPage();
         assertEquals(pollName, xpollEditPage.getName());
         xpollEditPage.setDescription(pollDescription);
         xpollEditPage.setStatus(status);
         xpollEditPage.setProposals(pollProposals);
+        xpollEditPage.setType("single");
         xpollEditPage.clickSaveAndView();
+        return xpollEditPage;
     }
 }

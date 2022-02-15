@@ -38,6 +38,12 @@ public class ActiveStatusViewPage extends ViewPage
     public List<WebElement> proposals = getDriver().findElements(
         By.xpath("//table[contains(@class, 'xpoll')]//tr[1]//th[position()>1]"));
 
+    public List<WebElement> proposalVoteInputs = getDriver().findElements(
+        By.xpath("//table[contains(@class, 'xpoll')]//tr[contains(@class, 'active')]//input"));
+
+    @FindBy(xpath = "//div[contains(@class, 'save')]/input")
+    public WebElement saveButton;
+
     public ArrayList<String> pollProposals = new ArrayList<String>();
 
     public String getDescription()
@@ -50,5 +56,15 @@ public class ActiveStatusViewPage extends ViewPage
         for (WebElement proposal : proposals) {
             pollProposals.add(proposal.getText().trim());
         }
+    }
+
+    public void voteProposal(int i) {
+        proposalVoteInputs.get(i).click();
+        saveButton.click();
+        getDriver().waitUntilPageIsReloaded();
+    }
+
+    public WebElement getVoteInput(int i) {
+        return proposalVoteInputs.get(i);
     }
 }
