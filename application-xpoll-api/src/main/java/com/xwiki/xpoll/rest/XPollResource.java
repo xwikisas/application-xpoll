@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.stability.Unstable;
 
-import com.xwiki.xpoll.model.jaxb.Vote;
+import com.xwiki.xpoll.rest.model.jaxb.Vote;
 
 /**
  * Provides the functionality of saving the user's votes and determining the winning proposal in a desired page.
@@ -51,7 +51,7 @@ public interface XPollResource
      * @throws XWikiRestException when failing to find the document or the document is missing the poll
      */
     @PUT
-    Response saveXPollAnswers(
+    Response vote(
         @PathParam("wikiName") String wikiName,
         @PathParam("spaceName") @Encoded String spaces,
         @PathParam("pageName") String pageName,

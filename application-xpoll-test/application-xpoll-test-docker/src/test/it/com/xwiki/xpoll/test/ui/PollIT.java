@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xpoll.test.ui;
+package com.xwiki.xpoll.test.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -32,11 +33,11 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.xpoll.test.po.ActiveStatusViewPage;
-import org.xwiki.xpoll.test.po.FinishedStatusViewPage;
-import org.xwiki.xpoll.test.po.InPreparationStatusViewPage;
-import org.xwiki.xpoll.test.po.XPollEditPage;
-import org.xwiki.xpoll.test.po.XPollHomePage;
+import com.xwiki.xpoll.test.po.ActiveStatusViewPage;
+import com.xwiki.xpoll.test.po.FinishedStatusViewPage;
+import com.xwiki.xpoll.test.po.InPreparationStatusViewPage;
+import com.xwiki.xpoll.test.po.XPollEditPage;
+import com.xwiki.xpoll.test.po.XPollHomePage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -82,7 +83,7 @@ class PollIT
     {
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
         ViewPage vp = applicationPanel.clickApplication("Polls");
-        assertEquals(XPollHomePage.getSpace(), vp.getMetaDataValue("space"));
+        Assertions.assertEquals(XPollHomePage.getSpace(), vp.getMetaDataValue("space"));
         assertEquals(XPollHomePage.getPage(), vp.getMetaDataValue("page"));
     }
 

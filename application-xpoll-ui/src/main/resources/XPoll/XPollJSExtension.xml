@@ -132,11 +132,11 @@
       event.preventDefault();
       // Transform the form data into a JSON so the Vote object can be deserialized properly server side.
       var jsonForm = {};
-      $.map($(this).serializeArray(), function (n) {
-        if (!jsonForm[n['name']]) {
-          jsonForm[n['name']] = [];
+      $.map($(this).serializeArray(), function (entry) {
+        if (!jsonForm[entry['name']]) {
+          jsonForm[entry['name']] = [];
         }
-        jsonForm[n['name']].push(n['value']);
+        jsonForm[entry['name']].push(entry['value']);
       });
       $.ajax({
         type: $(this).attr('method'),

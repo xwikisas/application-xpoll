@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
 -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.com/xpoll/model/jaxb"
-  xmlns:xpoll="http://www.xwiki.com/xpoll/model/jaxb" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.com/xpoll"
+  xmlns:xpoll="http://www.xwiki.com/xpoll" elementFormDefault="qualified">
 
-  <xs:element name="xpoll" type="xpoll:Vote"/>
+  <xs:element name="vote" type="xpoll:Vote"/>
 
   <xs:complexType name="Vote">
     <xs:sequence>
-      <xs:element name="votedProposals" maxOccurs="unbounded" type="xs:string"/>
+      <xs:element name="proposal" maxOccurs="unbounded" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

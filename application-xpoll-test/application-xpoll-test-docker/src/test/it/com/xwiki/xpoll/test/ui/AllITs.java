@@ -17,36 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xpoll.test.po;
+package com.xwiki.xpoll.test.ui;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
 
-public class InPreparationStatusViewPage extends ViewPage
+/**
+ * All UI tests for the Poll application.
+ *
+ * @version $Id$
+ * @since 2.2
+ */
+@UITest
+class AllITs
 {
-    @FindBy(xpath = "//div[@class = 'xform']/dl/dd")
-    public WebElement pollDescription;
-
-    @FindBy(xpath = "//div[@class = 'xform']//div[contains(@class,'row')]//div[1]//dd")
-    public WebElement pollProposals;
-
-    @FindBy(css = ".xform .label.label-warning")
-    public WebElement pollStatus;
-
-    public String getPollDescription()
+    @Nested
+    @DisplayName("Overall Poll UI")
+    class NestedPollIT extends PollIT
     {
-        return pollDescription.getText();
     }
-
-    public String getPollStatus()
-    {
-        return pollStatus.getText();
-    }
-
-    public String getPollProposals()
-    {
-        return pollProposals.getText();
-    }
-
 }

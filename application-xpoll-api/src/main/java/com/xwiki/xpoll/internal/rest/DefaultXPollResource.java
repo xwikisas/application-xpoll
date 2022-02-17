@@ -39,7 +39,7 @@ import org.xwiki.security.authorization.Right;
 import com.xpn.xwiki.XWikiContext;
 import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
-import com.xwiki.xpoll.model.jaxb.Vote;
+import com.xwiki.xpoll.rest.model.jaxb.Vote;
 import com.xwiki.xpoll.rest.XPollResource;
 
 /**
@@ -60,7 +60,7 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Override
-    public Response saveXPollAnswers(String wikiName, String spaces, String pageName, Vote vote)
+    public Response vote(String wikiName, String spaces, String pageName, Vote vote)
         throws XWikiRestException
     {
         DocumentReference documentReference = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
@@ -71,7 +71,7 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
         XWikiContext context = getXWikiContext();
         try {
             DocumentReference userReference = context.getUserReference();
-            xPollManager.vote(documentReference, userReference, vote.getVotedProposals());
+            xPollManager.vote(documentReference, userReference, vote.getProposals());
             return Response.ok().build();
         } catch (XPollException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e).build();

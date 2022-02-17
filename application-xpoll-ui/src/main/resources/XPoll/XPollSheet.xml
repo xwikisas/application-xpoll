@@ -84,7 +84,7 @@
                #end
              &lt;/select&gt;
              ## The hidden inputs that will have the values sent by the form.
-             &lt;input class="xpollHiddenInput" id="option$foreach.count" name="votedProposals"
+             &lt;input class="xpollHiddenInput" id="option$foreach.count" name="proposals"
               #if ($votes.size() &gt; $foreach.index)value="$escapetool.xml($votes.get($foreach.index))"#end
                type="hidden"/&gt;
            #else
@@ -96,7 +96,7 @@
          ## Display the inputs for the normal polls.
          #else
            &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="votedProposals"
+             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="proposals"
              value="$escapetool.xml($proposal)" $checked
              $disabled /&gt;
          #end

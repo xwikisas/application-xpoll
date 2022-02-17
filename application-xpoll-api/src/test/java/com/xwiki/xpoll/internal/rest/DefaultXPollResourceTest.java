@@ -46,7 +46,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
-import com.xwiki.xpoll.model.jaxb.Vote;
+import com.xwiki.xpoll.rest.model.jaxb.Vote;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
@@ -100,7 +100,7 @@ public class DefaultXPollResourceTest
     void saveXPollAnswersWithoutEditRightTest() throws XWikiRestException
     {
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT)).thenReturn(false);
-        Response response = this.resource.saveXPollAnswers("wiki", "space", "page", null);
+        Response response = this.resource.vote("wiki", "space", "page", null);
         assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
     }
 
@@ -114,7 +114,7 @@ public class DefaultXPollResourceTest
         Vote vote = new Vote();
 
         doThrow(new XPollException("Message")).when(this.xPollManager).vote(docRef, null, Collections.emptyList());
-        Response response = resource.saveXPollAnswers("xwiki", "Main", "WebHome", vote);
+        Response response = resource.vote("xwiki", "Main", "WebHome", vote);
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 }
