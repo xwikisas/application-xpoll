@@ -19,29 +19,27 @@
  */
 package com.xwiki.xpoll.internal.rest;
 
-import java.util.Arrays;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.resources.pages.ModifiablePageResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
+import com.xwiki.xpoll.rest.model.jaxb.Vote;
 import com.xwiki.xpoll.rest.XPollResource;
 
 /**
@@ -56,20 +54,14 @@ import com.xwiki.xpoll.rest.XPollResource;
 public class DefaultXPollResource extends ModifiablePageResource implements XPollResource
 {
     @Inject
-    protected Logger logger;
-
-    @Inject
     private XPollManager xPollManager;
-
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> serializer;
 
     @Inject
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Override
-    public Response saveXPollAnswers(String wikiName, String spaces, String pageName) throws XWikiRestException
+    public Response vote(String wikiName, String spaces, String pageName, Vote vote)
+        throws XWikiRestException
     {
         DocumentReference documentReference = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
 
@@ -77,31 +69,41 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         XWikiContext context = getXWikiContext();
-        // We should seriously consider to stop using Restlet, because the @FormParam attribute does not work.
-        // See: https://github.com/restlet/restlet-framework-java/issues/1120
-        // That's why we need to use this workaround: manually getting the POST params in the request object.
-        XWikiRequest request = context.getRequest();
         try {
             DocumentReference userReference = context.getUserReference();
-            String userIdentifier = this.serializer.serialize(userReference, new WikiReference(wikiName));
-            String[] proposalsArray = request.getParameterValues(userIdentifier);
-            List<String> votedProposals;
-            if (proposalsArray == null) {
-                String paramsMap = request.getParameterMap().keySet().stream()
-                    .map(key -> key + "=" + Arrays.toString(request.getParameterMap().get(key)))
-                    .collect(Collectors.joining(", ", "{", "}"));
-                String error = String
-                    .format("Missing request parameter with the name [%s]. Received parameters are [%s]",
-                        userIdentifier, paramsMap);
-                return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
-            } else {
-                votedProposals = Arrays.asList(proposalsArray);
-                logger.debug("The user [{}] submitted the following votes [{}]", userIdentifier, votedProposals);
-            }
-            xPollManager.vote(documentReference, userReference, votedProposals);
+            xPollManager.vote(documentReference, userReference, vote.getProposals());
             return Response.ok().build();
         } catch (XPollException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e).build();
         }
+    }
+
+    // This function is copied from the XWikiResource version 14.0 because it is needed to solve the following issue
+    // https://jira.xwiki.org/browse/XWIKI-18782 . The function shall be removed once we upgrade the parent to 13.10.
+    @Override
+    public List<String> parseSpaceSegments(String spaceSegments) throws XWikiRestException
+    {
+        // The URL format is: "spaces/A/spaces/B/spaces/C" to actually point to the space "A.B.C".
+        List<String> spaces = new ArrayList<>();
+        // We actually don't get the first "spaces/" segment so we start from the first space.
+        int i = 1;
+        for (String space : spaceSegments.split("/")) {
+            if (i++ % 2 == 0) {
+                // Every 2 segments, we should have "spaces". If not, the URL is malformed
+                if (!"spaces".equals(space)) {
+                    throw new XWikiRestException("Malformed URL: the spaces section is invalid.");
+                }
+            } else if (!space.isEmpty()) {
+                try {
+                    spaces.add(URLDecoder.decode(space, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    // Shouldn't happen.
+                    throw new XWikiRestException("Unable to decode space name.", e);
+                }
+            } else {
+                throw new XWikiRestException("Malformed URL: a space name cannot be empty.");
+            }
+        }
+        return spaces;
     }
 }

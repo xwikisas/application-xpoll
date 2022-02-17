@@ -84,11 +84,11 @@
                #end
              &lt;/select&gt;
              ## The hidden inputs that will have the values sent by the form.
-             &lt;input class="xpollHiddenInput" id="option$foreach.count" name="$escapetool.xml($user)"
+             &lt;input class="xpollHiddenInput" id="option$foreach.count" name="proposals"
               #if ($votes.size() &gt; $foreach.index)value="$escapetool.xml($votes.get($foreach.index))"#end
                type="hidden"/&gt;
            #else
-             &lt;input type="checkbox" name="$escapetool.xml($user)" $checked $disabled /&gt;
+             &lt;input type="checkbox" $checked $disabled /&gt;
              #if ($indexOfProposal &gt; 0)
                &lt;span class="label label-primary"&gt;#$indexOfProposal&lt;/span&gt;
              #end
@@ -96,7 +96,7 @@
          ## Display the inputs for the normal polls.
          #else
            &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="$escapetool.xml($user)"
+             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="proposals"
              value="$escapetool.xml($proposal)" $checked
              $disabled /&gt;
          #end
@@ -226,7 +226,7 @@
     #set ($restURL = $services.xpoll.url($doc.documentReference))
 
     {{html wiki='true' clean='false'}}
-      &lt;form id="xpollSaveForm" action="$restURL" method="post"&gt;
+      &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
         &lt;div id="xpollTableWrapper"&gt;
           &lt;table class='xpoll medium-avatars table table-bordered'&gt;
             ## Table header row.

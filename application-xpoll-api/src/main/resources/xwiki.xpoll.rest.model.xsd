@@ -1,4 +1,6 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,38 +18,16 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.xpoll.test.po;
+ *
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.com/xpoll"
+  xmlns:xpoll="http://www.xwiki.com/xpoll" elementFormDefault="qualified">
 
-import java.util.ArrayList;
-import java.util.List;
+  <xs:element name="vote" type="xpoll:Vote"/>
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
-
-/**
- * @version $Id$
- */
-public class FinishedStatusViewPage extends ViewPage
-{
-    @FindBy(xpath = "//div[@id = 'xwikicontent']/p[1]")
-    public WebElement pollDescription;
-
-    public List<WebElement> proposals = getDriver().findElements(By.xpath("//table//tr[1]//th[position()>1]"));
-
-    public ArrayList<String> pollProposals = new ArrayList<String>();
-
-    public String getDescription()
-    {
-        return pollDescription.getText();
-    }
-
-    public void getProposals()
-    {
-        for (WebElement proposal : proposals) {
-            pollProposals.add(proposal.getText().trim());
-        }
-    }
-}
+  <xs:complexType name="Vote">
+    <xs:sequence>
+      <xs:element name="proposal" maxOccurs="unbounded" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
