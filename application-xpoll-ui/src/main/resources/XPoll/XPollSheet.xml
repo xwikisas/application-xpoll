@@ -37,6 +37,16 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#macro (displayPropertyValue $property $action)
+  #if ($action)
+    #set ($output = $doc.display($property, $action))
+  #else
+    #set ($output = $doc.display($property))
+  #end
+  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
+  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
+  $output
+#end
 #*
  Displays the value of the name property as the title of the document.
  If value is empty (e.g. creation step), displays the document title.
@@ -46,7 +56,7 @@
   #if ("$!pollObj.getProperty('name').value" == '')
     #set ($discard = $pollObj.set('name', $doc.title))
   #end
-  $doc.display('name')
+  #displayPropertyValue('name')
 #end
 #macro(displayInput $votes $isCurrentUser $user)
   #set ($disabled = '')
@@ -147,62 +157,76 @@
 ## Flag to know wheter the options must be displayed as checkbox or radio inputs.
 #set ($isRadio = $pollObj.getProperty('type').value == 'single')
 #if ($xcontext.action == 'edit' || $status == 'inpreparation')
-  {{html wiki='true' clean='false'}}
+  {{html clean='false'}}
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
   #set ($discard = $doc.use('XPoll.XPollClass'))
   ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
-  (% class="xform" %)
-  (((
-    #if ($xcontext.action == 'edit')
-      ; &lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;
-      : #displayPollTitle()
-    #end
-    (% class="row inline-input-row" %)
-    (((
-    (% class="col-xs-12 col-sm-4" %)
-      (((
-      ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_proposals"#end&gt;
-          $doc.displayPrettyName('proposals', false, false)
-        &lt;/label&gt;
-        (% class="xHint" %)$services.localization.render('XPoll.XPollClass_proposals_hint')
-      : $doc.display('proposals')
-      )))
-      (% class="col-xs-12 col-sm-4" %)
-      (((
-      ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_status"#end&gt;
-          $doc.displayPrettyName('status', false, false)
-        &lt;/label&gt;
-        (% class="xHint" %)$services.localization.render('XPoll.XPollClass_status_hint')
-      #if($xcontext.action == 'view')
-        : &lt;span class="label label-warning"&gt;$doc.display('status')&lt;/span&gt;
-      #else
-        : $doc.display('status')
-      #end
-      )))
-      (% class="col-xs-12 col-sm-4" %)
-      (((
+  &lt;div class="xform"&gt;
+  #if ($xcontext.action == 'edit')
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;#displayPollTitle()&lt;/dd&gt;
+    &lt;/dl&gt;
+  #end
+    &lt;div class="row inline-input-row"&gt;
+      &lt;div class="col-xs-12 col-sm-4"&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label #if($xcontext.action=='edit' )for="XPoll.XPollClass_0_proposals" #end&gt;
+              $doc.displayPrettyName('proposals', false, false)
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;$services.localization.render('XPoll.XPollClass_proposals_hint')&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;#displayPropertyValue('proposals')&lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/div&gt;
+      &lt;div class="col-xs-12 col-sm-4"&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label #if($xcontext.action=='edit' )for="XPoll.XPollClass_0_status" #end&gt;
+              $doc.displayPrettyName('status', false, false)
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;$services.localization.render('XPoll.XPollClass_status_hint')&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+          #if($xcontext.action == 'view')
+            &lt;span class="label label-warning"&gt;#displayPropertyValue('status')&lt;/span&gt;
+          #else
+            #displayPropertyValue('status')
+          #end
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/div&gt;
+
+      &lt;div class="col-xs-12 col-sm-4"&gt;
       #if ($doc.getValue('status') == 'inpreparation' &amp;&amp; ($hasAdmin || $xcontext.user == $doc.creator))
-        ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_type"#end&gt;
-            $doc.displayPrettyName('type', false, false)
-          &lt;/label&gt;
-          (% class="xHint" %)$services.localization.render('XPoll.XPollClass_type_hint')
-        #if($xcontext.action == 'view')
-          : $doc.display('type')
-        #else
-          : $doc.display('type')
-        #end
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_type"#end&gt;
+              $doc.displayPrettyName('type', false, false)
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;$services.localization.render('XPoll.XPollClass_type_hint')&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            #displayPropertyValue('type')
+          &lt;/dd&gt;
+        &lt;/dl&gt;
       #end
-      )))
-    )))
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;dl&gt;
     #if ($xcontext.action == 'edit' || "$!doc.getValue('description')" != '')
-      ; &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_description"#end&gt;
+      &lt;dt&gt;
+        &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_description"#end&gt;
           $doc.displayPrettyName('description', false, false)
-        &lt;/label&gt;
-      : $doc.display('description')
+        &lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt; #displayPropertyValue('description')&lt;/dd&gt;
     #else
       $services.localization.render('XPoll.XPollClass_description_emptyvalue')
     #end
-  )))
+    &lt;/dl&gt;
+  &lt;/div&gt;
   {{/html}}
 #else
   $doc.display('description')
@@ -225,7 +249,7 @@
   #if ($status == 'active')
     #set ($restURL = $services.xpoll.url($doc.documentReference))
 
-    {{html wiki='true' clean='false'}}
+    {{html clean='false'}}
       &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
         &lt;div id="xpollTableWrapper"&gt;
           &lt;table class='xpoll medium-avatars table table-bordered'&gt;
