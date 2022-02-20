@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -34,6 +35,7 @@ import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -49,6 +51,7 @@ import com.xwiki.xpoll.XPollException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -75,6 +78,10 @@ class DefaultXPollManagerTest
 
     @MockComponent
     private ComponentManager componentManager;
+
+    @MockComponent
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> serializer;
 
     @Mock
     private XWikiContext xWikiContext;
@@ -110,6 +117,29 @@ class DefaultXPollManagerTest
         String result = manager.getRestURL(docRef);
         String expected = "xwiki/rest/wikis/XWiki/spaces/Space1/spaces/Space2/pages/Page/xpoll";
         assertEquals(expected, result);
+    }
+
+    @Test
+    void voteTest() throws XWikiException, XPollException
+    {
+        DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
+        DocumentReference userReference = new DocumentReference("XWiki", "User", "User");
+        List<String> votedResults = Arrays.asList("Proposal1", "Proposal2");
+
+        when(this.xWikiContext.getWiki()).thenReturn(wiki);
+        when(this.wiki.getDocument(docRef, xWikiContext)).thenReturn(document);
+        when(this.document.clone()).thenReturn(document);
+        when(this.document.getDocumentReference()).thenReturn(docRef);
+        when(this.serializer.serialize(userReference, docRef.getWikiReference())).thenReturn("User.User");
+        BaseObject xpollVotes = mock(BaseObject.class);
+        when(this.document.getXObject(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE, "user", "User.User", false))
+            .thenReturn(xpollVotes);
+
+        this.manager.vote(docRef, userReference, votedResults);
+
+        verify(xpollVotes).set("user", "User.User", this.xWikiContext);
+        verify(xpollVotes).set("votes", votedResults, this.xWikiContext);
+        verify(this.wiki).saveDocument(this.document, "New Vote", this.xWikiContext);
     }
 
     @Test
