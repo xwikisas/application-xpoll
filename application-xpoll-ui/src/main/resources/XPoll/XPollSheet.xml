@@ -251,7 +251,7 @@
 
     {{html clean='false'}}
       &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
-        &lt;div id="xpollTableWrapper"&gt;
+        &lt;div id="xpollTableWrapper" style="width:100%; overflow-x:scroll;"&gt;
           &lt;table class='xpoll medium-avatars table table-bordered'&gt;
             ## Table header row.
             &lt;thead&gt;
