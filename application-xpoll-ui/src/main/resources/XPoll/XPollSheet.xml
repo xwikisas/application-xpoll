@@ -476,6 +476,11 @@
 #xwikicontent {
   overflow: visible;
 }
+
+#xpollTableWrapper{
+  overflow-x: auto;
+}
+
 .xpoll th, .xpoll td {
   border: 1px solid $theme.borderColor;
 }
