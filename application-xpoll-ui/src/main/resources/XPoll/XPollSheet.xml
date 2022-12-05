@@ -58,10 +58,12 @@
   #end
   #displayPropertyValue('name')
 #end
-#macro(displayInput $votes $isCurrentUser $user)
+#macro(displayInput $votes $isCurrentUser $user $rowIndex)
   #set ($disabled = '')
+  #set ($inputName = 'proposals')
   #if (!$isCurrentUser || $pollObj.getValue('status') != 'active')
     #set ($disabled = 'disabled')
+    #set ($inputName = "${inputName}$!{rowIndex}")
   #end
   #foreach ($proposal in $proposals)
     #set ($isChecked = $votes.contains($proposal))
@@ -106,7 +108,7 @@
          ## Display the inputs for the normal polls.
          #else
            &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="proposals"
+             #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="${inputName}"
              value="$escapetool.xml($proposal)" $checked
              $disabled /&gt;
          #end
@@ -284,7 +286,7 @@
                   &lt;td&gt;
                     #displayUser($user, {'wrapAvatar': true})
                   &lt;/td&gt;
-                  #displayInput($votes $isCurrentUser $user)
+                  #displayInput($votes $isCurrentUser $user $foreach.index)
                 #end
               &lt;/tr&gt;
             #end
@@ -324,40 +326,42 @@
 
     {{html wiki='true' clean='false'}}
       $services.localization.render('contrib.xpoll.finish.message')
-      &lt;table class='xpoll medium-avatars table table-bordered'&gt;
-        ## Table header row.
-        &lt;tr&gt;
-          &lt;th&gt;
-            $services.localization.render('contrib.xpoll.user')
-            &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
-          &lt;/th&gt;
-          #foreach ($proposal in $proposals)&lt;th&gt; $proposal &lt;/th&gt; #end
-        &lt;/tr&gt;
-
-        ## Users and their votes.
-        #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
-          #set ($user = $voteObj.user)
-          #set ($votes = $voteObj.getValue('votes'))
-          #set ($isCurrentUser = $user == $xcontext.user)
-          &lt;tr #if($isCurrentUser)class="active"#end&gt;
-            &lt;td&gt;
-              #displayUser($user, {'wrapAvatar': true})
-            &lt;/td&gt;
-            ## The 3rd parameter is false in order to disable the input when the poll is finished.
-            #displayInput($votes false $user)
+      &lt;div id="xpollTableWrapper"&gt;
+        &lt;table class='xpoll medium-avatars table table-bordered'&gt;
+          ## Table header row.
+          &lt;tr&gt;
+            &lt;th&gt;
+              $services.localization.render('contrib.xpoll.user')
+              &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
+            &lt;/th&gt;
+            #foreach ($proposal in $proposals)&lt;th&gt; $proposal &lt;/th&gt; #end
           &lt;/tr&gt;
-        #end
 
-        &lt;tr&gt;
-          &lt;td&gt;
-            $services.localization.render('contrib.xpoll.numberVotes')
-            &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
-          &lt;/td&gt;
-          #foreach ($proposal in $proposals)
-            &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
+          ## Users and their votes.
+          #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+            #set ($user = $voteObj.user)
+            #set ($votes = $voteObj.getValue('votes'))
+            #set ($isCurrentUser = $user == $xcontext.user)
+            &lt;tr #if($isCurrentUser)class="active"#end&gt;
+              &lt;td&gt;
+                #displayUser($user, {'wrapAvatar': true})
+              &lt;/td&gt;
+              ## The 3rd parameter is false in order to disable the input when the poll is finished.
+              #displayInput($votes false $user $foreach.index)
+            &lt;/tr&gt;
           #end
-        &lt;/tr&gt;
-      &lt;/table&gt;
+
+          &lt;tr&gt;
+            &lt;td&gt;
+              $services.localization.render('contrib.xpoll.numberVotes')
+              &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
+            &lt;/td&gt;
+            #foreach ($proposal in $proposals)
+              &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
+            #end
+          &lt;/tr&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
     {{/html}}
   #end
 #end
