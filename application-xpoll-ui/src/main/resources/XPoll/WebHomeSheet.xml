@@ -37,6 +37,10 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#if (!$services.licensing.licensor.hasLicensureForEntity(
+    $services.model.createDocumentReference('', 'XPoll', 'XPollClass')))
+  {{missingLicenseMessage extensionName="polls.extension.name"/}}
+#else
 #set($oldPolls = $services.query.xwql('where doc.object(XPoll.XPollClass).type in (:types)').bindValue('types', ['0', '1']).setLimit(1).execute())
 #set($needsMigration = $oldPolls.size() &gt; 0)
 
@@ -70,5 +74,6 @@ $services.localization.render('contrib.xpoll.WebHome.description')
 })
 #set($columns = ['name', 'status', 'winner', '_actions'])
 #livetable('xpoll' $columns $columnsProperties $options)
+#end
 {{/velocity}}</content>
 </xwikidoc>

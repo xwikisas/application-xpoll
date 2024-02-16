@@ -36,7 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>contrib.xpoll.app.title=Polls
+  <content>polls.extension.name=Polls Application (Pro)
+
+contrib.xpoll.app.title=Polls
 contrib.xpoll.finish.message=Vote is finished. Here are the results:
 contrib.xpoll.home.title=Polls
 contrib.xpoll.notVoted=You haven't voted yet
