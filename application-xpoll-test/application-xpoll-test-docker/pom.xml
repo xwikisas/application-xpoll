@@ -29,7 +29,7 @@
   </parent>
   <artifactId>application-xpoll-test-docker</artifactId>
   <name>XPoll Application - Tests - Functional Docker Tests</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed, see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
+  <!-- TODO: Move to use "functional-test" in the future when https://issues.apache.org/jira/browse/MNG-1911 is fixed, see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>Functional tests for the Poll Application</description>
   <properties>
