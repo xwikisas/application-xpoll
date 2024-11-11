@@ -303,9 +303,6 @@
       <defaultCategories/>
     </property>
     <property>
-      <defaultCategory/>
-    </property>
-    <property>
       <description>Displays the N most recent polls.</description>
     </property>
     <property>
