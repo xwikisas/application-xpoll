@@ -29,7 +29,7 @@
   </parent>
   <artifactId>application-xpoll-test-docker</artifactId>
   <name>XPoll Application - Tests - Functional Docker Tests</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed, see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
+  <!-- TODO: Move to use "functional-test" in the future when https://issues.apache.org/jira/browse/MNG-1911 is fixed, see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>Functional tests for the Poll Application</description>
   <properties>
@@ -63,7 +63,30 @@
       <version>${platform.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Test dependencies -->
+    <!-- Test only dependencies. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${platform.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Remove when licensing application has the parent to 14.10. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-api</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+    <!-- Remove to here -->
     <dependency>
       <groupId>com.xwiki.licensing</groupId>
       <artifactId>application-licensing-test-dependencies</artifactId>
