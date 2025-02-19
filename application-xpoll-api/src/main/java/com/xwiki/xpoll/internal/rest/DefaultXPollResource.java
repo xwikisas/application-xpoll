@@ -31,6 +31,7 @@ import org.xwiki.rest.internal.resources.pages.ModifiablePageResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.XWikiContext;
 import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
@@ -58,13 +59,14 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
     public Response vote(String wikiName, String spaces, String pageName, Vote vote) throws XWikiRestException
     {
         DocumentReference documentReference = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
+        XWikiContext context = getXWikiContext();
+        DocumentReference userReference = context.getUserReference();
 
-        if (!contextualAuthorizationManager.hasAccess(Right.EDIT, documentReference)) {
+        if (!(contextualAuthorizationManager.hasAccess(Right.VIEW, documentReference)
+                && !XWikiRightService.isGuest(userReference))) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
-        XWikiContext context = getXWikiContext();
         try {
-            DocumentReference userReference = context.getUserReference();
             xPollManager.vote(documentReference, userReference, vote.getProposals());
             return Response.ok().build();
         } catch (XPollException e) {
