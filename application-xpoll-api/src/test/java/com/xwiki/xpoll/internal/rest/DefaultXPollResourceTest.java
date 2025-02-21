@@ -105,9 +105,7 @@ public class DefaultXPollResourceTest
     @Test
     void saveXPollAnswersWithEditRightTest() throws XWikiRestException
     {
-        when(this.contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(true);
-        when(this.contextualAuthorizationManager.hasAccess(eq(Right.EDIT), any(DocumentReference.class))).thenReturn(true);
-        when(this.xWikiContext.getUserReference()).thenReturn(userDocumentReference);
+        setMockUserRights(true, true, userDocumentReference);
         Response response = this.resource.vote("wiki", "space", "page", new Vote());
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
@@ -115,9 +113,7 @@ public class DefaultXPollResourceTest
     @Test
     void saveXPollAnswersWithoutEditRightTest() throws XWikiRestException
     {
-        when(this.contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(true);
-        when(this.contextualAuthorizationManager.hasAccess(eq(Right.EDIT), any(DocumentReference.class))).thenReturn(false);
-        when(this.xWikiContext.getUserReference()).thenReturn(userDocumentReference);
+        setMockUserRights(true, false, userDocumentReference);
         Response response = this.resource.vote("wiki", "space", "page", new Vote());
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
@@ -125,9 +121,7 @@ public class DefaultXPollResourceTest
     @Test
     void saveXPollAnswersWithoutViewRightTest() throws XWikiRestException
     {
-        when(this.contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(false);
-        when(this.contextualAuthorizationManager.hasAccess(eq(Right.EDIT), any(DocumentReference.class))).thenReturn(false);
-        when(this.xWikiContext.getUserReference()).thenReturn(userDocumentReference);
+        setMockUserRights(false, false, userDocumentReference);
         Response response = this.resource.vote("wiki", "space", "page", new Vote());
         assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
     }
@@ -135,9 +129,7 @@ public class DefaultXPollResourceTest
     @Test
     void saveXPollAnswersLoggedOutTest() throws XWikiRestException
     {
-        when(this.contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(true);
-        when(this.contextualAuthorizationManager.hasAccess(eq(Right.EDIT), any(DocumentReference.class))).thenReturn(false);
-        when(this.xWikiContext.getUserReference()).thenReturn(null);
+        setMockUserRights(true, false, null);
         Response response = this.resource.vote("wiki", "space", "page", new Vote());
         assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
     }
@@ -146,8 +138,7 @@ public class DefaultXPollResourceTest
     void saveXPollButManagerThrowsException() throws XPollException, XWikiRestException
     {
         DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
-        when(this.xWikiContext.getUserReference()).thenReturn(userDocumentReference);
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, docRef)).thenReturn(true);
+        setMockUserRights(true, false, userDocumentReference);
         when(this.serializer.serialize(null, new WikiReference("wiki"))).thenReturn("userIdentifier");
 
         Vote vote = new Vote();
@@ -156,5 +147,12 @@ public class DefaultXPollResourceTest
             .vote(docRef, userDocumentReference, Collections.emptyList());
         Response response = resource.vote("xwiki", "Main", "WebHome", vote);
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+    private void setMockUserRights(boolean viewRight, boolean editRight, DocumentReference userReference)
+    {
+        when(this.contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(viewRight);
+        when(this.contextualAuthorizationManager.hasAccess(eq(Right.EDIT), any(DocumentReference.class))).thenReturn(editRight);
+        when(this.xWikiContext.getUserReference()).thenReturn(userReference);
     }
 }
