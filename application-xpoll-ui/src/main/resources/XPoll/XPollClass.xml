@@ -56,6 +56,7 @@
       <number>2</number>
       <picker>0</picker>
       <prettyName>Description</prettyName>
+      <restricted>0</restricted>
       <rows>5</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
@@ -152,6 +153,31 @@
       <values>multi=Allow multiple options|single=Can select a single option|condorcet=Allow multiple options in order</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </type>
+    <votePrivacy>
+      <cache>0</cache>
+      <customDisplay/>
+      <defaultValue>public</defaultValue>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <freeText/>
+      <hint>Set whether the poll results are visible to all users (including those without edit permissions) or restricted to users with edit access only</hint>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>votePrivacy</name>
+      <number>7</number>
+      <picker>1</picker>
+      <prettyName>Vote Privacy</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>public=Public|private=Private</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </votePrivacy>
     <winner>
       <customDisplay/>
       <disabled>0</disabled>

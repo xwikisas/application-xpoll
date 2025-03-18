@@ -49,6 +49,7 @@ contrib.xpoll.status.active=Active
 contrib.xpoll.status.finished=Finished
 contrib.xpoll.status.inPreparation=In preparation
 contrib.xpoll.user=Users
+contrib.xpoll.singleUser=User
 contrib.xpoll.vote.failed=Failed to save the document. Reason: {0}
 contrib.xpoll.vote.failed.forbidden=Not allowed to vote!
 contrib.xpoll.vote.guest.submit=Save
@@ -76,6 +77,11 @@ XPoll.XPollClass_type_hint=A poll can be configured to require only one or multi
 XPoll.XPollClass_type_multi=Allow multiple options
 XPoll.XPollClass_type_single=Can select a single option
 XPoll.XPollClass_type_condorcet=Allow multiple options in order
+XPoll.XPollClass_votePrivacy=Vote Privacy
+XPoll.XPollClass_votePrivacy_public=Public
+XPoll.XPollClass_votePrivacy_private=Private
+XPoll.XPollClass_votePrivacy_hint=Set whether the poll results are visible to all users (including those without edit permissions) or restricted to users with edit access only
+
 
 ## Migration
 
