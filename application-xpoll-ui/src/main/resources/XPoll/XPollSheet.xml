@@ -38,84 +38,84 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro (displayPropertyValue $property $action)
-    #if ($action)
-        #set ($output = $doc.display($property, $action))
-    #else
-        #set ($output = $doc.display($property))
-    #end
-    #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
-    #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
-    $output
+  #if ($action)
+    #set ($output = $doc.display($property, $action))
+  #else
+    #set ($output = $doc.display($property))
+  #end
+  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
+  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
+  $output
 #end
 #*
  Displays the value of the name property as the title of the document.
  If value is empty (e.g. creation step), displays the document title.
 *#
 #macro (displayPollTitle)
-    #set ($pollObj = $!doc.getObject('XPoll.XPollClass'))
-    #if ("$!pollObj.getProperty('name').value" == '')
-        #set ($discard = $pollObj.set('name', $doc.title))
-    #end
-    #displayPropertyValue('name')
+  #set ($pollObj = $!doc.getObject('XPoll.XPollClass'))
+  #if ("$!pollObj.getProperty('name').value" == '')
+    #set ($discard = $pollObj.set('name', $doc.title))
+  #end
+  #displayPropertyValue('name')
 #end
 #macro(displayInput $votes $isCurrentUser $user $rowIndex)
-    #set ($disabled = '')
-    #set ($inputName = 'proposals')
-    #if (!$isCurrentUser || $pollObj.getValue('status') != 'active')
-        #set ($disabled = 'disabled')
-        #set ($inputName = "${inputName}$!{rowIndex}")
+  #set ($disabled = '')
+  #set ($inputName = 'proposals')
+  #if (!$isCurrentUser || $pollObj.getValue('status') != 'active')
+    #set ($disabled = 'disabled')
+    #set ($inputName = "${inputName}$!{rowIndex}")
+  #end
+  #foreach ($proposal in $proposals)
+    #set ($isChecked = $votes.contains($proposal))
+    #set ($checked = '')
+    #if ($isChecked)
+      #set ($checked = 'checked')
     #end
-    #foreach ($proposal in $proposals)
-        #set ($isChecked = $votes.contains($proposal))
-        #set ($checked = '')
-        #if ($isChecked)
-            #set ($checked = 'checked')
-        #end
-    &lt;td&gt;
-        #if ($xcontext.action == 'export')
-            #if($isChecked)X#end
-        #else
-            &lt;label&gt;
-                ## Display the inputs for the condorcet polls.
-                #if ($pollObj.getValue('type') == 'condorcet')
-                    #set ($indexOfProposal = $votes.indexOf($proposal) + 1)
-                    #set ($noOption = '')
-                    #if ($indexOfProposal &lt; 1)
-                        #set ($noOption = 'selected')
-                    #end
+  &lt;td&gt;
+    #if ($xcontext.action == 'export')
+      #if($isChecked)X#end
+    #else
+      &lt;label&gt;
+        ## Display the inputs for the condorcet polls.
+        #if ($pollObj.getValue('type') == 'condorcet')
+          #set ($indexOfProposal = $votes.indexOf($proposal) + 1)
+          #set ($noOption = '')
+          #if ($indexOfProposal &lt; 1)
+            #set ($noOption = 'selected')
+          #end
 
-                    #if ($disabled.isEmpty())
-                        &lt;select class="xpollSelect" data-proposal="$escapetool.xml($proposal)"&gt;
-                            &lt;option disabled $noOption value=""&gt;
-                                $escapetool.xml($services.localization.render('contrib.xpoll.vote.select'))
-                            &lt;/option&gt;
-                            #foreach ($index in [1..$proposals.size()])
-                                &lt;option value="$index" #if($index == $indexOfProposal)selected#end&gt;
-                                    #$index
-                                &lt;/option&gt;
-                            #end
-                        &lt;/select&gt;
-                        ## The hidden inputs that will have the values sent by the form.
-                        &lt;input class="xpollHiddenInput" id="option$foreach.count" name="proposals"
-                               #if ($votes.size() &gt; $foreach.index)value="$escapetool.xml($votes.get($foreach.index))"#end
-                               type="hidden"/&gt;
-                    #else
-                        &lt;input type="checkbox" $checked $disabled /&gt;
-                        #if ($indexOfProposal &gt; 0)
-                            &lt;span class="label label-primary"&gt;#$indexOfProposal&lt;/span&gt;
-                        #end
-                    #end
-                    ## Display the inputs for the normal polls.
-                #else
-                    &lt;input type="#if($isRadio)radio#{else}checkbox#end"
-                           #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="${inputName}"
-                           value="$escapetool.xml($proposal)" $checked
-                        $disabled /&gt;
-                #end
-            &lt;/label&gt;
+          #if ($disabled.isEmpty())
+            &lt;select class="xpollSelect" data-proposal="$escapetool.xml($proposal)"&gt;
+              &lt;option disabled $noOption value=""&gt;
+                $escapetool.xml($services.localization.render('contrib.xpoll.vote.select'))
+              &lt;/option&gt;
+              #foreach ($index in [1..$proposals.size()])
+                &lt;option value="$index" #if($index == $indexOfProposal)selected#end&gt;
+                  #$index
+                &lt;/option&gt;
+              #end
+            &lt;/select&gt;
+            ## The hidden inputs that will have the values sent by the form.
+            &lt;input class="xpollHiddenInput" id="option$foreach.count" name="proposals"
+                   #if ($votes.size() &gt; $foreach.index)value="$escapetool.xml($votes.get($foreach.index))"#end
+                   type="hidden"/&gt;
+          #else
+            &lt;input type="checkbox" $checked $disabled /&gt;
+            #if ($indexOfProposal &gt; 0)
+              &lt;span class="label label-primary"&gt;#$indexOfProposal&lt;/span&gt;
+            #end
+          #end
+          ## Display the inputs for the normal polls.
+        #else
+          &lt;input type="#if($isRadio)radio#{else}checkbox#end"
+                 #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="${inputName}"
+                 value="$escapetool.xml($proposal)" $checked
+            $disabled /&gt;
         #end
-    &lt;/td&gt;
+      &lt;/label&gt;
     #end
+  &lt;/td&gt;
+  #end
 #end
 {{/velocity}}
 
@@ -129,298 +129,298 @@
 
 #set ($type = $pollObj.getValue('type'))
 #set ($types = {
-    '0': 'multi',
-    '1': 'single'
+  '0': 'multi',
+  '1': 'single'
 })
 #set ($canMigrate = $hasEdit || $hasAdmin)
 #if ($types.containsKey($type))
-    #if ($request.migrate &amp;&amp; $canMigrate &amp;&amp; $services.csrf.isTokenValid($request.form_token))
-        #set ($discard = $pollObj.set('type', $types.get($type)))
-        #set ($discard = $doc.save($services.localization.render('xpoll.migration.migrated')))
+  #if ($request.migrate &amp;&amp; $canMigrate &amp;&amp; $services.csrf.isTokenValid($request.form_token))
+    #set ($discard = $pollObj.set('type', $types.get($type)))
+    #set ($discard = $doc.save($services.localization.render('xpoll.migration.migrated')))
+  #else
+  {{warning}}
+  {{translation key="xpoll.migration.shouldMigrateOne" /}}
+    #if ($canMigrate)
+      {{translation key="xpoll.migration.migrate" /}}
+      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;||queryString="migrate=true&amp;form_token=$services.csrf.getToken()"]]
     #else
-    {{warning}}
-    {{translation key="xpoll.migration.shouldMigrateOne" /}}
-        #if ($canMigrate)
-        {{translation key="xpoll.migration.migrate" /}}
-        [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;||queryString="migrate=true&amp;form_token=$services.csrf.getToken()"]]
-        #else
-        {{translation key="xpoll.migration.notifyAdmin" /}}
-        #end
-    {{/warning}}
+      {{translation key="xpoll.migration.notifyAdmin" /}}
     #end
+  {{/warning}}
+  #end
 #end
 #if($hasEdit &amp;&amp; ("$!votePrivacy" == ""))
-    #set($discard = $pollObj.set('votePrivacy', 'public'))
-    #set($discard = $doc.save())
-    #set($votePrivacy = 'public')
+  ## To display the value when using doc.display($property, $action)
+  #set($discard = $pollObj.set('votePrivacy', 'public'))
+  #set($votePrivacy = 'public')
 #end
-
 #if ($xcontext.action == 'view' &amp;&amp; $status == 'inpreparation')
-    #if ($hasEdit)
-        $services.localization.render('contrib.xpoll.preparation.hasRight')
-    #else
-        $services.localization.render('contrib.xpoll.preparation.noRight')
-    #end
+  #if ($hasEdit)
+    $escapetool.xml($services.localization.render('contrib.xpoll.preparation.hasRight'))
+  #else
+    $escapetool.xml($services.localization.render('contrib.xpoll.preparation.noRight'))
+  #end
 #end
 ## Flag to know wheter the options must be displayed as checkbox or radio inputs.
 #set ($isRadio = $pollObj.getProperty('type').value == 'single')
 #if ($xcontext.action == 'edit' || $status == 'inpreparation')
-{{html clean='false'}}
-    #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
-    #set ($discard = $doc.use('XPoll.XPollClass'))
-    ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
-&lt;div class="xform"&gt;
+  {{html clean='false'}}
+  #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
+  #set ($discard = $doc.use('XPoll.XPollClass'))
+  ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
+  &lt;div class="xform"&gt;
     #if ($xcontext.action == 'edit')
-        &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;#displayPollTitle()&lt;/dd&gt;
-        &lt;/dl&gt;
+      &lt;dl&gt;
+        &lt;dt&gt;&lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;#displayPollTitle()&lt;/dd&gt;
+      &lt;/dl&gt;
     #end
     &lt;div class="row inline-input-row"&gt;
-        &lt;div class="col-xs-12 col-sm-4"&gt;
-            &lt;dl&gt;
-                &lt;dt&gt;
-                    &lt;label #if($xcontext.action=='edit' )for="XPoll.XPollClass_0_proposals" #end&gt;
-                        $doc.displayPrettyName('proposals', false, false)
-                    &lt;/label&gt;
-                    &lt;span class="xHint"&gt;$services.localization.render('XPoll.XPollClass_proposals_hint')&lt;/span&gt;
-                &lt;/dt&gt;
-                &lt;dd&gt;#displayPropertyValue('proposals')&lt;/dd&gt;
-            &lt;/dl&gt;
-        &lt;/div&gt;
-        &lt;div class="col-xs-12 col-sm-4"&gt;
-            &lt;dl&gt;
-                &lt;dt&gt;
-                    &lt;label #if($xcontext.action=='edit' )for="XPoll.XPollClass_0_status" #end&gt;
-                        $doc.displayPrettyName('status', false, false)
-                    &lt;/label&gt;
-                    &lt;span class="xHint"&gt;$services.localization.render('XPoll.XPollClass_status_hint')&lt;/span&gt;
-                &lt;/dt&gt;
-                &lt;dd&gt;
-                    #if($xcontext.action == 'view')
-                        &lt;span class="label label-warning"&gt;#displayPropertyValue('status')&lt;/span&gt;
-                    #else
-                        #displayPropertyValue('status')
-                    #end
-                &lt;/dd&gt;
-            &lt;/dl&gt;
-        &lt;/div&gt;
-        &lt;div class="col-xs-12 col-sm-4"&gt;
-            #if ($doc.getValue('status') == 'inpreparation' &amp;&amp; ($hasAdmin || $xcontext.user == $doc.creator))
-                &lt;dl&gt;
-                    &lt;dt&gt;
-                        &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_type"#end&gt;
-                            $doc.displayPrettyName('type', false, false)
-                        &lt;/label&gt;
-                        &lt;span class="xHint"&gt;$services.localization.render('XPoll.XPollClass_type_hint')&lt;/span&gt;
-                    &lt;/dt&gt;
-                    &lt;dd&gt;
-                        #displayPropertyValue('type')
-                    &lt;/dd&gt;
-                &lt;/dl&gt;
+      &lt;div class="col-xs-12 col-sm-4"&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label #if($xcontext.action=='edit' )for="XPoll.XPollClass_0_proposals" #end&gt;
+              $doc.displayPrettyName('proposals', false, false)
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('XPoll.XPollClass_proposals_hint'))&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;#displayPropertyValue('proposals')&lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/div&gt;
+      &lt;div class="col-xs-12 col-sm-4"&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label #if($xcontext.action=='edit' )for="XPoll.XPollClass_0_status" #end&gt;
+              $doc.displayPrettyName('status', false, false)
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('XPoll.XPollClass_status_hint'))&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            #if($xcontext.action == 'view')
+              &lt;span class="label label-warning"&gt;#displayPropertyValue('status')&lt;/span&gt;
+            #else
+              #displayPropertyValue('status')
             #end
-        &lt;/div&gt;
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/div&gt;
+      &lt;div class="col-xs-12 col-sm-4"&gt;
+        #if ($doc.getValue('status') == 'inpreparation' &amp;&amp; ($hasAdmin || $xcontext.user == $doc.creator))
+          &lt;dl&gt;
+            &lt;dt&gt;
+              &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_type"#end&gt;
+                $doc.displayPrettyName('type', false, false)
+              &lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('XPoll.XPollClass_type_hint'))&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              #displayPropertyValue('type')
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+        #end
+      &lt;/div&gt;
     &lt;/div&gt;
     &lt;div class="row inline-input-row"&gt;
-        &lt;div class="col-xs-12 col-sm-4"&gt;
-            &lt;dl&gt;
-                &lt;dt&gt;
-                    &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_votePrivacy"#end&gt;
-                        $doc.displayPrettyName('votePrivacy', false, false)
-                    &lt;/label&gt;
-                    &lt;span class="xHint"&gt;$services.localization.render('XPoll.XPollClass_votePrivacy_hint')&lt;/span&gt;
-                &lt;/dt&gt;
-                &lt;dd&gt;
-                    #displayPropertyValue('votePrivacy')
-                &lt;/dd&gt;
-            &lt;/dl&gt;
-        &lt;/div&gt;
+      &lt;div class="col-xs-12 col-sm-4"&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_votePrivacy"#end&gt;
+              $doc.displayPrettyName('votePrivacy', false, false)
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('XPoll.XPollClass_votePrivacy_hint'))&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            #displayPropertyValue('votePrivacy')
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
     &lt;dl&gt;
-        #if ($xcontext.action == 'edit' || "$!doc.getValue('description')" != '')
-            &lt;dt&gt;
-                &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_description"#end&gt;
-                    $doc.displayPrettyName('description', false, false)
-                &lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt; #displayPropertyValue('description')&lt;/dd&gt;
-        #else
-            $services.localization.render('XPoll.XPollClass_description_emptyvalue')
-        #end
+      #if ($xcontext.action == 'edit' || "$!doc.getValue('description')" != '')
+        &lt;dt&gt;
+          &lt;label #if($xcontext.action == 'edit')for="XPoll.XPollClass_0_description"#end&gt;
+            $doc.displayPrettyName('description', false, false)
+          &lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt; #displayPropertyValue('description')&lt;/dd&gt;
+      #else
+        $escapetool.xml($services.localization.render('XPoll.XPollClass_description_emptyvalue'))
+      #end
     &lt;/dl&gt;
-&lt;/div&gt;
-{{/html}}
+  &lt;/div&gt;
+  {{/html}}
 #else
-    $doc.display('description')
-    #set ($proposals = $pollObj.getValue('proposals'))
-    #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
-        #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
-        ## Count only the existing users, without the deleted users.
-        ## This is needed to update the number of user when the status is active and the deleted users are hidden.
-        #set ($usersCountActive = 0)
-        #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
-            #if ($xwiki.exists($obj.user))
-                #set ($usersCountActive = $usersCountActive + 1)
-            #end
-        #end
-        ## Votes count.
-        #set ($totalVotesCount = 0)
-        #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
-        #foreach ($key in $voteCount.keySet())
-            #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
-        #end
+  $doc.display('description')
+  #set ($proposals = $pollObj.getValue('proposals'))
+  #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
+    #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
+    ## Count only the existing users, without the deleted users.
+    ## This is needed to update the number of user when the status is active and the deleted users are hidden.
+    #set ($usersCountActive = 0)
+    #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
+      #if ($xwiki.exists($obj.user))
+        #set ($usersCountActive = $usersCountActive + 1)
+      #end
     #end
-    #if ($status == 'active')
-        #set ($restURL = $services.xpoll.url($doc.documentReference))
+    ## Votes count.
+    #set ($totalVotesCount = 0)
+    #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
+    #foreach ($key in $voteCount.keySet())
+      #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
+    #end
+  #end
+  #if ($status == 'active')
+    #set ($restURL = $services.xpoll.url($doc.documentReference))
 
-        {{html clean='false'}}
-            &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
-            &lt;div id="xpollTableWrapper"&gt;
-                &lt;table class='xpoll medium-avatars table table-bordered'&gt;
-                    ## Table header row.
-                    &lt;thead&gt;
-                        &lt;tr&gt;
-                            &lt;th&gt;
-                                #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
-                                    $services.localization.render('contrib.xpoll.user')
-                                    &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
-                                #else
-                                    $services.localization.render('contrib.xpoll.singleUser')
-                                #end
-                            &lt;/th&gt;
-                            #foreach($proposal in $proposals)
-                                &lt;th&gt;
-                                    &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
-                                        $proposal
-                                    &lt;/label&gt;
-                                &lt;/th&gt;
-                            #end
-                        &lt;/tr&gt;
-                    &lt;/thead&gt;
-                    ## Users and their votes.
-                    &lt;tbody&gt;
-                        #set ($foundUser = false)
-                        #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
-                            #set ($user = $voteObj.user)
-                            #set ($isCurrentUser = $user.equals($xcontext.user))
-                            #set ($votes = $voteObj.getValue('votes'))
-                            #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
-                            &lt;tr #if($isCurrentUser)class="active"#end&gt;
-                                #if ($isCurrentUser)
-                                    #set ($foundUser = true)
-                                #end
-                                #if ($xwiki.exists($user))
-                                    &lt;td&gt;
-                                        #displayUser($user, {'wrapAvatar': true})
-                                    &lt;/td&gt;
-                                    #displayInput($votes $isCurrentUser $user $foreach.index)
-                                #end
-                            &lt;/tr&gt;
-                            #elseif($isCurrentUser)
-                                #set ($foundUser = true)
-                            &lt;tr class="active"&gt;
-                                &lt;td&gt;
-                                    #displayUser($user, {'wrapAvatar': true})
-                                &lt;/td&gt;
-                                #displayInput($votes $isCurrentUser $user 0)
-                            &lt;/tr&gt;
-                            #end
-                        #end
-
-                        ## Display the current user if he hasn't voted yet.
-                        #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
-                        &lt;tr class="active"&gt;
-                            &lt;td&gt;
-                                #displayUser($xcontext.user, {'wrapAvatar': true})
-                            &lt;/td&gt;
-                            ## The 3rd parameter is true in order to not disable the input for current user.
-                            #displayInput([] true $xcontext.user)
-                        &lt;/tr&gt;
-                        #end
-                    &lt;/tbody&gt;
-                    #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
-                        &lt;tfoot&gt;
-                        &lt;tr&gt;
-                            &lt;td&gt;
-                                $services.localization.render('contrib.xpoll.numberVotes')
-                                &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
-                            &lt;/td&gt;
-                            #foreach ($proposal in $proposals) &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt; #end
-                        &lt;/tr&gt;
-                        &lt;/tfoot&gt;
-                    #end
-                &lt;/table&gt;
-            &lt;/div&gt;
-            #if ($xcontext.user != 'XWiki.XWikiGuest')
-                &lt;div class='save'&gt;
-                    &lt;input type="submit" value="$services.localization.render("contrib.xpoll.vote.user.submit")"
-                           class="button" /&gt;
-                &lt;/div&gt;
+    {{html clean='false'}}
+    &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
+      &lt;div id="xpollTableWrapper"&gt;
+        &lt;table class='xpoll medium-avatars table table-bordered'&gt;
+          ## Table header row.
+          &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;
+              #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
+                $escapetool.xml($services.localization.render('contrib.xpoll.user'))
+                &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
+              #else
+                $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+              #end
+            &lt;/th&gt;
+            #foreach($proposal in $proposals)
+              &lt;th&gt;
+                &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
+                  $proposal
+                &lt;/label&gt;
+              &lt;/th&gt;
             #end
-        &lt;/form&gt;
-        {{/html}}
-    #elseif ($status == 'finished')
-        #if(!$totalVotesCount)
-            #set ($totalVotesCount = 0)
-            #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
-            #foreach ($key in $voteCount.keySet())
-                #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
-            #end
-        #end
-        {{html wiki='true' clean='false'}}
-            $services.localization.render('contrib.xpoll.finish.message')
-            &lt;div id="xpollTableWrapper"&gt;
-            &lt;table class='xpoll medium-avatars table table-bordered'&gt;
-                ## Table header row.
-                &lt;tr&gt;
-                    &lt;th&gt;
-                        #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
-                            $services.localization.render('contrib.xpoll.user')
-                            &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
-                        #else
-                            $services.localization.render('contrib.xpoll.singleUser')
-                        #end
-                    &lt;/th&gt;
-                    #foreach ($proposal in $proposals)
-                        &lt;th&gt; $proposal &lt;/th&gt;
-                    #end
-                &lt;/tr&gt;
-
-                ## Users and their votes.
-                #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
-                    #set ($user = $voteObj.user)
-                    #set ($votes = $voteObj.getValue('votes'))
-                    #set ($isCurrentUser = $user == $xcontext.user)
-                    #if($hasEdit || $votePrivacy == 'public')
-                        &lt;tr #if($isCurrentUser)class="active"#end&gt;
-                            &lt;td&gt;
-                                #displayUser($user, {'wrapAvatar': true})
-                            &lt;/td&gt;
-                            ## The 3rd parameter is false in order to disable the input when the poll is finished.
-                            #displayInput($votes false $user $foreach.index)
-                        &lt;/tr&gt;
-                    #elseif($isCurrentUser)
-                        &lt;tr class="active"&gt;
-                            &lt;td&gt;
-                                #displayUser($user, {'wrapAvatar': true})
-                            &lt;/td&gt;
-                            ## The 3rd parameter is false in order to disable the input when the poll is finished.
-                            #displayInput($votes false $user 0)
-                        &lt;/tr&gt;
-                    #end
+          &lt;/tr&gt;
+          &lt;/thead&gt;
+          ## Users and their votes.
+          &lt;tbody&gt;
+            #set ($foundUser = false)
+            #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+              #set ($user = $voteObj.user)
+              #set ($isCurrentUser = $user.equals($xcontext.user))
+              #set ($votes = $voteObj.getValue('votes'))
+              #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
+              &lt;tr #if($isCurrentUser)class="active"#end&gt;
+                #if ($isCurrentUser)
+                  #set ($foundUser = true)
                 #end
-                &lt;tr&gt;
-                    &lt;td&gt;
-                        $services.localization.render('contrib.xpoll.numberVotes')
-                        &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
-                    &lt;/td&gt;
-                    #foreach ($proposal in $proposals)
-                        &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
-                    #end
-                &lt;/tr&gt;
-            &lt;/table&gt;
+                #if ($xwiki.exists($user))
+                  &lt;td&gt;
+                    #displayUser($user, {'wrapAvatar': true})
+                  &lt;/td&gt;
+                  #displayInput($votes $isCurrentUser $user $foreach.index)
+                #end
+              &lt;/tr&gt;
+              #elseif($isCurrentUser)
+                #set ($foundUser = true)
+              &lt;tr class="active"&gt;
+                &lt;td&gt;
+                  #displayUser($user, {'wrapAvatar': true})
+                &lt;/td&gt;
+                #displayInput($votes $isCurrentUser $user 0)
+              &lt;/tr&gt;
+              #end
+            #end
+
+            ## Display the current user if he hasn't voted yet.
+            #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
+            &lt;tr class="active"&gt;
+              &lt;td&gt;
+                #displayUser($xcontext.user, {'wrapAvatar': true})
+              &lt;/td&gt;
+              ## The 3rd parameter is true in order to not disable the input for current user.
+              #displayInput([] true $xcontext.user)
+            &lt;/tr&gt;
+            #end
+          &lt;/tbody&gt;
+          #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
+            &lt;tfoot&gt;
+            &lt;tr&gt;
+              &lt;td&gt;
+                $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
+                &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
+              &lt;/td&gt;
+              #foreach ($proposal in $proposals)
+                &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt; #end
+            &lt;/tr&gt;
+            &lt;/tfoot&gt;
+          #end
+        &lt;/table&gt;
+      &lt;/div&gt;
+      #if ($xcontext.user != 'XWiki.XWikiGuest')
+        &lt;div class='save'&gt;
+          &lt;input type="submit" value="$escapetool.xml($services.localization.render("contrib.xpoll.vote.user.submit"))"
+                 class="button"/&gt;
         &lt;/div&gt;
-        {{/html}}
+      #end
+    &lt;/form&gt;
+    {{/html}}
+  #elseif ($status == 'finished')
+    #if(!$totalVotesCount)
+      #set ($totalVotesCount = 0)
+      #set ($voteCount = $services.xpoll.getVoteResults($doc.documentReference))
+      #foreach ($key in $voteCount.keySet())
+        #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
+      #end
     #end
+    {{html wiki='true' clean='false'}}
+    $escapetool.xml($services.localization.render('contrib.xpoll.finish.message'))
+    &lt;div id="xpollTableWrapper"&gt;
+      &lt;table class='xpoll medium-avatars table table-bordered'&gt;
+      ## Table header row.
+      &lt;tr&gt;
+        &lt;th&gt;
+          #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
+            $escapetool.xml($services.localization.render('contrib.xpoll.user'))
+            &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
+          #else
+            $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+          #end
+        &lt;/th&gt;
+        #foreach ($proposal in $proposals)
+          &lt;th&gt; $proposal &lt;/th&gt;
+        #end
+      &lt;/tr&gt;
+
+      ## Users and their votes.
+      #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+        #set ($user = $voteObj.user)
+        #set ($votes = $voteObj.getValue('votes'))
+        #set ($isCurrentUser = $user == $xcontext.user)
+        #if($hasEdit || $votePrivacy == 'public')
+          &lt;tr #if($isCurrentUser)class="active"#end&gt;
+            &lt;td&gt;
+              #displayUser($user, {'wrapAvatar': true})
+            &lt;/td&gt;
+            ## The 3rd parameter is false in order to disable the input when the poll is finished.
+            #displayInput($votes false $user $foreach.index)
+          &lt;/tr&gt;
+        #elseif($isCurrentUser)
+          &lt;tr class="active"&gt;
+            &lt;td&gt;
+              #displayUser($user, {'wrapAvatar': true})
+            &lt;/td&gt;
+            ## The 3rd parameter is false in order to disable the input when the poll is finished.
+            #displayInput($votes false $user 0)
+          &lt;/tr&gt;
+        #end
+      #end
+      &lt;tr&gt;
+        &lt;td&gt;
+          $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
+          &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
+        &lt;/td&gt;
+        #foreach ($proposal in $proposals)
+          &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
+        #end
+      &lt;/tr&gt;
+    &lt;/table&gt;
+    &lt;/div&gt;
+    {{/html}}
+  #end
 #end
 {{/velocity}}</content>
   <object>

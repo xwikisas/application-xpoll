@@ -160,7 +160,7 @@
       <disabled>0</disabled>
       <displayType>select</displayType>
       <freeText/>
-      <hint>Set whether the poll results are visible to all users (including those without edit permissions) or restricted to users with edit access only</hint>
+      <hint/>
       <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>votePrivacy</name>

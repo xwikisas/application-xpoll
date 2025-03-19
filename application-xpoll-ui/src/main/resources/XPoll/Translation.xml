@@ -80,7 +80,7 @@ XPoll.XPollClass_type_condorcet=Allow multiple options in order
 XPoll.XPollClass_votePrivacy=Vote Privacy
 XPoll.XPollClass_votePrivacy_public=Public
 XPoll.XPollClass_votePrivacy_private=Private
-XPoll.XPollClass_votePrivacy_hint=Set whether the poll results are visible to all users (including those without edit permissions) or restricted to users with edit access only
+XPoll.XPollClass_votePrivacy_hint=Set whether the poll results are visible to all users (including those without edit permissions) or restricted to users with edit permissions only
 
 
 ## Migration
