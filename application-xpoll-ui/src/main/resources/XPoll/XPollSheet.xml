@@ -378,7 +378,7 @@
         ## Table header row.
         &lt;tr&gt;
           &lt;th&gt;
-            #if($hasEdit || $votePrivacy == 'public' || ("$!votePrivacy" == ""))
+            #if($displayAllUsers)
               $escapetool.xml($services.localization.render('contrib.xpoll.user'))
               &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
             #else
@@ -395,7 +395,7 @@
           #set ($user = $voteObj.user)
           #set ($votes = $voteObj.getValue('votes'))
           #set ($isCurrentUser = $user == $xcontext.user)
-          #if($hasEdit || $votePrivacy == 'public')
+          #if($displayAllUsers)
             &lt;tr #if($isCurrentUser)class="active"#end&gt;
               &lt;td&gt;
                 #displayUser($user, {'wrapAvatar': true})
