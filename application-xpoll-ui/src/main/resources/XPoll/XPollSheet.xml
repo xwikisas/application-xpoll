@@ -159,9 +159,9 @@
 #set ($displayAllUsers = $hasEdit || $votePrivacy == 'public')
 #if ($xcontext.action == 'view' &amp;&amp; $status == 'inpreparation')
   #if ($hasEdit)
-    $escapetool.xml($services.localization.render('contrib.xpoll.preparation.hasRight'))
+    $services.rendering.escape($services.localization.render('contrib.xpoll.preparation.hasRight'), 'xwiki/2.1')
   #else
-    $escapetool.xml($services.localization.render('contrib.xpoll.preparation.noRight'))
+    $services.rendering.escape($services.localization.render('contrib.xpoll.preparation.noRight'), 'xwiki/2.1')
   #end
 #end
 ## Flag to know wheter the options must be displayed as checkbox or radio inputs.
