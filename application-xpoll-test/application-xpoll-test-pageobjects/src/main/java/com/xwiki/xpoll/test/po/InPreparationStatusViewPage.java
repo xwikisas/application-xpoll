@@ -34,6 +34,9 @@ public class InPreparationStatusViewPage extends ViewPage
     @FindBy(css = ".xform .label.label-warning")
     public WebElement pollStatus;
 
+    @FindBy(xpath = "//div[@class = 'xform']//div[contains(@class,'row')][2]//div[1]//dd")
+    public WebElement votePrivacy;
+
     public String getPollDescription()
     {
         return pollDescription.getText();
@@ -49,4 +52,7 @@ public class InPreparationStatusViewPage extends ViewPage
         return pollProposals.getText();
     }
 
+    public String getPollVotePrivacy() {
+        return votePrivacy.getText();
+    }
 }
