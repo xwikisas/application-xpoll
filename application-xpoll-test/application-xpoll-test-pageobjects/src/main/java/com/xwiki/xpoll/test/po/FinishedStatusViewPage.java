@@ -32,12 +32,15 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class FinishedStatusViewPage extends ViewPage
 {
-    @FindBy(xpath = "//div[@id = 'xwikicontent']/p[1]")
+    @FindBy(xpath = "//div[@id = 'xwikicontent']/p[2]")
     public WebElement pollDescription;
 
     public List<WebElement> proposals = getDriver().findElements(By.xpath("//table//tr[1]//th[position()>1]"));
 
     public ArrayList<String> pollProposals = new ArrayList<String>();
+
+    @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//a")
+    public List<WebElement> usersThatVotedTableRows;
 
     public String getDescription()
     {
@@ -49,5 +52,13 @@ public class FinishedStatusViewPage extends ViewPage
         for (WebElement proposal : proposals) {
             pollProposals.add(proposal.getText().trim());
         }
+    }
+
+    public int getNumberOfUsersThatAlreadyVotedFromTable() {
+        return usersThatVotedTableRows.size();
+    }
+
+    public boolean searchIfUserIsInTable(String user) {
+        return usersThatVotedTableRows.stream().anyMatch(vote -> user.equals(vote.getText()));
     }
 }

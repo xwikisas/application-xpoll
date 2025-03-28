@@ -44,6 +44,9 @@ public class ActiveStatusViewPage extends ViewPage
     @FindBy(xpath = "//div[contains(@class, 'save')]/input")
     public WebElement saveButton;
 
+    @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//a")
+    public List<WebElement> usersThatVotedTableRows;
+
     public ArrayList<String> pollProposals = new ArrayList<String>();
 
     public String getDescription()
@@ -66,5 +69,13 @@ public class ActiveStatusViewPage extends ViewPage
 
     public WebElement getVoteInput(int i) {
         return proposalVoteInputs.get(i);
+    }
+
+    public int getNumberOfUsersThatAlreadyVotedFromTable() {
+        return usersThatVotedTableRows.size();
+    }
+
+    public boolean searchIfUserIsInTable(String user) {
+        return usersThatVotedTableRows.stream().anyMatch(vote -> user.equals(vote.getText()));
     }
 }
