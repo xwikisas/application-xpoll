@@ -27,9 +27,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.administration.test.po.EditGroupModal;
-import org.xwiki.administration.test.po.GroupsPage;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -56,29 +55,32 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin" })
 class PollIT
 {
-    public static final String pollName = "Poll 1";
-    
-    public static final String pollSpace = "XPoll";
+    private static final String POLL_NAME = "Poll 1";
 
-    public static final String pollDescription = "Poll 1 Description";
+    private static final String POLL_SPACE = "XPoll";
 
-    public static final String pollProposals = "1,2,3,4,5";
+    private static final String POLL_DESCRIPTION = "Poll 1 Description";
 
-    public static final String statusActive = "active";
+    private static final String POLL_PROPOSALS = "1,2,3,4,5";
 
-    public static final String statusFinished = "finished";
-    
-    public static final String statusInPreparation = "inpreparation";
+    private static final String STATUS_ACTIVE = "active";
 
-    public static final String pollVotePrivacyPublicValue = "public";
+    private static final String STATUS_FINISHED = "finished";
 
-    public static final String pollVotePrivacyPrivateValue = "private";
+    private static final String STATUS_IN_PREPARATION = "inpreparation";
 
-    public static final String pollVotePrivacyPrivateLabel = "Private";
+    private static final String STATUS_IN_PREPARATION_LABEL = "In preparation";
 
-    private static final String GROUP_NAME =  "Xwiki_no_edit_group";
+    private static final String TYPE_SINGLE = "single";
 
-    public ArrayList<String> proposals = new ArrayList<String>(Arrays.asList(pollProposals.split(",")));
+    private static final String POLL_VOTE_PRIVACY_PUBLIC_VALUE = "public";
+
+    private static final String POLL_VOTE_PRIVACY_PRIVATE_VALUE = "private";
+
+    private static final String POLL_VOTE_PRIVACY_PRIVATE_LABEL = "Private";
+
+    private final ArrayList<String> proposals = new ArrayList<>(Arrays.asList(POLL_PROPOSALS.split(",")));
+
     @BeforeAll
     static void createUsers(TestUtils setup)
     {
@@ -86,22 +88,13 @@ class PollIT
         setup.createUser("JohnDoe", "pass", setup.getURLToNonExistentPage(), "first_name", "John", "last_name", "Doe");
 
         setup.loginAsSuperAdmin();
-        GroupsPage groupsPage = GroupsPage.gotoPage();
-        groupsPage.addNewGroup(GROUP_NAME);
-
-        EditGroupModal devsGroupModal = groupsPage.clickEditGroup(GROUP_NAME);
-        devsGroupModal.addUsers("JohnDoe");
-        groupsPage = GroupsPage.gotoPage();
-        assertEquals("1", groupsPage.getMemberCount(GROUP_NAME));
-        setup.setGlobalRights(GROUP_NAME, "JohnDoe", "edit", false);
-
-        groupsPage.logout();
+        setup.setGlobalRights(null, "XWiki.JohnDoe", "edit", false);
     }
     
     @BeforeEach
     void setUp(TestUtils setup) {
         setup.login("JaneDoe", "pass");
-        DocumentReference pageRef = new DocumentReference("xwiki", Arrays.asList(pollSpace, pollName), "WebHome");
+        DocumentReference pageRef = new DocumentReference("xwiki", Arrays.asList(POLL_SPACE, POLL_NAME), "WebHome");
         setup.deletePage(pageRef);
     }
 
@@ -119,40 +112,31 @@ class PollIT
     @Order(2)
     void createNewEntryWithInPreparationStatus()
     {
-        String status = statusInPreparation;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
         createPage(xpollHomePage);
-
-        XPollEditPage xpollEditPage = new XPollEditPage();
-        assertEquals(pollName, xpollEditPage.getName());
-        xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatus(status);
-        xpollEditPage.setProposals(pollProposals);
-        xpollEditPage.setVotePrivacy(pollVotePrivacyPrivateValue);
-        xpollEditPage.clickSaveAndView();
+        editPage(STATUS_IN_PREPARATION, POLL_VOTE_PRIVACY_PRIVATE_VALUE);
 
         InPreparationStatusViewPage inPreparationStatusViewPage = new InPreparationStatusViewPage();
-        assertEquals(pollDescription, inPreparationStatusViewPage.getPollDescription());
-        assertEquals(xpollEditPage.getStatusInPreparation(), inPreparationStatusViewPage.getPollStatus());
-        assertEquals(pollProposals, inPreparationStatusViewPage.getPollProposals());
-        assertEquals(pollVotePrivacyPrivateLabel, inPreparationStatusViewPage.getPollVotePrivacy());
+        assertEquals(POLL_DESCRIPTION, inPreparationStatusViewPage.getPollDescription());
+        assertEquals(STATUS_IN_PREPARATION_LABEL, inPreparationStatusViewPage.getPollStatus());
+        assertEquals(POLL_PROPOSALS, inPreparationStatusViewPage.getPollProposals());
+        assertEquals(POLL_VOTE_PRIVACY_PRIVATE_LABEL, inPreparationStatusViewPage.getPollVotePrivacy());
     }
 
     @Test
     @Order(3)
     void createNewEntryWithActiveStatus()
     {
-        String status = statusActive;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
         createPage(xpollHomePage);
 
-        editPage(status);
+        editPage(STATUS_ACTIVE);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        assertEquals(pollName, activeStatusViewPage.getDocumentTitle());
-        assertEquals(pollDescription, activeStatusViewPage.getDescription());
+        assertEquals(POLL_NAME, activeStatusViewPage.getDocumentTitle());
+        assertEquals(POLL_DESCRIPTION, activeStatusViewPage.getDescription());
 
         activeStatusViewPage.getProposals();
         assertEquals(this.proposals, activeStatusViewPage.pollProposals);
@@ -161,11 +145,10 @@ class PollIT
     @Test
     @Order(5)
     void createNewEntryAndVoteProposal() {
-        String status = statusActive;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
 
         createPage(xpollHomePage);
-        editPage(status);
+        editPage(STATUS_ACTIVE);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
 
@@ -181,15 +164,14 @@ class PollIT
     @Order(4)
     void createNewEntryWithFinishedStatus()
     {
-        String status = statusFinished;
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
         createPage(xpollHomePage);
 
-        editPage(status);
+        editPage(STATUS_FINISHED);
 
         FinishedStatusViewPage finishedStatusViewPage = new FinishedStatusViewPage();
-        assertEquals(pollName, finishedStatusViewPage.getDocumentTitle());
-        assertEquals(pollDescription, finishedStatusViewPage.getDescription());
+        assertEquals(POLL_NAME, finishedStatusViewPage.getDocumentTitle());
+        assertEquals(POLL_DESCRIPTION, finishedStatusViewPage.getDescription());
 
         finishedStatusViewPage.getProposals();
         assertEquals(this.proposals, finishedStatusViewPage.pollProposals);
@@ -200,21 +182,12 @@ class PollIT
     void createNewEntryWithVotePrivacyPublicFinalStatusActive(TestUtils setup) {
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
         createPage(xpollHomePage);
-
-        XPollEditPage xpollEditPage = new XPollEditPage();
-        xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatus(statusActive);
-        xpollEditPage.setProposals(pollProposals);
-        xpollEditPage.setType("single");
-        xpollEditPage.setVotePrivacy(pollVotePrivacyPublicValue);
-        xpollEditPage.clickSaveAndView();
+        editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PUBLIC_VALUE);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.voteProposal(1);
-        activeStatusViewPage.logout();
 
-        setup.login("JohnDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
         activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.voteProposal(1);
 
@@ -222,11 +195,7 @@ class PollIT
         assertTrue(activeStatusViewPage.searchIfUserIsInTable("JohnDoe"));
         assertTrue(activeStatusViewPage.searchIfUserIsInTable("JaneDoe"));
 
-        activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.logout();
-
-        setup.login("JaneDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JaneDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
         activeStatusViewPage = new ActiveStatusViewPage();
 
@@ -240,21 +209,12 @@ class PollIT
     void createNewEntryWithVotePrivacyPrivateFinalStatusActive(TestUtils setup) {
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
         createPage(xpollHomePage);
-
-        XPollEditPage xpollEditPage = new XPollEditPage();
-        xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatus(statusActive);
-        xpollEditPage.setProposals(pollProposals);
-        xpollEditPage.setType("single");
-        xpollEditPage.setVotePrivacy(pollVotePrivacyPrivateValue);
-        xpollEditPage.clickSaveAndView();
+        editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PRIVATE_VALUE);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.voteProposal(1);
-        activeStatusViewPage.logout();
 
-        setup.login("JohnDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
         activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.voteProposal(1);
 
@@ -262,11 +222,8 @@ class PollIT
         assertTrue(activeStatusViewPage.searchIfUserIsInTable("JohnDoe"));
         assertFalse(activeStatusViewPage.searchIfUserIsInTable("JaneDoe"));
 
-        activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.logout();
-
-        setup.login("JaneDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JaneDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
+        setup.gotoPage(POLL_SPACE, POLL_NAME);
 
         activeStatusViewPage = new ActiveStatusViewPage();
 
@@ -280,32 +237,22 @@ class PollIT
     void createNewEntryWithVotePrivacyPublicFinalStatusFinal(TestUtils setup) {
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
         createPage(xpollHomePage);
-
-        XPollEditPage xpollEditPage = new XPollEditPage();
-        xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatus(statusActive);
-        xpollEditPage.setProposals(pollProposals);
-        xpollEditPage.setType("single");
-        xpollEditPage.setVotePrivacy(pollVotePrivacyPublicValue);
-        xpollEditPage.clickSaveAndView();
+        editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PUBLIC_VALUE);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.voteProposal(1);
-        activeStatusViewPage.logout();
 
-        setup.login("JohnDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
         activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.voteProposal(1);
 
-        activeStatusViewPage.logout();
+        setup.loginAndGotoPage("JaneDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
-        setup.login("JaneDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
         activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.edit();
-        xpollEditPage = new XPollEditPage();
-        xpollEditPage.setStatus(statusFinished);
+
+        XPollEditPage xpollEditPage = new XPollEditPage();
+        xpollEditPage.setStatus(STATUS_FINISHED);
         xpollEditPage.clickSaveAndView();
 
         FinishedStatusViewPage finishedStatusViewPage = new FinishedStatusViewPage();
@@ -314,10 +261,8 @@ class PollIT
         assertTrue(finishedStatusViewPage.searchIfUserIsInTable("JohnDoe"));
         assertTrue(finishedStatusViewPage.searchIfUserIsInTable("JaneDoe"));
 
-        finishedStatusViewPage.logout();
-
-        setup.login("JohnDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
+        setup.gotoPage(POLL_SPACE, POLL_NAME);
 
         finishedStatusViewPage = new FinishedStatusViewPage();
 
@@ -331,33 +276,23 @@ class PollIT
     void createNewEntryWithVotePrivacyPrivateFinalStatusFinal(TestUtils setup) {
         XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
         createPage(xpollHomePage);
-
-        XPollEditPage xpollEditPage = new XPollEditPage();
-        xpollEditPage.setDescription(pollDescription);
-        xpollEditPage.setStatus(statusActive);
-        xpollEditPage.setProposals(pollProposals);
-        xpollEditPage.setType("single");
-        xpollEditPage.setVotePrivacy(pollVotePrivacyPrivateValue);
-        xpollEditPage.clickSaveAndView();
+        editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PRIVATE_VALUE);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.voteProposal(1);
-        activeStatusViewPage.logout();
 
-        setup.login("JohnDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
         activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.voteProposal(1);
-        activeStatusViewPage.logout();
 
-        setup.login("JaneDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JaneDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
         activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.edit();
-        xpollEditPage = new XPollEditPage();
-        xpollEditPage.setStatus(statusFinished);
+
+        XPollEditPage xpollEditPage = new XPollEditPage();
+        xpollEditPage.setStatus(STATUS_FINISHED);
         xpollEditPage.clickSaveAndView();
 
         FinishedStatusViewPage finishedStatusViewPage = new FinishedStatusViewPage();
@@ -366,10 +301,7 @@ class PollIT
         assertTrue(finishedStatusViewPage.searchIfUserIsInTable("JohnDoe"));
         assertTrue(finishedStatusViewPage.searchIfUserIsInTable("JaneDoe"));
 
-        finishedStatusViewPage.logout();
-
-        setup.login("JohnDoe", "pass");
-        setup.gotoPage(pollSpace, pollName);
+        setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
         finishedStatusViewPage = new FinishedStatusViewPage();
 
@@ -381,20 +313,29 @@ class PollIT
     private void createPage(XPollHomePage xpollHomePage)
     {
         CreatePagePage createPage = xpollHomePage.createPage();
-        createPage.getDocumentPicker().setTitle(pollName);
+        createPage.getDocumentPicker().setTitle(POLL_NAME);
         createPage.setTemplate("XPoll.Code.XPollTemplateProvider");
         createPage.clickCreate();
     }
     
-    private XPollEditPage editPage(String status)
+    private void editPage(String status)
     {
         XPollEditPage xpollEditPage = new XPollEditPage();
-        assertEquals(pollName, xpollEditPage.getName());
-        xpollEditPage.setDescription(pollDescription);
+        assertEquals(POLL_NAME, xpollEditPage.getName());
+        xpollEditPage.setDescription(POLL_DESCRIPTION);
         xpollEditPage.setStatus(status);
-        xpollEditPage.setProposals(pollProposals);
-        xpollEditPage.setType("single");
+        xpollEditPage.setProposals(POLL_PROPOSALS);
+        xpollEditPage.setType(TYPE_SINGLE);
         xpollEditPage.clickSaveAndView();
-        return xpollEditPage;
+    }
+
+    private void editPage(String status, String votePrivacy) {
+        XPollEditPage xpollEditPage = new XPollEditPage();
+        xpollEditPage.setDescription(POLL_DESCRIPTION);
+        xpollEditPage.setStatus(status);
+        xpollEditPage.setProposals(POLL_PROPOSALS);
+        xpollEditPage.setType(TYPE_SINGLE);
+        xpollEditPage.setVotePrivacy(votePrivacy);
+        xpollEditPage.clickSaveAndView();
     }
 }

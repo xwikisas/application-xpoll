@@ -71,14 +71,6 @@ public class XPollEditPage extends InlinePage
     }
 
     /**
-     * @return the in preparation status
-     */
-    public String getStatusInPreparation()
-    {
-        return "In preparation";
-    }
-
-    /**
      * @param status to be set
      */
     public void setStatus(String status)
