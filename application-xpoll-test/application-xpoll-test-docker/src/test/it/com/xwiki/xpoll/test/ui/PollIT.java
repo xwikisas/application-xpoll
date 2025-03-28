@@ -21,6 +21,7 @@ package com.xwiki.xpoll.test.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -150,9 +151,7 @@ class PollIT
         createPage(xpollHomePage);
         editPage(STATUS_ACTIVE);
 
-        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-
-        activeStatusViewPage.voteProposal(1);
+        voteProposals(List.of(1));
 
         ActiveStatusViewPage viewPageAfterVote = new ActiveStatusViewPage();
         String inputCheckAttribute = viewPageAfterVote.getVoteInput(1).getAttribute("checked");
@@ -184,12 +183,13 @@ class PollIT
         createPage(xpollHomePage);
         editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PUBLIC_VALUE);
 
-        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.voteProposal(1);
+        voteProposals(List.of(1));
 
         setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
-        activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.voteProposal(1);
+
+        voteProposals(List.of(1));
+
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
 
         assertEquals(2, activeStatusViewPage.getNumberOfUsersThatAlreadyVotedFromTable());
         assertTrue(activeStatusViewPage.searchIfUserIsInTable("JohnDoe"));
@@ -211,12 +211,13 @@ class PollIT
         createPage(xpollHomePage);
         editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PRIVATE_VALUE);
 
-        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.voteProposal(1);
+        voteProposals(List.of(1));
 
         setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
-        activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.voteProposal(1);
+
+        voteProposals(List.of(1));
+
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
 
         assertEquals(1, activeStatusViewPage.getNumberOfUsersThatAlreadyVotedFromTable());
         assertTrue(activeStatusViewPage.searchIfUserIsInTable("JohnDoe"));
@@ -239,16 +240,15 @@ class PollIT
         createPage(xpollHomePage);
         editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PUBLIC_VALUE);
 
-        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.voteProposal(1);
+        voteProposals(List.of(1));
 
         setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
-        activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.voteProposal(1);
+
+        voteProposals(List.of(1));
 
         setup.loginAndGotoPage("JaneDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
-        activeStatusViewPage = new ActiveStatusViewPage();
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.edit();
 
         XPollEditPage xpollEditPage = new XPollEditPage();
@@ -278,17 +278,15 @@ class PollIT
         createPage(xpollHomePage);
         editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PRIVATE_VALUE);
 
-        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.voteProposal(1);
+        voteProposals(List.of(1));
 
         setup.loginAndGotoPage("JohnDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
-        activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.voteProposal(1);
+        voteProposals(List.of(1));
 
         setup.loginAndGotoPage("JaneDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
-        activeStatusViewPage = new ActiveStatusViewPage();
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.edit();
 
         XPollEditPage xpollEditPage = new XPollEditPage();
@@ -337,5 +335,12 @@ class PollIT
         xpollEditPage.setType(TYPE_SINGLE);
         xpollEditPage.setVotePrivacy(votePrivacy);
         xpollEditPage.clickSaveAndView();
+    }
+
+    private void voteProposals(List<Integer> optionsIndexes) {
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
+        for (Integer index : optionsIndexes) {
+            activeStatusViewPage.voteProposal(index);
+        }
     }
 }
