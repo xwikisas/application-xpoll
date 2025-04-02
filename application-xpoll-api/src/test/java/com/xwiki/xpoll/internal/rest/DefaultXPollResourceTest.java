@@ -19,19 +19,20 @@
  */
 package com.xwiki.xpoll.internal.rest;
 
-import java.util.Collections;
 
 import javax.inject.Provider;
 import javax.ws.rs.core.Response;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -44,8 +45,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.xpoll.XPollException;
 import com.xwiki.xpoll.XPollManager;
 import com.xwiki.xpoll.rest.model.jaxb.Vote;
@@ -68,6 +67,10 @@ public class DefaultXPollResourceTest
 {
     private static final DocumentReference userDocumentReference = new DocumentReference("xwiki", "XWiki", "User");
 
+    private static final String POLL_PUBLICITY_PRIVATE = "private";
+
+    private static final String POLL_PUBLICITY_PUBLIC = "public";
+
     @InjectMockComponents
     private DefaultXPollResource resource;
 
@@ -86,7 +89,16 @@ public class DefaultXPollResourceTest
     @MockComponent
     protected Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
+    private XWiki wiki;
+
+    @MockComponent
+    private XWikiDocument wikiDocument;
+
     private XWikiContext xWikiContext;
+
+    @MockComponent
+    private BaseObject xPollObj;
 
     @BeforeComponent
     public void configure() throws Exception
@@ -98,8 +110,13 @@ public class DefaultXPollResourceTest
         ExecutionContext executionContext = new ExecutionContext();
         this.xWikiContext = mock(XWikiContext.class);
         executionContext.setProperty("xwikicontext", this.xWikiContext);
+        when(this.xWikiContext.getWiki()).thenReturn(this.wiki);
+        when(this.wiki.getDocument((DocumentReference) any(), any())).thenReturn(this.wikiDocument);
+        when(this.wikiDocument.clone()).thenReturn(this.wikiDocument);
         when(execution.getContext()).thenReturn(executionContext);
         when(this.xcontextProvider.get()).thenReturn(this.xWikiContext);
+        when(this.wikiDocument.getXObject((LocalDocumentReference)any())).thenReturn(this.xPollObj);
+        when(this.xPollObj.getStringValue("pollPublicity")).thenReturn(POLL_PUBLICITY_PRIVATE);
     }
 
     @Test
@@ -135,6 +152,15 @@ public class DefaultXPollResourceTest
     }
 
     @Test
+    void saveXPollAnswersLoggedOutPollPublicityPublicTest() throws XWikiRestException
+    {
+        when(this.xPollObj.getStringValue("pollPublicity")).thenReturn(POLL_PUBLICITY_PUBLIC);
+        setMockUserRights(true, false, null);
+        Response response = this.resource.vote("wiki", "space", "page", new Vote());
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
     void saveXPollButManagerThrowsException() throws XPollException, XWikiRestException
     {
         DocumentReference docRef = new DocumentReference("xwiki", "Main", "WebHome");
@@ -144,7 +170,7 @@ public class DefaultXPollResourceTest
         Vote vote = new Vote();
 
         doThrow(new XPollException("Message")).when(this.xPollManager)
-            .vote(docRef, userDocumentReference, Collections.emptyList());
+            .vote(docRef, userDocumentReference, vote);
         Response response = resource.vote("xwiki", "Main", "WebHome", vote);
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }

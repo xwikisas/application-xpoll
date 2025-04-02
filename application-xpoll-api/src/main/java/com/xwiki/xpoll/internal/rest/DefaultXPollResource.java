@@ -24,8 +24,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.resources.pages.ModifiablePageResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -49,6 +53,8 @@ import com.xwiki.xpoll.rest.model.jaxb.Vote;
 @Singleton
 public class DefaultXPollResource extends ModifiablePageResource implements XPollResource
 {
+    private static final String POLL_PUBLICITY_PRIVATE = "private";
+
     @Inject
     private XPollManager xPollManager;
 
@@ -61,13 +67,19 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
         DocumentReference documentReference = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
         XWikiContext context = getXWikiContext();
         DocumentReference userReference = context.getUserReference();
-
-        if (!(contextualAuthorizationManager.hasAccess(Right.VIEW, documentReference)
-                && !XWikiRightService.isGuest(userReference))) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            XWikiDocument doc = context.getWiki().getDocument(documentReference, context).clone();
+            BaseObject xpollObj = doc.getXObject(new LocalDocumentReference("XPoll", "XPollClass"));
+            String pollPublicity = xpollObj.getStringValue("pollPublicity");
+            if (!contextualAuthorizationManager.hasAccess(Right.VIEW, documentReference)
+                    || (XWikiRightService.isGuest(userReference) && pollPublicity.equals(POLL_PUBLICITY_PRIVATE))) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (XWikiException e) {
+            throw new XWikiRestException(e);
         }
         try {
-            xPollManager.vote(documentReference, userReference, vote.getProposals());
+            xPollManager.vote(documentReference, userReference, vote);
             return Response.ok().build();
         } catch (XPollException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e).build();

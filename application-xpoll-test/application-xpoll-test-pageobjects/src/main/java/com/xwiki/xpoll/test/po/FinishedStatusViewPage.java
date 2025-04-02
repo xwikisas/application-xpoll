@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class FinishedStatusViewPage extends ViewPage
 {
-    @FindBy(xpath = "//div[@id = 'xwikicontent']/p[1]")
+    @FindBy(xpath = "//div[@id = 'xwikicontent']/p[2]")
     public WebElement pollDescription;
 
     public List<WebElement> proposals = getDriver().findElements(By.xpath("//table//tr[1]//th[position()>1]"));

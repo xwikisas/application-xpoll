@@ -19,9 +19,9 @@
  */
 package com.xwiki.xpoll;
 
-import java.util.List;
 import java.util.Map;
 
+import com.xwiki.xpoll.rest.model.jaxb.Vote;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
@@ -37,15 +37,15 @@ import org.xwiki.stability.Unstable;
 public interface XPollManager
 {
     /**
-     * Casts a vote of an user to an existing poll in a XWiki page.
+     * Casts a vote of a user to an existing poll in a XWiki page.
      *
      * @param page the page that has a poll associated with itself
      * @param user a reference to the user that cast the votes
-     * @param votedProposals a array or Proposals that the user voted
+     * @param vote user voted options
      * @throws XPollException thrown if the page is not found or if the function fails to create a new XPollVote or
      *     save the Document
      */
-    void vote(DocumentReference page, DocumentReference user, List<String> votedProposals) throws XPollException;
+    void vote(DocumentReference page, DocumentReference user, Vote vote) throws XPollException;
 
     /**
      * @param documentReference the document that we want to get the URL for

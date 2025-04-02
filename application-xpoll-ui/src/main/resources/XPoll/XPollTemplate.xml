@@ -61,6 +61,7 @@
         <number>2</number>
         <picker>0</picker>
         <prettyName>Description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -82,6 +83,31 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <pollPublicity>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue>private</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>pollPublicity</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Poll Publicity</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>private|public</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </pollPublicity>
       <proposals>
         <cache>0</cache>
         <customDisplay/>
@@ -177,6 +203,9 @@
     </property>
     <property>
       <name/>
+    </property>
+    <property>
+      <pollPublicity>private</pollPublicity>
     </property>
     <property>
       <proposals/>

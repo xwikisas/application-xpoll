@@ -23,13 +23,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
 
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xwiki.xpoll.rest.model.jaxb.Vote;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -72,6 +76,12 @@ public class DefaultXPollManager implements XPollManager
 
     static final String USER = "user";
 
+    static final String GUEST_NAME = "guestName";
+
+    static final String GUEST_ID = "guestId";
+
+    static final String COOKIE_NAME = "poll_publicity_id";
+
     static final String XPOLL_TYPE = "type";
 
     static final String MISSING_XPOLL_OBJECT_MESSAGE = "The document [%s] does not have a poll object.";
@@ -88,14 +98,14 @@ public class DefaultXPollManager implements XPollManager
     private Provider<ComponentManager> componentManagerProvider;
 
     @Override
-    public void vote(DocumentReference docReference, DocumentReference user, List<String> votedProposals)
+    public void vote(DocumentReference docReference, DocumentReference user, Vote vote)
         throws XPollException
     {
         XWikiContext context = contextProvider.get();
         XWikiDocument document;
         try {
             document = context.getWiki().getDocument(docReference, context).clone();
-            setUserVotes(votedProposals, context, document, user);
+            setUserVotes(vote, context, document, user);
         } catch (XWikiException e) {
             throw new XPollException(String.format("Failed to vote for [%s] on behalf of [%s].", docReference, user),
                 e);
@@ -148,28 +158,79 @@ public class DefaultXPollManager implements XPollManager
         }
     }
 
-    private void setUserVotes(List<String> votedProposals, XWikiContext context, XWikiDocument doc,
-        DocumentReference user) throws XWikiException
+    private void setUserVotes(
+        Vote vote,
+        XWikiContext context,
+        XWikiDocument doc,
+        DocumentReference user
+    ) throws XWikiException
     {
         String currentUserName = serializer.serialize(user, doc.getDocumentReference().getWikiReference());
-        BaseObject xpollVoteOfCurrentUser = doc.getXObject(XPOLL_VOTES_CLASS_REFERENCE, USER,
-            currentUserName, false);
+        Cookie cookie = context.getRequest().getCookie(COOKIE_NAME);
 
-        if (xpollVoteOfCurrentUser == null) {
-            xpollVoteOfCurrentUser = doc.newXObject(XPOLL_VOTES_CLASS_REFERENCE, context);
+        BaseObject xpollVoteOfCurrentUser = getXPollVoteForCurrentUser(doc, currentUserName, context, cookie);
+
+        List<String> filteredProposals = vote.getProposals().stream()
+                .filter(p -> !p.isEmpty())
+                .collect(Collectors.toList());
+
+        if (cookie == null && currentUserName == null) {
+            cookie = createCookie(context);
         }
 
-        List<String> filteredProposals = votedProposals.stream().filter(p -> !p.isEmpty()).collect(Collectors.toList());
-
-        xpollVoteOfCurrentUser.set(USER, currentUserName, context);
+        xpollVoteOfCurrentUser.set(
+                USER,
+                currentUserName != null
+                        ? currentUserName
+                        : XWikiRightService.GUEST_USER_FULLNAME,
+                context
+        );
         xpollVoteOfCurrentUser.set(VOTES, filteredProposals, context);
+        xpollVoteOfCurrentUser.set(GUEST_NAME,
+                currentUserName != null
+                        ? null
+                        : vote.getGuestName(),
+                context
+        );
+        xpollVoteOfCurrentUser.set(
+                GUEST_ID,
+                cookie != null && currentUserName == null
+                        ? cookie.getValue()
+                        : null,
+                context
+        );
 
         context.getWiki().saveDocument(doc, "New Vote", context);
     }
 
+    private BaseObject getXPollVoteForCurrentUser(
+        XWikiDocument doc,
+        String currentUserName,
+        XWikiContext context,
+        Cookie cookie
+    )  throws XWikiException
+    {
+        BaseObject xpollVoteOfCurrentUser = doc.getXObject(XPOLL_VOTES_CLASS_REFERENCE, USER,
+                currentUserName, false);
 
+        if (currentUserName == null && cookie != null) {
+            xpollVoteOfCurrentUser = doc.getXObject(XPOLL_VOTES_CLASS_REFERENCE, GUEST_ID, cookie.getValue(), false);
+        }
 
+        if (xpollVoteOfCurrentUser == null) {
+            xpollVoteOfCurrentUser = doc.newXObject(XPOLL_VOTES_CLASS_REFERENCE, context);
+        }
+        return xpollVoteOfCurrentUser;
+    }
 
+    private Cookie createCookie(XWikiContext context)
+    {
+        Cookie cookie = new Cookie(COOKIE_NAME, UUID.randomUUID().toString());
+        cookie.setMaxAge(60 * 60 * 24 * 365);
+        cookie.setPath("/");
+        context.getResponse().addCookie(cookie);
+        return cookie;
+    }
 
     private Map<String, Integer> getXPollResults(DocumentReference documentReference, String pollType)
         throws XPollException
