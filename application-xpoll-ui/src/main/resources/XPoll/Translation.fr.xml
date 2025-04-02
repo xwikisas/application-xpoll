@@ -76,8 +76,8 @@ XPoll.XPollClass_type_hint=Un sondage peut être configuré pour ne nécessiter 
 XPoll.XPollClass_type_multi=Autoriser plusieurs options
 XPoll.XPollClass_type_single=Peut sélectionner une seule option
 XPoll.XPollClass_type_condorcet=Autoriser plusieurs options dans l'ordre
-### Missing: XPoll.XPollClass_votePrivacy=Vote Privacy
-### Missing: XPoll.XPollClass_votePrivacy_public=Public
+XPoll.XPollClass_votePrivacy=Confidentialité des votes
+XPoll.XPollClass_votePrivacy_public=Publics
 ### Missing: XPoll.XPollClass_votePrivacy_private=Private
 ### Missing: XPoll.XPollClass_votePrivacy_hint=Set whether the poll results are visible to all users (including those without edit permissions) or restricted to users with edit permissions only
 
