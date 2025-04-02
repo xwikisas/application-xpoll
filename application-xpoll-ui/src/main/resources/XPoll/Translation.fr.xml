@@ -78,7 +78,7 @@ XPoll.XPollClass_type_single=Peut sélectionner une seule option
 XPoll.XPollClass_type_condorcet=Autoriser plusieurs options dans l'ordre
 XPoll.XPollClass_votePrivacy=Confidentialité des votes
 XPoll.XPollClass_votePrivacy_public=Publics
-### Missing: XPoll.XPollClass_votePrivacy_private=Private
+XPoll.XPollClass_votePrivacy_private=Privé
 ### Missing: XPoll.XPollClass_votePrivacy_hint=Set whether the poll results are visible to all users (including those without edit permissions) or restricted to users with edit permissions only
 
 
