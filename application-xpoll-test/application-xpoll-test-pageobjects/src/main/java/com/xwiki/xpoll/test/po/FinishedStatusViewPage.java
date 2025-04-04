@@ -41,6 +41,7 @@ public class FinishedStatusViewPage extends ViewPage
 
     @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//a")
     public List<WebElement> usersThatVotedTableRows;
+
     @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//td[1][not(descendant::a) and not(contains(translate(., 'SCORES', 'scores'), 'scores'))]")
     public List<WebElement> guestUsersThatVotedTableRows;
 
