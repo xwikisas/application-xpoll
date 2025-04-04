@@ -149,7 +149,12 @@
     {{/warning}}
   #end
 #end
-
+#if ("$!type" == '')
+  #set ($discard = $pollObj.set('type', 'multi'))
+  #if ($hasEdit || $hasAdmin)
+    #set ($discard = $doc.save())
+  #end
+#end
 #if("$!votePrivacy" == '')
   ## To display the value when using doc.display($property, $action)
   #set($discard = $pollObj.set('votePrivacy', 'public'))
