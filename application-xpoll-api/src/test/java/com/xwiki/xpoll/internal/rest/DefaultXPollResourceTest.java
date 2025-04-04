@@ -152,11 +152,22 @@ public class DefaultXPollResourceTest
     }
 
     @Test
-    void saveXPollAnswersLoggedOutPollPublicityPublicTest() throws XWikiRestException
+    void saveXPollGuestNameEMptyPollPublicityPublicTest() throws XWikiRestException
     {
         when(this.xPollObj.getStringValue("pollPublicity")).thenReturn(POLL_PUBLICITY_PUBLIC);
         setMockUserRights(true, false, null);
         Response response = this.resource.vote("wiki", "space", "page", new Vote());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void saveXPollAnswersGuestPollPublicityPublicTest() throws XWikiRestException
+    {
+        when(this.xPollObj.getStringValue("pollPublicity")).thenReturn(POLL_PUBLICITY_PUBLIC);
+        Vote vote = new Vote();
+        vote.setGuestName("Guest");
+        setMockUserRights(true, false, null);
+        Response response = this.resource.vote("wiki", "space", "page", vote);
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 

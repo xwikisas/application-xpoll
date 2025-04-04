@@ -79,6 +79,9 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             throw new XWikiRestException(e);
         }
         try {
+            if ((vote.getGuestName() == null || vote.getGuestName().isEmpty()) && userReference == null) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
             xPollManager.vote(documentReference, userReference, vote);
             return Response.ok().build();
         } catch (XPollException e) {

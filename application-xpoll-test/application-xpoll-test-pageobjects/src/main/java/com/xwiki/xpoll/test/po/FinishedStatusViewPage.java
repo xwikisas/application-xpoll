@@ -41,6 +41,8 @@ public class FinishedStatusViewPage extends ViewPage
 
     @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//a")
     public List<WebElement> usersThatVotedTableRows;
+    @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//td[1][not(descendant::a) and not(contains(translate(., 'SCORES', 'scores'), 'scores'))]")
+    public List<WebElement> guestUsersThatVotedTableRows;
 
     public String getDescription()
     {
@@ -60,5 +62,15 @@ public class FinishedStatusViewPage extends ViewPage
 
     public boolean searchIfUserIsInTable(String user) {
         return usersThatVotedTableRows.stream().anyMatch(vote -> user.equals(vote.getText()));
+    }
+
+    public int getNumberOfGuestsThatVotedFromTable()
+    {
+        return guestUsersThatVotedTableRows.size();
+    }
+
+    public boolean searchIfGuestUserIsInTable(String user)
+    {
+        return guestUsersThatVotedTableRows.stream().anyMatch(vote -> user.equals(vote.getText()));
     }
 }

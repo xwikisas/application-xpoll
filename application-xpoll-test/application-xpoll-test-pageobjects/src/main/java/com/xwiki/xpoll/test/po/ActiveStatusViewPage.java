@@ -67,6 +67,16 @@ public class ActiveStatusViewPage extends ViewPage
         getDriver().waitUntilPageIsReloaded();
     }
 
+    public void voteSetGuestName(String guestName)
+    {
+        proposalVoteInputs.get(0).sendKeys(guestName);
+    }
+
+    public String voteGetGuestName()
+    {
+        return proposalVoteInputs.get(0).getAttribute("value");
+    }
+
     public WebElement getVoteInput(int i) {
         return proposalVoteInputs.get(i);
     }
