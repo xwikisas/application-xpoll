@@ -152,7 +152,7 @@ public class DefaultXPollResourceTest
     }
 
     @Test
-    void saveXPollGuestNameEMptyPollPublicityPublicTest() throws XWikiRestException
+    void saveXPollGuestNameEmptyPollPublicityPublicTest() throws XWikiRestException
     {
         when(this.xPollObj.getStringValue("pollPublicity")).thenReturn(POLL_PUBLICITY_PUBLIC);
         setMockUserRights(true, false, null);

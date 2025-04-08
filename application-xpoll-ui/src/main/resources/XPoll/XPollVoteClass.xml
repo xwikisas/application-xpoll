@@ -66,20 +66,6 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </guestId>
-    <guestName>
-      <customDisplay/>
-      <disabled>0</disabled>
-      <hint/>
-      <name>guestName</name>
-      <number>3</number>
-      <picker>1</picker>
-      <prettyName>Guest Name</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </guestName>
     <user>
       <customDisplay/>
       <disabled>0</disabled>

@@ -134,8 +134,7 @@
       // Transform the form data into a JSON so the Vote object can be deserialized properly server side.
       var jsonForm = {};
       $.map($(this).serializeArray(), function (entry) {
-        console.log(entry.name);
-        if(entry.name == "proposals") {
+        if (entry.name == "proposals") {
           jsonForm[entry.name] = jsonForm[entry.name] ?? [];
           jsonForm[entry.name].push(entry.value);
         }
@@ -160,9 +159,9 @@
           if (data.status == 403) {
             this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.forbidden')", 'error'));
           } else if (data.status == 400) {
-            this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.guestEmpty')", 'error'));
+              this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.guestEmpty')", 'error'));
           } else {
-            this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error'));
+              this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error'));
           }
         }
       });

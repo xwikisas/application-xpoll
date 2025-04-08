@@ -150,7 +150,6 @@ class DefaultXPollManagerTest
         this.manager.vote(docRef, userReference, vote);
 
         verify(xpollVotes).set("user", "User.User", this.xWikiContext);
-        verify(xpollVotes).set("guestName", null, this.xWikiContext);
         verify(xpollVotes).set("guestId", null, this.xWikiContext);
         verify(xpollVotes).set("votes", vote.getProposals(), this.xWikiContext);
         verify(this.wiki).saveDocument(this.document, "New Vote", this.xWikiContext);
@@ -180,9 +179,8 @@ class DefaultXPollManagerTest
 
         this.manager.vote(docRef, userReference, vote);
 
-        verify(xpollVotes).set("user", "XWiki.XWikiGuest", this.xWikiContext);
+        verify(xpollVotes).set("user", "JohnDoe", this.xWikiContext);
         verify(xpollVotes).set("votes", vote.getProposals(), this.xWikiContext);
-        verify(xpollVotes).set("guestName", vote.getGuestName(), this.xWikiContext);
         verify(xpollVotes).set("guestId", "cookie_value", this.xWikiContext);
         verify(this.wiki).saveDocument(this.document, "New Vote", this.xWikiContext);
     }

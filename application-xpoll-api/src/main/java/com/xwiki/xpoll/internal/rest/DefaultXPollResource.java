@@ -72,18 +72,17 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             BaseObject xpollObj = doc.getXObject(new LocalDocumentReference("XPoll", "XPollClass"));
             String pollPublicity = xpollObj.getStringValue("pollPublicity");
             if (!contextualAuthorizationManager.hasAccess(Right.VIEW, documentReference)
-                    || (XWikiRightService.isGuest(userReference) && pollPublicity.equals(POLL_PUBLICITY_PRIVATE))) {
+                || (XWikiRightService.isGuest(userReference) && pollPublicity.equals(POLL_PUBLICITY_PRIVATE)))
+            {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
-        } catch (XWikiException e) {
-            throw new XWikiRestException(e);
-        }
-        try {
             if ((vote.getGuestName() == null || vote.getGuestName().isEmpty()) && userReference == null) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
             xPollManager.vote(documentReference, userReference, vote);
             return Response.ok().build();
+        } catch (XWikiException e) {
+            throw new XWikiRestException(e);
         } catch (XPollException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e).build();
         }
