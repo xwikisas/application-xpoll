@@ -121,6 +121,10 @@
 
 {{velocity}}
 #set ($pollObj = $doc.getObject('XPoll.XPollClass'))
+#if ($!pollObj.getValue('pollPublicity') == "")
+  #set ($discard = $doc.set('pollPublicity', 'private'))
+#end
+#set ($pollObj = $doc.getObject('XPoll.XPollClass'))
 #set ($status = $pollObj.getValue('status'))
 #set ($pollPublicity = $pollObj.getValue('pollPublicity'))
 #set ($votePrivacy = $pollObj.getValue('votePrivacy'))
@@ -150,11 +154,6 @@
     #end
     {{/warning}}
   #end
-#end
-#if("$pollPublicity" == "")
-  ## To display the value when using doc.display($property, $action)
-  #set($discard = $pollObj.set('pollPublicity', 'private'))
-  #set($pollPublicity = 'private')
 #end
 
 #if("$!votePrivacy" == '')
