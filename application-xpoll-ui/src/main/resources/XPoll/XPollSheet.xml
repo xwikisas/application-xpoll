@@ -117,14 +117,16 @@
     &lt;/td&gt;
   #end
 #end
+#macro(setDefaultProperty $obj $propertyName $defaultValue)
+  #if ("$!obj.getValue($propertyName)" == "")
+    #set ($discard = $doc.set($propertyName, $defaultValue))
+  #end
+#end
 {{/velocity}}
 
 {{velocity}}
 #set ($pollObj = $doc.getObject('XPoll.XPollClass'))
-#if ($!pollObj.getValue('pollPublicity') == "")
-  #set ($discard = $doc.set('pollPublicity', 'private'))
-#end
-#set ($pollObj = $doc.getObject('XPoll.XPollClass'))
+#setDefaultProperty($pollObj 'pollPublicity' 'private')
 #set ($status = $pollObj.getValue('status'))
 #set ($pollPublicity = $pollObj.getValue('pollPublicity'))
 #set ($votePrivacy = $pollObj.getValue('votePrivacy'))
