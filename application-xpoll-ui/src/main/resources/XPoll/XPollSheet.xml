@@ -121,6 +121,10 @@
 
 {{velocity}}
 #set ($pollObj = $doc.getObject('XPoll.XPollClass'))
+#if ($!pollObj.getValue('type') == "")
+  #set ($discard = $doc.set('type', 'multi'))
+#end
+#set ($pollObj = $doc.getObject('XPoll.XPollClass'))
 #set ($status = $pollObj.getValue('status'))
 #set ($votePrivacy = $pollObj.getValue('votePrivacy'))
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
@@ -128,9 +132,6 @@
 ## Check if the document needs migration
 
 #set ($type = $pollObj.getValue('type'))
-#if ("$!type" == '')
-  #set ($discard = $pollObj.set('type', 'multi'))
-#end
 #set ($types = {
   '0': 'multi',
   '1': 'single'
