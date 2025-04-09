@@ -157,11 +157,26 @@
         },
         error: function(data) {
           if (data.status == 403) {
-            this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.forbidden')", 'error'));
+            this.progressNotification.replace(
+              new XWiki.widgets.Notification(
+                "$services.localization.render('contrib.xpoll.vote.failed.forbidden')",
+                'error'
+              )
+            );
           } else if (data.status == 400) {
-              this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.guestEmpty')", 'error'));
+              this.progressNotification.replace(
+                new XWiki.widgets.Notification(
+                  "$services.localization.render('contrib.xpoll.vote.failed.guestEmpty')",
+                  'error'
+                )
+              );
           } else {
-              this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error'));
+              this.progressNotification.replace(
+                new XWiki.widgets.Notification(
+                  "$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')",
+                  'error'
+                )
+              );
           }
         }
       });

@@ -53,8 +53,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @UITest( properties = {
         // Add the RightsManagerPlugin needed by the test
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin" }
-)
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin" })
 class PollIT
 {
     private static final String POLL_NAME = "Poll 1";
@@ -327,7 +326,8 @@ class PollIT
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.logout();
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> setup.getDriver().findElementWithoutWaiting(By.xpath("//div[contains(@class, 'save')]/input")));
+        Assertions.assertThrows(NoSuchElementException.class,
+            () -> setup.getDriver().findElementWithoutWaiting(By.cssSelector("div[class*='save'] input")));
     }
 
     @Test

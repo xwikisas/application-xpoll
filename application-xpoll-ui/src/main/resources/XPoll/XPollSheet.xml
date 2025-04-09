@@ -124,7 +124,7 @@
 #set ($status = $pollObj.getValue('status'))
 #set ($pollPublicity = $pollObj.getValue('pollPublicity'))
 #set ($votePrivacy = $pollObj.getValue('votePrivacy'))
-#set($cookieId = $request.getCookie("poll_publicity_id").getValue())
+#set ($cookieId = $request.getCookie("poll_publicity_id").getValue())
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
 ## Check if the document needs migration
@@ -252,7 +252,7 @@
             &lt;label #if($xcontext.action=='edit' )for="XPoll.XPollClass_0_pollPublicity" #end&gt;
               $doc.displayPrettyName('pollPublicity', false, false)
             &lt;/label&gt;
-            &lt;span class="xHint"&gt;$services.localization.render('XPoll.XPollClass_pollPublicity_hint')&lt;/span&gt;
+            &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('XPoll.XPollClass_pollPublicity_hint'))&lt;/span&gt;
           &lt;/dt&gt;
           &lt;dd&gt;
             #displayPropertyValue('pollPublicity')
@@ -334,6 +334,7 @@
               #set ($isCurrentUser = $user.equals($xcontext.user) &amp;&amp; !$isVoteFromGuest)
               #set ($votes = $voteObj.getValue('votes'))
               #set ($guestName = $voteObj.getValue('user'))
+              #set ($escapedGuestName = $escapetool.xml($guestName))
               #if ($isCurrentUser)
                 #set ($foundUser = true)
               #end
@@ -344,7 +345,7 @@
               #if ($isVoteFromCurrentGuest &amp;&amp; $isPollPublicityPublic)
                 &lt;tr class="active"&gt;
                   &lt;td&gt;
-                    &lt;input type="text" value="${guestName}" name="guestName"&gt;
+                    &lt;input type="text" value="$escapedGuestName" name="guestName"&gt;
                   &lt;/td&gt;
                   #displayInput($votes true $guestName $foreach.index)
                 &lt;/tr&gt;
@@ -354,7 +355,7 @@
                 #if ($isVoteFromGuest &amp;&amp; !$isVoteFromCurrentGuest)
                   &lt;tr&gt;
                     &lt;td&gt;
-                      $guestName
+                      $escapedGuestName
                     &lt;/td&gt;
                     #displayInput($votes false $guestName $foreach.index)
                   &lt;/tr&gt;
@@ -453,6 +454,7 @@
           #set ($user = $voteObj.user)
           #set ($votes = $voteObj.getValue('votes'))
           #set ($guestName = $voteObj.getValue('user'))
+          #set ($escapedGuestName = $escapetool.xml($guestName))
           #set ($guestId = $voteObj.getValue('guestId'))
           #set ($isVoteFromGuest = "$guestId" != "")
           #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
@@ -461,7 +463,7 @@
             &lt;tr #if($isCurrentUser || $isVoteFromCurrentGuest)class="active"#end&gt;
               #if ($isVoteFromGuest)
                 &lt;td&gt;
-                 $guestName
+                 $escapedGuestName
                 &lt;/td&gt;
                 ## The 3rd parameter is false in order to disable the input when the poll is finished.
                 #displayInput($votes false $guestName $foreach.index)
@@ -477,7 +479,7 @@
             &lt;tr class="active"&gt;
               #if ($isVoteFromCurrentGuest)
                 &lt;td&gt;
-                  $guestName
+                  $escapedGuestName
                 &lt;/td&gt;
                 #displayInput($votes false $guestName 0)
               #elseif ($isCurrentUser)

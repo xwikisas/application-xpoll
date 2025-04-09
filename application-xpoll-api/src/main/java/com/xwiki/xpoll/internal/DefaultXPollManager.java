@@ -171,21 +171,19 @@ public class DefaultXPollManager implements XPollManager
             cookie = createCookie(context);
         }
 
-        xpollVoteOfCurrentUser.set(
-            USER,
-            currentUserName != null
-                ? currentUserName
-                : vote.getGuestName(),
-            context
-        );
+        if (currentUserName != null) {
+            xpollVoteOfCurrentUser.set(USER, currentUserName, context);
+        } else {
+            xpollVoteOfCurrentUser.set(USER, vote.getGuestName(), context);
+        }
+
         xpollVoteOfCurrentUser.set(VOTES, filteredProposals, context);
-        xpollVoteOfCurrentUser.set(
-            GUEST_ID,
-            cookie != null && currentUserName == null
-                ? cookie.getValue()
-                : null,
-            context
-        );
+
+        if (cookie != null && currentUserName == null) {
+            xpollVoteOfCurrentUser.set(GUEST_ID, cookie.getValue(), context);
+        } else {
+            xpollVoteOfCurrentUser.set(GUEST_ID, null, context);
+        }
 
         context.getWiki().saveDocument(doc, "New Vote", context);
     }

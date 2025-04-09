@@ -27,6 +27,8 @@ import javax.ws.rs.core.Response;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -61,6 +63,9 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
     @Inject
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public Response vote(String wikiName, String spaces, String pageName, Vote vote) throws XWikiRestException
     {
@@ -72,8 +77,7 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             BaseObject xpollObj = doc.getXObject(new LocalDocumentReference("XPoll", "XPollClass"));
             String pollPublicity = xpollObj.getStringValue("pollPublicity");
             if (!contextualAuthorizationManager.hasAccess(Right.VIEW, documentReference)
-                || (XWikiRightService.isGuest(userReference) && pollPublicity.equals(POLL_PUBLICITY_PRIVATE)))
-            {
+                || (XWikiRightService.isGuest(userReference) && pollPublicity.equals(POLL_PUBLICITY_PRIVATE))) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             if ((vote.getGuestName() == null || vote.getGuestName().isEmpty()) && userReference == null) {
@@ -82,7 +86,8 @@ public class DefaultXPollResource extends ModifiablePageResource implements XPol
             xPollManager.vote(documentReference, userReference, vote);
             return Response.ok().build();
         } catch (XWikiException e) {
-            throw new XWikiRestException(e);
+            logger.error("Failed to get document reference", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } catch (XPollException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e).build();
         }
