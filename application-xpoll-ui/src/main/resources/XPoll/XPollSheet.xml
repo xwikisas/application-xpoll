@@ -126,9 +126,11 @@
 
 {{velocity}}
 #set ($pollObj = $doc.getObject('XPoll.XPollClass'))
+#setDefaultProperty($pollObj 'status' 'inpreparation')
 #set ($status = $pollObj.getValue('status'))
 #setDefaultProperty($pollObj 'pollPublicity' 'private')
 #set ($pollPublicity = $pollObj.getValue('pollPublicity'))
+#setDefaultProperty($pollObj 'votePrivacy', 'public')
 #set ($votePrivacy = $pollObj.getValue('votePrivacy'))
 #set ($cookieId = $request.getCookie("poll_publicity_id").getValue())
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
@@ -157,11 +159,7 @@
     {{/warning}}
   #end
 #end
-#if("$!votePrivacy" == '')
-  ## To display the value when using doc.display($property, $action)
-  #set($discard = $pollObj.set('votePrivacy', 'public'))
-  #set($votePrivacy = 'public')
-#end
+
 ## Flag indicating whether to show all users or only the current user, depending on vote privacy
 #set ($displayAllUsers = $hasEdit || $votePrivacy == 'public')
 #set ($isCurrentContextUserGuest = $xcontext.user == 'XWiki.XWikiGuest')

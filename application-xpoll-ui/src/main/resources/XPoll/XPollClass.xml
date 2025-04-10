@@ -131,7 +131,7 @@
     <status>
       <cache>0</cache>
       <customDisplay/>
-      <defaultValue/>
+      <defaultValue>inpreparation</defaultValue>
       <disabled>0</disabled>
       <displayType>select</displayType>
       <freeText/>
