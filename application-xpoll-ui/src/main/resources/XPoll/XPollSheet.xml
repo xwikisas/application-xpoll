@@ -126,6 +126,7 @@
 
 {{velocity}}
 #set ($pollObj = $doc.getObject('XPoll.XPollClass'))
+#setDefaultProperty($pollObj 'status' 'inpreparation')
 #set ($status = $pollObj.getValue('status'))
 #setDefaultProperty($pollObj 'pollPublicity' 'private')
 #set ($pollPublicity = $pollObj.getValue('pollPublicity'))
