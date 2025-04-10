@@ -161,7 +161,7 @@
       <type>
         <cache>0</cache>
         <customDisplay/>
-        <defaultValue/>
+        <defaultValue>multi</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText/>
@@ -239,7 +239,7 @@
       <status>inpreparation</status>
     </property>
     <property>
-      <type/>
+      <type>multi</type>
     </property>
     <property>
       <votePrivacy>public</votePrivacy>

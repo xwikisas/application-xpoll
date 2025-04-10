@@ -136,7 +136,7 @@
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
 ## Check if the document needs migration
-
+#setDefaultProperty($pollObj, 'type', 'multi')
 #set ($type = $pollObj.getValue('type'))
 #set ($types = {
   '0': 'multi',

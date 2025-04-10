@@ -81,6 +81,8 @@ public class DefaultXPollManager implements XPollManager
 
     static final String XPOLL_TYPE = "type";
 
+    static final String XPOLL_TYPE_MULTI = "multi";
+
     static final String MISSING_XPOLL_OBJECT_MESSAGE = "The document [%s] does not have a poll object.";
 
     @Inject
@@ -146,7 +148,10 @@ public class DefaultXPollManager implements XPollManager
                     documentReference));
             }
             String pollType = xpollObj.getStringValue(XPOLL_TYPE);
-
+            if (pollType.isEmpty()) {
+                xpollObj.set(XPOLL_TYPE_MULTI, XPOLL_TYPE_MULTI, context);
+                pollType = XPOLL_TYPE_MULTI;
+            }
             return getXPollResults(documentReference, pollType);
         } catch (XWikiException e) {
             throw new XPollException(String
