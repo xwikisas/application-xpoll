@@ -44,6 +44,9 @@ public class XPollEditPage extends InlinePage
     @FindBy(id = "XPoll.XPollClass_0_votePrivacy")
     public WebElement entryVotePrivacy;
 
+    @FindBy(id = "XPoll.XPollClass_0_pollPublicity")
+    public WebElement pollPublicity;
+
     /**
      * @return the poll name
      */
@@ -110,6 +113,22 @@ public class XPollEditPage extends InlinePage
      */
     public void setVotePrivacy(String value) {
         Select select = new Select(this.entryVotePrivacy);
+        select.selectByValue(value);
+    }
+
+    /**
+     * @return the poll publicity selected value
+     */
+    public String getPollPublicity() {
+        Select select = new Select(this.pollPublicity);
+        return select.getFirstSelectedOption().getAttribute("value");
+    }
+
+    /**
+     * @param value to be set
+     */
+    public void setPollPublicity(String value) {
+        Select select = new Select(this.pollPublicity);
         select.selectByValue(value);
     }
 }

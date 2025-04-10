@@ -19,19 +19,18 @@
  */
 package com.xwiki.xpoll.internal;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.servlet.http.Cookie;
 
+import com.xpn.xwiki.web.XWikiResponse;
+import com.xwiki.xpoll.rest.model.jaxb.Vote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -50,9 +49,8 @@ import com.xwiki.xpoll.PollResultsCalculator;
 import com.xwiki.xpoll.XPollException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DefaultXPollManager}.
@@ -63,6 +61,12 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultXPollManagerTest
 {
+    private static final String COOKIE_NAME = "poll_publicity_id";
+
+    private static final String COOKIE_VALUE = "cookie_value";
+
+    private static final String GUEST_ID = "guestId";
+
     @InjectMockComponents
     private DefaultXPollManager manager;
 
@@ -88,6 +92,9 @@ class DefaultXPollManagerTest
 
     @Mock
     private XWikiRequest request;
+
+    @Mock
+    private XWikiResponse response;
 
     @Mock
     private XWiki wiki;
@@ -124,9 +131,13 @@ class DefaultXPollManagerTest
     {
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
         DocumentReference userReference = new DocumentReference("XWiki", "User", "User");
-        List<String> votedResults = Arrays.asList("Proposal1", "Proposal2");
+        Vote vote = new Vote();
+        vote.withProposals(Arrays.asList("Proposal1", "Proposal2"));
 
         when(this.xWikiContext.getWiki()).thenReturn(wiki);
+        when(this.xWikiContext.getRequest()).thenReturn(request);
+        when(this.xWikiContext.getResponse()).thenReturn(response);
+        when(this.request.getCookie(any())).thenReturn(new Cookie(COOKIE_NAME, COOKIE_VALUE));
         when(this.wiki.getDocument(docRef, xWikiContext)).thenReturn(document);
         when(this.document.clone()).thenReturn(document);
         when(this.document.getDocumentReference()).thenReturn(docRef);
@@ -134,11 +145,43 @@ class DefaultXPollManagerTest
         BaseObject xpollVotes = mock(BaseObject.class);
         when(this.document.getXObject(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE, "user", "User.User", false))
             .thenReturn(xpollVotes);
+        when(this.request.getCookie(any())).thenReturn(new Cookie(COOKIE_NAME, COOKIE_VALUE));
 
-        this.manager.vote(docRef, userReference, votedResults);
+        this.manager.vote(docRef, userReference, vote);
 
         verify(xpollVotes).set("user", "User.User", this.xWikiContext);
-        verify(xpollVotes).set("votes", votedResults, this.xWikiContext);
+        verify(xpollVotes).set("guestId", null, this.xWikiContext);
+        verify(xpollVotes).set("votes", vote.getProposals(), this.xWikiContext);
+        verify(this.wiki).saveDocument(this.document, "New Vote", this.xWikiContext);
+    }
+
+    @Test
+    void voteWithGuestUserTest() throws XWikiException, XPollException
+    {
+        DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
+        DocumentReference userReference = new DocumentReference("XWiki", "XWiki", "XWikiGuest");
+        Vote vote = new Vote();
+        vote.withProposals(Arrays.asList("Proposal1", "Proposal2"));
+        vote.withGuestName("JohnDoe");
+
+        when(this.xWikiContext.getWiki()).thenReturn(wiki);
+        when(this.xWikiContext.getRequest()).thenReturn(this.request);
+        when(this.xWikiContext.getResponse()).thenReturn(this.response);
+        when(this.wiki.getDocument(docRef, xWikiContext)).thenReturn(document);
+        when(this.document.clone()).thenReturn(document);
+        when(this.document.getDocumentReference()).thenReturn(docRef);
+        when(this.serializer.serialize(userReference, docRef.getWikiReference())).thenReturn(null);
+        BaseObject xpollVotes = mock(BaseObject.class);
+        when(this.document.getXObject(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE, GUEST_ID, COOKIE_VALUE, false))
+                .thenReturn(xpollVotes);
+        when(this.request.getCookie(any())).thenReturn(new Cookie(COOKIE_NAME, COOKIE_VALUE));
+        doNothing().when(this.response).addCookie(any());
+
+        this.manager.vote(docRef, userReference, vote);
+
+        verify(xpollVotes).set("user", "JohnDoe", this.xWikiContext);
+        verify(xpollVotes).set("votes", vote.getProposals(), this.xWikiContext);
+        verify(xpollVotes).set("guestId", "cookie_value", this.xWikiContext);
         verify(this.wiki).saveDocument(this.document, "New Vote", this.xWikiContext);
     }
 
