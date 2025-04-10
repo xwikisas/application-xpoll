@@ -134,10 +134,13 @@
       // Transform the form data into a JSON so the Vote object can be deserialized properly server side.
       var jsonForm = {};
       $.map($(this).serializeArray(), function (entry) {
-        if (!jsonForm[entry.name]) {
-          jsonForm[entry.name] = [];
+        if (entry.name == "proposals") {
+          jsonForm[entry.name] = jsonForm[entry.name] ?? [];
+          jsonForm[entry.name].push(entry.value);
         }
-        jsonForm[entry.name].push(entry.value);
+        else {
+          jsonForm[entry.name] = entry.value;
+        }
       });
       $.ajax({
         type: $(this).attr('method'),
@@ -154,9 +157,26 @@
         },
         error: function(data) {
           if (data.status == 403) {
-            this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed.forbidden')", 'error'));
+            this.progressNotification.replace(
+              new XWiki.widgets.Notification(
+                "$services.localization.render('contrib.xpoll.vote.failed.forbidden')",
+                'error'
+              )
+            );
+          } else if (data.status == 400) {
+              this.progressNotification.replace(
+                new XWiki.widgets.Notification(
+                  "$services.localization.render('contrib.xpoll.vote.failed.guestEmpty')",
+                  'error'
+                )
+              );
           } else {
-            this.progressNotification.replace(new XWiki.widgets.Notification("$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')", 'error'));
+              this.progressNotification.replace(
+                new XWiki.widgets.Notification(
+                  "$services.localization.render('contrib.xpoll.vote.failed', 'HTTP Error')",
+                  'error'
+                )
+              );
           }
         }
       });

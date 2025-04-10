@@ -52,9 +52,24 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
+    <guestId>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>guestId</name>
+      <number>4</number>
+      <picker>1</picker>
+      <prettyName>Guest Id</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </guestId>
     <user>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>user</name>
       <number>1</number>
       <picker>0</picker>
@@ -68,8 +83,12 @@
     <votes>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>input</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
       <multiSelect>1</multiSelect>
       <name>votes</name>
       <number>2</number>

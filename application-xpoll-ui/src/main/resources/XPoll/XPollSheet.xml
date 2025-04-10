@@ -117,12 +117,20 @@
     &lt;/td&gt;
   #end
 #end
+#macro(setDefaultProperty $obj $propertyName $defaultValue)
+  #if ("$!obj.getValue($propertyName)" == "")
+    #set ($discard = $doc.set($propertyName, $defaultValue))
+  #end
+#end
 {{/velocity}}
 
 {{velocity}}
 #set ($pollObj = $doc.getObject('XPoll.XPollClass'))
 #set ($status = $pollObj.getValue('status'))
+#setDefaultProperty($pollObj 'pollPublicity' 'private')
+#set ($pollPublicity = $pollObj.getValue('pollPublicity'))
 #set ($votePrivacy = $pollObj.getValue('votePrivacy'))
+#set ($cookieId = $request.getCookie("poll_publicity_id").getValue())
 #set ($discard = $xwiki.jsx.use('XPoll.XPollJSExtension'))
 #set ($discard = $xwiki.ssx.use('XPoll.XPollSheet'))
 ## Check if the document needs migration
@@ -157,6 +165,7 @@
 #end
 ## Flag indicating whether to show all users or only the current user, depending on vote privacy
 #set ($displayAllUsers = $hasEdit || $votePrivacy == 'public')
+#set ($isCurrentContextUserGuest = $xcontext.user == 'XWiki.XWikiGuest')
 #if ($xcontext.action == 'view' &amp;&amp; $status == 'inpreparation')
   #if ($hasEdit)
     $services.rendering.escape($services.localization.render('contrib.xpoll.preparation.hasRight'), 'xwiki/2.1')
@@ -207,6 +216,7 @@
           &lt;/dd&gt;
         &lt;/dl&gt;
       &lt;/div&gt;
+
       &lt;div class="col-xs-12 col-sm-4"&gt;
         #if ($doc.getValue('status') == 'inpreparation' &amp;&amp; ($hasAdmin || $xcontext.user == $doc.creator))
           &lt;dl&gt;
@@ -237,6 +247,19 @@
           &lt;/dd&gt;
         &lt;/dl&gt;
       &lt;/div&gt;
+      &lt;div class="col-xs-12 col-sm-4"&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label #if($xcontext.action=='edit' )for="XPoll.XPollClass_0_pollPublicity" #end&gt;
+              $doc.displayPrettyName('pollPublicity', false, false)
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('XPoll.XPollClass_pollPublicity_hint'))&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            #displayPropertyValue('pollPublicity')
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
     &lt;dl&gt;
       #if ($xcontext.action == 'edit' || "$!doc.getValue('description')" != '')
@@ -255,13 +278,14 @@
 #else
   $doc.display('description')
   #set ($proposals = $pollObj.getValue('proposals'))
+  #set ($isPollPublicityPublic = $pollPublicity == 'public')
   #if($displayAllUsers)
     #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
     ## Count only the existing users, without the deleted users.
     ## This is needed to update the number of user when the status is active and the deleted users are hidden.
     #set ($usersCountActive = 0)
     #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
-      #if ($xwiki.exists($obj.user))
+      #if ($xwiki.exists($obj.user) || ($obj.user.equals('XWiki.XWikiGuest') &amp;&amp; $isPollPublicityPublic))
         #set ($usersCountActive = $usersCountActive + 1)
       #end
     #end
@@ -302,45 +326,81 @@
           ## Users and their votes.
           &lt;tbody&gt;
             #set ($foundUser = false)
+            #set ($foundGuestUser = false)
             #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
               #set ($user = $voteObj.user)
-              #set ($isCurrentUser = $user.equals($xcontext.user))
+              #set ($guestId = $voteObj.getValue('guestId'))
+              #set ($isVoteFromGuest = "$guestId" != "")
+              #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
+              #set ($isCurrentUser = $user.equals($xcontext.user) &amp;&amp; !$isVoteFromGuest)
               #set ($votes = $voteObj.getValue('votes'))
-              #if($displayAllUsers)
-                &lt;tr #if($isCurrentUser)class="active"#end&gt;
-                  #if ($isCurrentUser)
-                    #set ($foundUser = true)
-                  #end
-                  #if ($xwiki.exists($user))
+              #set ($guestName = $voteObj.getValue('user'))
+              #set ($escapedGuestName = $escapetool.xml($guestName))
+              #if ($isCurrentUser)
+                #set ($foundUser = true)
+              #end
+              #if ($isVoteFromCurrentGuest)
+                #set ($foundGuestUser = true)
+              #end
+              ## display the input for a guest user that already voted and wants to vote again
+              #if ($isVoteFromCurrentGuest &amp;&amp; $isPollPublicityPublic)
+                &lt;tr class="active"&gt;
+                  &lt;td&gt;
+                    &lt;input type="text" value="$escapedGuestName" name="guestName"&gt;
+                  &lt;/td&gt;
+                  #displayInput($votes true $guestName $foreach.index)
+                &lt;/tr&gt;
+              #end
+              #if ($displayAllUsers)
+                ## display the vote for a guest user that is not the current user
+                #if ($isVoteFromGuest &amp;&amp; !$isVoteFromCurrentGuest)
+                  &lt;tr&gt;
+                    &lt;td&gt;
+                      $escapedGuestName
+                    &lt;/td&gt;
+                    #displayInput($votes false $guestName $foreach.index)
+                  &lt;/tr&gt;
+                ## display the vote for users who are logged in or have voted while logged in
+                #elseif ($xwiki.exists($user) &amp;&amp; !$isVoteFromGuest)
+                  &lt;tr #if ($isCurrentUser) class="active" #end&gt;
                     &lt;td&gt;
                       #displayUser($user, {'wrapAvatar': true})
                     &lt;/td&gt;
                     #displayInput($votes $isCurrentUser $user $foreach.index)
-                  #end
-                &lt;/tr&gt;
-              #elseif($isCurrentUser)
-                #set ($foundUser = true)
+                  &lt;/tr&gt;
+                #end
+              #else
                 &lt;tr class="active"&gt;
-                  &lt;td&gt;
-                    #displayUser($user, {'wrapAvatar': true})
-                  &lt;/td&gt;
-                  #displayInput($votes $isCurrentUser $user 0)
+                  #if ($isCurrentUser)
+                    &lt;td&gt;
+                      #displayUser($user, {'wrapAvatar': true})
+                    &lt;/td&gt;
+                    #displayInput($votes $isCurrentUser $user 0)
+                  #end
                 &lt;/tr&gt;
               #end
             #end
 
             ## Display the current user if he hasn't voted yet.
-            #if (!$foundUser &amp;&amp; $xcontext.user != 'XWiki.XWikiGuest')
-            &lt;tr class="active"&gt;
-              &lt;td&gt;
-                #displayUser($xcontext.user, {'wrapAvatar': true})
-              &lt;/td&gt;
-              ## The 3rd parameter is true in order to not disable the input for current user.
-              #displayInput([] true $xcontext.user)
-            &lt;/tr&gt;
+            #if (!$foundUser &amp;&amp; !$isCurrentContextUserGuest)
+              &lt;tr class="active"&gt;
+                &lt;td&gt;
+                  #displayUser($xcontext.user, {'wrapAvatar': true})
+                &lt;/td&gt;
+                ## The 3rd parameter is true in order to not disable the input for current user.
+                #displayInput([] true $xcontext.user)
+              &lt;/tr&gt;
+            #end
+            #if (!$foundGuestUser &amp;&amp; $isCurrentContextUserGuest &amp;&amp; $isPollPublicityPublic)
+              &lt;tr class="active"&gt;
+                &lt;td&gt;
+                  &lt;input type="text" name="guestName" value="" placeholder="Name..."&gt;
+                  #displayInput([] true $xcontext.user)
+                &lt;/td&gt;
+              &lt;/tr&gt;
             #end
           &lt;/tbody&gt;
-          #if($displayAllUsers)
+          #if ($displayAllUsers)
             &lt;tfoot&gt;
               &lt;tr&gt;
                 &lt;td&gt;
@@ -355,7 +415,7 @@
           #end
         &lt;/table&gt;
       &lt;/div&gt;
-      #if ($xcontext.user != 'XWiki.XWikiGuest')
+      #if (!$isCurrentContextUserGuest || $isPollPublicityPublic)
         &lt;div class='save'&gt;
           &lt;input type="submit" value="$escapetool.xml($services.localization.render("contrib.xpoll.vote.user.submit"))"
             class="button"/&gt;
@@ -394,22 +454,42 @@
         #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
           #set ($user = $voteObj.user)
           #set ($votes = $voteObj.getValue('votes'))
-          #set ($isCurrentUser = $user == $xcontext.user)
+          #set ($guestName = $voteObj.getValue('user'))
+          #set ($escapedGuestName = $escapetool.xml($guestName))
+          #set ($guestId = $voteObj.getValue('guestId'))
+          #set ($isVoteFromGuest = "$guestId" != "")
+          #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
+          #set ($isCurrentUser = $user == $xcontext.user &amp;&amp; !$isVoteFromGuest)
           #if($displayAllUsers)
-            &lt;tr #if($isCurrentUser)class="active"#end&gt;
-              &lt;td&gt;
-                #displayUser($user, {'wrapAvatar': true})
-              &lt;/td&gt;
-              ## The 3rd parameter is false in order to disable the input when the poll is finished.
-              #displayInput($votes false $user $foreach.index)
+            &lt;tr #if($isCurrentUser || $isVoteFromCurrentGuest)class="active"#end&gt;
+              #if ($isVoteFromGuest)
+                &lt;td&gt;
+                 $escapedGuestName
+                &lt;/td&gt;
+                ## The 3rd parameter is false in order to disable the input when the poll is finished.
+                #displayInput($votes false $guestName $foreach.index)
+              #else
+                &lt;td&gt;
+                  #displayUser($user, {'wrapAvatar': true})
+                &lt;/td&gt;
+                ## The 3rd parameter is false in order to disable the input when the poll is finished.
+                #displayInput($votes false $user $foreach.index)
+              #end
             &lt;/tr&gt;
-          #elseif($isCurrentUser)
+          #else
             &lt;tr class="active"&gt;
-              &lt;td&gt;
-                #displayUser($user, {'wrapAvatar': true})
-              &lt;/td&gt;
-              ## The 3rd parameter is false in order to disable the input when the poll is finished.
-              #displayInput($votes false $user 0)
+              #if ($isVoteFromCurrentGuest)
+                &lt;td&gt;
+                  $escapedGuestName
+                &lt;/td&gt;
+                #displayInput($votes false $guestName 0)
+              #elseif ($isCurrentUser)
+                &lt;td&gt;
+                  #displayUser($user, {'wrapAvatar': true})
+                &lt;/td&gt;
+                ## The 3rd parameter is false in order to disable the input when the poll is finished.
+                #displayInput($votes false $user 0)
+              #end
             &lt;/tr&gt;
           #end
         #end

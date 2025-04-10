@@ -28,6 +28,7 @@
   <xs:complexType name="Vote">
     <xs:sequence>
       <xs:element name="proposal" maxOccurs="unbounded" type="xs:string"/>
+      <xs:element name="guestName" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
