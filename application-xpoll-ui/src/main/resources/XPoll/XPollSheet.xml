@@ -172,7 +172,7 @@
 #end
 ## Flag to know wheter the options must be displayed as checkbox or radio inputs.
 #set ($isRadio = $pollObj.getProperty('type').value == 'single')
-#if ($xcontext.action == 'edit' || $status == 'inpreparation')
+#if (($xcontext.action == 'edit' || $status == 'inpreparation') &amp;&amp; $hasEdit)
   {{html clean='false'}}
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
   #set ($discard = $doc.use('XPoll.XPollClass'))
@@ -273,16 +273,17 @@
   &lt;/div&gt;
   {{/html}}
 #else
-  $doc.display('description')
   #set ($proposals = $pollObj.getValue('proposals'))
   #set ($isPollPublicityPublic = $pollPublicity == 'public')
+  ##check to see if an user can vote
+  #set ($userCanVote = !$isCurrentContextUserGuest || $isPollPublicityPublic)
   #if($displayAllUsers)
     #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
     ## Count only the existing users, without the deleted users.
     ## This is needed to update the number of user when the status is active and the deleted users are hidden.
     #set ($usersCountActive = 0)
     #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
-      #if ($xwiki.exists($obj.user) || ($obj.user.equals('XWiki.XWikiGuest') &amp;&amp; $isPollPublicityPublic))
+      #if ($xwiki.exists($obj.user) || (!$obj.guestId.isEmpty()))
         #set ($usersCountActive = $usersCountActive + 1)
       #end
     #end
@@ -293,33 +294,61 @@
       #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
     #end
   #end
+    #set ($currentGuestUserVoted = false)
+    #set ($currentUserVoted = false)
+    #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+      #if ($cookieId.equals($voteObj.getValue('guestId')) &amp;&amp; $isCurrentContextUserGuest)
+        #set ($currentGuestUserVoted = true)
+      #end
+      #if ($voteObj.getValue('user').equals($xcontext.user))
+        #set ($currentUserVoted = true)
+      #end
+    #end
+  #set ($showPollSummary = !$isCurrentContextUserGuest || $currentGuestUserVoted || $userCanVote || ($usersCountActive &gt; 0 &amp;&amp; $displayAllUsers ))
   #if ($status == 'active')
+    #if ($showPollSummary)
+      $doc.display('description')
+    #end
     #set ($restURL = $services.xpoll.url($doc.documentReference))
+    #if (!$isPollPublicityPublic &amp;&amp; $currentGuestUserVoted)
+      {{warning}}
+      $escapetool.xml($services.localization.render('contrib.xpoll.guestCannotChangeVote'))
+      {{/warning}}
 
+    #end
     {{html clean='false'}}
     &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
       &lt;div id="xpollTableWrapper"&gt;
         &lt;table class='xpoll medium-avatars table table-bordered'&gt;
           ## Table header row.
-          &lt;thead&gt;
-          &lt;tr&gt;
-            &lt;th&gt;
-              #if($displayAllUsers)
-                $escapetool.xml($services.localization.render('contrib.xpoll.user'))
-                &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
-              #else
-                $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
-              #end
-            &lt;/th&gt;
-            #foreach($proposal in $proposals)
-              &lt;th&gt;
-                &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
-                  $proposal
-                &lt;/label&gt;
-              &lt;/th&gt;
-            #end
-          &lt;/tr&gt;
-          &lt;/thead&gt;
+          #if ($showPollSummary)
+            &lt;thead&gt;
+              &lt;tr&gt;
+                &lt;th&gt;
+                  #if($displayAllUsers)
+                    #if($usersCountActive == 1)
+                      $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+                    #else
+                      $escapetool.xml($services.localization.render('contrib.xpoll.user'))
+                      &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
+                    #end
+                  #elseif ($currentGuestUserVoted || $currentUserVoted)
+                    $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+                  #else
+                    $escapetool.xml($services.localization.render('contrib.xpoll.user'))
+                    &lt;span class='count'&gt;(0)&lt;/span&gt;
+                  #end
+                &lt;/th&gt;
+                #foreach($proposal in $proposals)
+                  &lt;th&gt;
+                    &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
+                      $proposal
+                    &lt;/label&gt;
+                  &lt;/th&gt;
+                #end
+              &lt;/tr&gt;
+            &lt;/thead&gt;
+          #end
           ## Users and their votes.
           &lt;tbody&gt;
             #set ($foundUser = false)
@@ -339,13 +368,13 @@
               #if ($isVoteFromCurrentGuest)
                 #set ($foundGuestUser = true)
               #end
-              ## display the input for a guest user that already voted and wants to vote again
-              #if ($isVoteFromCurrentGuest &amp;&amp; $isPollPublicityPublic)
+              ## display the input for a guest user that already voted
+              #if ($isVoteFromCurrentGuest)
                 &lt;tr class="active"&gt;
                   &lt;td&gt;
-                    &lt;input type="text" value="$escapedGuestName" name="guestName"&gt;
+                    &lt;input type="text" value="$escapedGuestName" name="guestName" #if(!$isPollPublicityPublic) disabled#end&gt;
                   &lt;/td&gt;
-                  #displayInput($votes true $guestName $foreach.index)
+                  #displayInput($votes $isPollPublicityPublic $guestName $foreach.index)
                 &lt;/tr&gt;
               #end
               #if ($displayAllUsers)
@@ -397,7 +426,7 @@
               &lt;/tr&gt;
             #end
           &lt;/tbody&gt;
-          #if ($displayAllUsers)
+          #if ($displayAllUsers &amp;&amp; $showPollSummary)
             &lt;tfoot&gt;
               &lt;tr&gt;
                 &lt;td&gt;
@@ -428,25 +457,37 @@
         #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
       #end
     #end
+    #set ($showPollSummary = !$isCurrentContextUserGuest || $currentGuestUserVoted || $userCanVote || ($displayAllUsers &amp;&amp; $usersCount &gt; 0))
     {{html wiki='true' clean='false'}}
-    $escapetool.xml($services.localization.render('contrib.xpoll.finish.message'))
+    #if ($showPollSummary)
+      $doc.display('description')
+      $escapetool.xml($services.localization.render('contrib.xpoll.finish.message'))
+    #end
     &lt;div id="xpollTableWrapper"&gt;
       &lt;table class='xpoll medium-avatars table table-bordered'&gt;
         ## Table header row.
-        &lt;tr&gt;
-          &lt;th&gt;
-            #if($displayAllUsers)
-              $escapetool.xml($services.localization.render('contrib.xpoll.user'))
-              &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
-            #else
-              $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+        #if ($showPollSummary)
+          &lt;tr&gt;
+            &lt;th&gt;
+              #if($displayAllUsers)
+                #if($usersCountActive == 1)
+                  $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+                #else
+                  $escapetool.xml($services.localization.render('contrib.xpoll.user'))
+                  &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
+                #end
+              #elseif ($currentGuestUserVoted || $currentUserVoted)
+                $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+              #else
+                $escapetool.xml($services.localization.render('contrib.xpoll.user'))
+                &lt;span class='count'&gt;(0)&lt;/span&gt;
+              #end
+            &lt;/th&gt;
+            #foreach ($proposal in $proposals)
+              &lt;th&gt; $proposal &lt;/th&gt;
             #end
-          &lt;/th&gt;
-          #foreach ($proposal in $proposals)
-            &lt;th&gt; $proposal &lt;/th&gt;
-          #end
-        &lt;/tr&gt;
-
+          &lt;/tr&gt;
+        #end
         ## Users and their votes.
         #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
           #set ($user = $voteObj.user)
@@ -490,15 +531,17 @@
             &lt;/tr&gt;
           #end
         #end
-        &lt;tr&gt;
-          &lt;td&gt;
-            $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
-            &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
-          &lt;/td&gt;
-          #foreach ($proposal in $proposals)
-            &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
-          #end
-        &lt;/tr&gt;
+        #if ($showPollSummary)
+          &lt;tr&gt;
+            &lt;td&gt;
+              $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
+              &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
+            &lt;/td&gt;
+            #foreach ($proposal in $proposals)
+              &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
+            #end
+          &lt;/tr&gt;
+        #end
       &lt;/table&gt;
     &lt;/div&gt;
     {{/html}}
