@@ -55,29 +55,38 @@
   "from doc.object(XPoll.XPollClass) as poll where doc.fullName &lt;&gt; 'XPoll.XPollTemplate'"
 ).execute())
 #set ($pollList = [])
+#set ($isCurrentUserGuest = $xcontext.user == 'XWiki.XWikiGuest')
 #foreach ($poll in $polls)
   #set ($pollInstance = $xwiki.getDocument($poll))
-  #set ($pollMapObj = {})
-  #set ($votePrivacy = $pollInstance.getValue('votePrivacy'))
-  #set ($statusValue = $pollInstance.getValue("status"))
-  #set ($winnerValue = "")
-  #set ($hideWinner = $statusValue == "active" &amp;&amp; $votePrivacy == 'private' &amp;&amp; !$hasEdit)
-  #if (!$hideWinner &amp;&amp; $pollInstance.get('winner') != "")
-    #set ($winnerValue = $pollInstance.get('winner'))
+  #set ($pollPublicity = $pollInstance.getValue('pollPublicity'))
+  #set ($restrictUserToSeePoll = $isCurrentUserGuest &amp;&amp; $pollPublicity == 'private')
+  #if (!$restrictUserToSeePoll)
+    #set ($hasEditOnDocument = $services.security.authorization.hasAccess('edit', $pollInstance))
+    #set ($hasDeleteOnDocument = $services.security.authorization.hasAccess('delete', $pollInstance))
+    #set ($pollMapObj = {})
+    #set ($statusValue = $pollInstance.getValue("status"))
+    #set ($votePrivacy = $pollInstance.getValue('votePrivacy'))
+    #set ($winnerValue = "")
+    #set ($hideWinner = $statusValue == "active" &amp;&amp; $votePrivacy == 'private' &amp;&amp; !$hasEdit)
+    #if (!$hideWinner &amp;&amp; $pollInstance.get('winner') != "")
+      #set ($winnerValue = $pollInstance.get('winner'))
+    #end
+    #set ($winner = $winnerValue)
+    #if ($winner == "")
+      #set ($winner = "-")
+    #end
+    #set ($discard = $pollMapObj.put('name', $pollInstance.get("name")))
+    #set ($discard = $pollMapObj.put('name_value', $pollInstance.getValue("name")))
+    #set ($discard = $pollMapObj.put('status', $pollInstance.get("status")))
+    #set ($discard = $pollMapObj.put('status_value', $statusValue))
+    #set ($discard = $pollMapObj.put('winner', $winner))
+    #set ($discard = $pollMapObj.put('winner_value', $winnerValue))
+    #set ($discard = $pollMapObj.put('doc_hasedit', $hasEditOnDocument))
+    #set ($discard = $pollMapObj.put('doc_edit_url', $pollInstance.getURL('edit')))
+    #set ($discard = $pollMapObj.put('doc_hasdelete', $hasDeleteOnDocument))
+    #set ($discard = $pollMapObj.put('doc_delete_url', $pollInstance.getURL('delete')))
+    #set ($discard = $pollList.add($pollMapObj))
   #end
-  #set ($winner = $winnerValue)
-  #if ($winner == "")
-    #set ($winner = "-")
-  #end
-  #set ($discard = $pollMapObj.put('name', $pollInstance.get("name")))
-  #set ($discard = $pollMapObj.put('name_value', $pollInstance.getValue("name")))
-  #set ($discard = $pollMapObj.put('status', $pollInstance.get("status")))
-  #set ($discard = $pollMapObj.put('status_value', $statusValue))
-  #set ($discard = $pollMapObj.put('winner', $winner))
-  #set ($discard = $pollMapObj.put('winner_value', $winnerValue))
-  #set ($discard = $pollMapObj.put('doc_edit_url', $pollInstance.getURL('edit')))
-  #set ($discard = $pollMapObj.put('doc_delete_url', $pollInstance.getURL('delete')))
-  #set ($discard = $pollList.add($pollMapObj))
 #end
 ##filter the list
 #set ($filteredPollList = [])
@@ -114,7 +123,9 @@
 #foreach ($entry in $resultPollList)
   #set ($discard = $json.rows.add({
   'doc_viewable': true,
+  'doc_hasedit' : $entry.get('doc_hasedit'),
   'doc_edit_url': $entry.get('doc_edit_url'),
+  'doc_hasdelete': $entry.get('doc_hasdelete'),
   'doc_delete_url': $entry.get('doc_delete_url'),
   'name':  $entry.get('name'),
   'name_url': $entry.get('name'),
