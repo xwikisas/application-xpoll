@@ -39,8 +39,9 @@
   <content>polls.extension.name=Polls Application (Pro)
 
 contrib.xpoll.app.title=Polls
+contrib.xpoll.emptyPage=You are not allowed to access this content.
 contrib.xpoll.finish.message=Vote is finished. Here are the results:
-contrib.xpoll.guestCannotChangeVote = Your vote has been recorded. At this point, you can no longer change it!
+contrib.xpoll.guestCannotChangeVote=Your vote has been recorded. At this point, you can no longer change it!
 contrib.xpoll.home.title=Polls
 contrib.xpoll.notVoted=You haven't voted yet
 contrib.xpoll.numberVotes=Scores

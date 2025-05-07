@@ -172,7 +172,7 @@
 #end
 ## Flag to know wheter the options must be displayed as checkbox or radio inputs.
 #set ($isRadio = $pollObj.getProperty('type').value == 'single')
-#if (($xcontext.action == 'edit' || $status == 'inpreparation') &amp;&amp; $hasEdit)
+#if ($hasEdit &amp;&amp; ($xcontext.action == 'edit' || $status == 'inpreparation'))
   {{html clean='false'}}
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
   #set ($discard = $doc.use('XPoll.XPollClass'))
@@ -275,7 +275,7 @@
 #else
   #set ($proposals = $pollObj.getValue('proposals'))
   #set ($isPollPublicityPublic = $pollPublicity == 'public')
-  ##check to see if an user can vote
+  ## Check to see if an user can vote.
   #set ($userCanVote = !$isCurrentContextUserGuest || $isPollPublicityPublic)
   #if($displayAllUsers)
     #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
@@ -294,16 +294,16 @@
       #set ($totalVotesCount = $totalVotesCount + $voteCount.get($key))
     #end
   #end
-    #set ($currentGuestUserVoted = false)
-    #set ($currentUserVoted = false)
-    #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
-      #if ($cookieId.equals($voteObj.getValue('guestId')) &amp;&amp; $isCurrentContextUserGuest)
-        #set ($currentGuestUserVoted = true)
-      #end
-      #if ($voteObj.getValue('user').equals($xcontext.user))
-        #set ($currentUserVoted = true)
-      #end
+  #set ($currentGuestUserVoted = false)
+  #set ($currentUserVoted = false)
+  #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+    #if ($cookieId.equals($voteObj.getValue('guestId')) &amp;&amp; $isCurrentContextUserGuest)
+      #set ($currentGuestUserVoted = true)
     #end
+    #if ($voteObj.getValue('user').equals($xcontext.user))
+      #set ($currentUserVoted = true)
+    #end
+  #end
   #set ($showPollSummary = !$isCurrentContextUserGuest || $currentGuestUserVoted || $userCanVote || ($usersCountActive &gt; 0 &amp;&amp; $displayAllUsers ))
   #if ($status == 'active')
     #if ($showPollSummary)
@@ -315,6 +315,11 @@
       $escapetool.xml($services.localization.render('contrib.xpoll.guestCannotChangeVote'))
       {{/warning}}
 
+    #end
+    #if (!($showPollSummary || $displayAllUsers))
+      {{warning}}
+      $escapetool.xml($services.localization.render('contrib.xpoll.emptyPage'))
+      {{/warning}}
     #end
     {{html clean='false'}}
     &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
@@ -368,7 +373,7 @@
               #if ($isVoteFromCurrentGuest)
                 #set ($foundGuestUser = true)
               #end
-              ## display the input for a guest user that already voted
+              ## Display the input for a guest user that already voted
               #if ($isVoteFromCurrentGuest)
                 &lt;tr class="active"&gt;
                   &lt;td&gt;
@@ -462,6 +467,11 @@
     #if ($showPollSummary)
       $doc.display('description')
       $escapetool.xml($services.localization.render('contrib.xpoll.finish.message'))
+    #end
+    #if (!$showPollSummary)
+      {{warning}}
+      $escapetool.xml($services.localization.render('contrib.xpoll.emptyPage'))
+      {{/warning}}
     #end
     &lt;div id="xpollTableWrapper"&gt;
       &lt;table class='xpoll medium-avatars table table-bordered'&gt;
