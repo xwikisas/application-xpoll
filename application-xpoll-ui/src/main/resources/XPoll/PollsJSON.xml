@@ -67,7 +67,7 @@
     #set ($statusValue = $pollInstance.getValue("status"))
     #set ($votePrivacy = $pollInstance.getValue('votePrivacy'))
     #set ($winnerValue = "")
-    #set ($hideWinner = $statusValue == "active" &amp;&amp; $votePrivacy == 'private' &amp;&amp; !$hasEdit)
+    #set ($hideWinner = $statusValue == "active" &amp;&amp; $votePrivacy == 'private' &amp;&amp; !$hasEditOnDocument)
     #if (!$hideWinner &amp;&amp; $pollInstance.get('winner') != "")
       #set ($winnerValue = $pollInstance.get('winner'))
     #end
