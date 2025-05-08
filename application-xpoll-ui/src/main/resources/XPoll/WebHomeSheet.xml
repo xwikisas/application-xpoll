@@ -41,39 +41,40 @@
     $services.model.createDocumentReference('', 'XPoll', 'XPollClass')))
   {{missingLicenseMessage extensionName="polls.extension.name"/}}
 #else
-#set($oldPolls = $services.query.xwql('where doc.object(XPoll.XPollClass).type in (:types)').bindValue('types', ['0', '1']).setLimit(1).execute())
-#set($needsMigration = $oldPolls.size() &gt; 0)
+  #set($oldPolls = $services.query.xwql('where doc.object(XPoll.XPollClass).type in (:types)').bindValue('types', ['0', '1']).setLimit(1).execute())
+  #set($needsMigration = $oldPolls.size() &gt; 0)
 
-#if ($needsMigration)
-  {{warning cssClass='xpoll-migration-warning'}}
-    {{translation key="xpoll.migration.shouldMigrateAll" /}}
-    #if($hasAdmin)
-      {{translation key="xpoll.migration.migrate" /}}
-      [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;XPoll.XPollMigration||queryString="migrate=true&amp;form_token=$services.csrf.getToken()"]]
-      #set ($discard = $xwiki.jsx.use('XPoll.XPollMigration'))
-    #else
-      {{translation key="xpoll.migration.notifyAdmin" /}}
-    #end
-  {{/warning}}
-#end
+  #if ($needsMigration)
+    {{warning cssClass='xpoll-migration-warning'}}
+      {{translation key="xpoll.migration.shouldMigrateAll" /}}
+      #if($hasAdmin)
+        {{translation key="xpoll.migration.migrate" /}}
+        [[{{translation key="xpoll.migration.linkText" /}}&gt;&gt;XPoll.XPollMigration||queryString="migrate=true&amp;form_token=$services.csrf.getToken()"]]
+        #set ($discard = $xwiki.jsx.use('XPoll.XPollMigration'))
+      #else
+        {{translation key="xpoll.migration.notifyAdmin" /}}
+      #end
+    {{/warning}}
+  #end
 
-$services.localization.render('contrib.xpoll.WebHome.description')
-#set($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', 'true'))
-#set($docextras = [])
-#set($columnsProperties = {
-  'name': {'type': 'text', 'link' : 'view', 'size': 10},
-  'status': {'type': 'list', 'size': 10},
-  'winner': {'type': 'text', 'size': 10},
-  '_actions': {'html': true, 'sortable': false, 'filterable': false, 'actions': ['edit', 'delete']}
-})
-#set($options = {
-  'className': 'XPoll.XPollClass',
-  'translationPrefix': 'xpoll.livetable.',
-  'tagCloud': true,
-  'selectedColumn': 'name'
-})
-#set($columns = ['name', 'status', 'winner', '_actions'])
-#livetable('xpoll' $columns $columnsProperties $options)
+  $services.localization.render('contrib.xpoll.WebHome.description')
+  #set($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', 'true'))
+  #set($docextras = [])
+  #set($columnsProperties = {
+      'name': {'type': 'text', 'link' : 'auto', 'size': 10},
+      'status': {'type': 'list', 'size': 10},
+      'winner': {'type': 'text', 'size': 10},
+      '_actions': {'html': true, 'sortable': false, 'filterable': false, 'actions': ['edit', 'delete']}
+  })
+  #set($options = {
+      'className': 'XPoll.XPollClass',
+      "resultPage":"XPoll.PollsJSON",
+      'translationPrefix': 'xpoll.livetable.',
+      'tagCloud': true,
+      'selectedColumn': 'name'
+  })
+  #set($columns = ['name', 'status', 'winner', '_actions' ])
+  #livetable('xpoll' $columns $columnsProperties $options)
 #end
 {{/velocity}}</content>
 </xwikidoc>
