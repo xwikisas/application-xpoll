@@ -274,14 +274,15 @@
   {{/html}}
 #else
   #set ($proposals = $pollObj.getValue('proposals'))
-  #set ($isPollPublicityPublic = $pollPublicity == 'public')
+  #set ($isPollPublicityPublic = $pollPublicity == 'public' || $hasEdit)
+  #set ($usersCountActive = 0)
+  #set ($usersCount = 0)
   ## Check to see if an user can vote.
   #set ($userCanVote = !$isCurrentContextUserGuest || $isPollPublicityPublic)
   #if($displayAllUsers)
     #set ($usersCount = $doc.getObjects('XPoll.XPollVoteClass').size())
     ## Count only the existing users, without the deleted users.
     ## This is needed to update the number of user when the status is active and the deleted users are hidden.
-    #set ($usersCountActive = 0)
     #foreach ($obj in $doc.getObjects('XPoll.XPollVoteClass'))
       #if ($xwiki.exists($obj.user) || (!$obj.guestId.isEmpty()))
         #set ($usersCountActive = $usersCountActive + 1)
@@ -304,155 +305,153 @@
       #set ($currentUserVoted = true)
     #end
   #end
-  #set ($showPollSummary = !$isCurrentContextUserGuest || $currentGuestUserVoted || $userCanVote || ($usersCountActive &gt; 0 &amp;&amp; $displayAllUsers ))
   #if ($status == 'active')
-    #if ($showPollSummary)
-      $doc.display('description')
-    #end
+    #set ($showPollSummary = !$isCurrentContextUserGuest || $currentGuestUserVoted || $userCanVote || ($usersCountActive &gt; 0 &amp;&amp; $displayAllUsers ))
     #set ($restURL = $services.xpoll.url($doc.documentReference))
-    #if (!$isPollPublicityPublic &amp;&amp; $currentGuestUserVoted)
-      {{warning}}
-      $escapetool.xml($services.localization.render('contrib.xpoll.guestCannotChangeVote'))
-      {{/warning}}
-
-    #end
+    {{html clean='false', wiki='true'}}
     #if (!($showPollSummary || $displayAllUsers))
       {{warning}}
       $escapetool.xml($services.localization.render('contrib.xpoll.emptyPage'))
       {{/warning}}
-    #end
-    {{html clean='false'}}
-    &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
-      &lt;div id="xpollTableWrapper"&gt;
-        &lt;table class='xpoll medium-avatars table table-bordered'&gt;
-          ## Table header row.
-          #if ($showPollSummary)
-            &lt;thead&gt;
-              &lt;tr&gt;
-                &lt;th&gt;
-                  #if($displayAllUsers)
-                    #if($usersCountActive == 1)
+    #else
+      $doc.display('description')
+      #if (!$isPollPublicityPublic &amp;&amp; $currentGuestUserVoted)
+        {{warning}}
+        $escapetool.xml($services.localization.render('contrib.xpoll.guestCannotChangeVote'))
+        {{/warning}}
+      #end
+      &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
+        &lt;div id="xpollTableWrapper"&gt;
+          &lt;table class='xpoll medium-avatars table table-bordered'&gt;
+            ## Table header row.
+            #if ($showPollSummary)
+              &lt;thead&gt;
+                &lt;tr&gt;
+                  &lt;th&gt;
+                    #if($displayAllUsers)
+                      #if($usersCountActive == 1)
+                        $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+                      #else
+                        $escapetool.xml($services.localization.render('contrib.xpoll.user'))
+                        &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
+                      #end
+                    #elseif ($currentGuestUserVoted || $currentUserVoted)
                       $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
                     #else
                       $escapetool.xml($services.localization.render('contrib.xpoll.user'))
-                      &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
+                      &lt;span class='count'&gt;(0)&lt;/span&gt;
                     #end
-                  #elseif ($currentGuestUserVoted || $currentUserVoted)
-                    $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
-                  #else
-                    $escapetool.xml($services.localization.render('contrib.xpoll.user'))
-                    &lt;span class='count'&gt;(0)&lt;/span&gt;
-                  #end
-                &lt;/th&gt;
-                #foreach($proposal in $proposals)
-                  &lt;th&gt;
-                    &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
-                      $proposal
-                    &lt;/label&gt;
                   &lt;/th&gt;
+                  #foreach($proposal in $proposals)
+                    &lt;th&gt;
+                      &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
+                        $proposal
+                      &lt;/label&gt;
+                    &lt;/th&gt;
+                  #end
+                &lt;/tr&gt;
+              &lt;/thead&gt;
+            #end
+            ## Users and their votes.
+            &lt;tbody&gt;
+              #set ($foundUser = false)
+              #set ($foundGuestUser = false)
+              #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+                #set ($user = $voteObj.user)
+                #set ($guestId = $voteObj.getValue('guestId'))
+                #set ($isVoteFromGuest = "$guestId" != "")
+                #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
+                #set ($isCurrentUser = $user.equals($xcontext.user) &amp;&amp; !$isVoteFromGuest)
+                #set ($votes = $voteObj.getValue('votes'))
+                #set ($guestName = $voteObj.getValue('user'))
+                #set ($escapedGuestName = $escapetool.xml($guestName))
+                #if ($isCurrentUser)
+                  #set ($foundUser = true)
                 #end
-              &lt;/tr&gt;
-            &lt;/thead&gt;
-          #end
-          ## Users and their votes.
-          &lt;tbody&gt;
-            #set ($foundUser = false)
-            #set ($foundGuestUser = false)
-            #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
-              #set ($user = $voteObj.user)
-              #set ($guestId = $voteObj.getValue('guestId'))
-              #set ($isVoteFromGuest = "$guestId" != "")
-              #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
-              #set ($isCurrentUser = $user.equals($xcontext.user) &amp;&amp; !$isVoteFromGuest)
-              #set ($votes = $voteObj.getValue('votes'))
-              #set ($guestName = $voteObj.getValue('user'))
-              #set ($escapedGuestName = $escapetool.xml($guestName))
-              #if ($isCurrentUser)
-                #set ($foundUser = true)
+                #if ($isVoteFromCurrentGuest)
+                  #set ($foundGuestUser = true)
+                #end
+                ## Display the input for a guest user that already voted
+                #if ($isVoteFromCurrentGuest)
+                  &lt;tr class="active"&gt;
+                    &lt;td&gt;
+                      &lt;input type="text" value="$escapedGuestName" name="guestName" #if(!$isPollPublicityPublic) disabled#end&gt;
+                    &lt;/td&gt;
+                    #displayInput($votes $isPollPublicityPublic $guestName $foreach.index)
+                  &lt;/tr&gt;
+                #end
+                #if ($displayAllUsers)
+                  ## display the vote for a guest user that is not the current user
+                  #if ($isVoteFromGuest &amp;&amp; !$isVoteFromCurrentGuest)
+                    &lt;tr&gt;
+                      &lt;td&gt;
+                        $escapedGuestName
+                      &lt;/td&gt;
+                      #displayInput($votes false $guestName $foreach.index)
+                    &lt;/tr&gt;
+                  ## display the vote for users who are logged in or have voted while logged in
+                  #elseif ($xwiki.exists($user) &amp;&amp; !$isVoteFromGuest)
+                    &lt;tr #if ($isCurrentUser) class="active" #end&gt;
+                      &lt;td&gt;
+                        #displayUser($user, {'wrapAvatar': true})
+                      &lt;/td&gt;
+                      #displayInput($votes $isCurrentUser $user $foreach.index)
+                    &lt;/tr&gt;
+                  #end
+                #else
+                  &lt;tr class="active"&gt;
+                    #if ($isCurrentUser)
+                      &lt;td&gt;
+                        #displayUser($user, {'wrapAvatar': true})
+                      &lt;/td&gt;
+                      #displayInput($votes $isCurrentUser $user 0)
+                    #end
+                  &lt;/tr&gt;
+                #end
               #end
-              #if ($isVoteFromCurrentGuest)
-                #set ($foundGuestUser = true)
-              #end
-              ## Display the input for a guest user that already voted
-              #if ($isVoteFromCurrentGuest)
+
+              ## Display the current user if he hasn't voted yet.
+              #if (!$foundUser &amp;&amp; !$isCurrentContextUserGuest)
                 &lt;tr class="active"&gt;
                   &lt;td&gt;
-                    &lt;input type="text" value="$escapedGuestName" name="guestName" #if(!$isPollPublicityPublic) disabled#end&gt;
+                    #displayUser($xcontext.user, {'wrapAvatar': true})
                   &lt;/td&gt;
-                  #displayInput($votes $isPollPublicityPublic $guestName $foreach.index)
+                  ## The 3rd parameter is true in order to not disable the input for current user.
+                  #displayInput([] true $xcontext.user)
                 &lt;/tr&gt;
               #end
-              #if ($displayAllUsers)
-                ## display the vote for a guest user that is not the current user
-                #if ($isVoteFromGuest &amp;&amp; !$isVoteFromCurrentGuest)
-                  &lt;tr&gt;
-                    &lt;td&gt;
-                      $escapedGuestName
-                    &lt;/td&gt;
-                    #displayInput($votes false $guestName $foreach.index)
-                  &lt;/tr&gt;
-                ## display the vote for users who are logged in or have voted while logged in
-                #elseif ($xwiki.exists($user) &amp;&amp; !$isVoteFromGuest)
-                  &lt;tr #if ($isCurrentUser) class="active" #end&gt;
-                    &lt;td&gt;
-                      #displayUser($user, {'wrapAvatar': true})
-                    &lt;/td&gt;
-                    #displayInput($votes $isCurrentUser $user $foreach.index)
-                  &lt;/tr&gt;
-                #end
-              #else
+              #if (!$foundGuestUser &amp;&amp; $isCurrentContextUserGuest &amp;&amp; $isPollPublicityPublic)
                 &lt;tr class="active"&gt;
-                  #if ($isCurrentUser)
-                    &lt;td&gt;
-                      #displayUser($user, {'wrapAvatar': true})
-                    &lt;/td&gt;
-                    #displayInput($votes $isCurrentUser $user 0)
+                  &lt;td&gt;
+                    &lt;input type="text" name="guestName" value="" placeholder="Name..."&gt;
+                    #displayInput([] true $xcontext.user)
+                  &lt;/td&gt;
+                &lt;/tr&gt;
+              #end
+            &lt;/tbody&gt;
+            #if ($displayAllUsers &amp;&amp; $showPollSummary)
+              &lt;tfoot&gt;
+                &lt;tr&gt;
+                  &lt;td&gt;
+                    $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
+                    &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
+                  &lt;/td&gt;
+                  #foreach ($proposal in $proposals)
+                    &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
                   #end
                 &lt;/tr&gt;
-              #end
+              &lt;/tfoot&gt;
             #end
-
-            ## Display the current user if he hasn't voted yet.
-            #if (!$foundUser &amp;&amp; !$isCurrentContextUserGuest)
-              &lt;tr class="active"&gt;
-                &lt;td&gt;
-                  #displayUser($xcontext.user, {'wrapAvatar': true})
-                &lt;/td&gt;
-                ## The 3rd parameter is true in order to not disable the input for current user.
-                #displayInput([] true $xcontext.user)
-              &lt;/tr&gt;
-            #end
-            #if (!$foundGuestUser &amp;&amp; $isCurrentContextUserGuest &amp;&amp; $isPollPublicityPublic)
-              &lt;tr class="active"&gt;
-                &lt;td&gt;
-                  &lt;input type="text" name="guestName" value="" placeholder="Name..."&gt;
-                  #displayInput([] true $xcontext.user)
-                &lt;/td&gt;
-              &lt;/tr&gt;
-            #end
-          &lt;/tbody&gt;
-          #if ($displayAllUsers &amp;&amp; $showPollSummary)
-            &lt;tfoot&gt;
-              &lt;tr&gt;
-                &lt;td&gt;
-                  $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
-                  &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
-                &lt;/td&gt;
-                #foreach ($proposal in $proposals)
-                  &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
-                #end
-              &lt;/tr&gt;
-            &lt;/tfoot&gt;
-          #end
-        &lt;/table&gt;
-      &lt;/div&gt;
-      #if (!$isCurrentContextUserGuest || $isPollPublicityPublic)
-        &lt;div class='save'&gt;
-          &lt;input type="submit" value="$escapetool.xml($services.localization.render("contrib.xpoll.vote.user.submit"))"
-            class="button"/&gt;
+          &lt;/table&gt;
         &lt;/div&gt;
-      #end
-    &lt;/form&gt;
+        #if (!$isCurrentContextUserGuest || $isPollPublicityPublic)
+          &lt;div class='save'&gt;
+            &lt;input type="submit" value="$escapetool.xml($services.localization.render("contrib.xpoll.vote.user.submit"))"
+              class="button"/&gt;
+          &lt;/div&gt;
+        #end
+      &lt;/form&gt;
+    #end
     {{/html}}
   #elseif ($status == 'finished')
     #if(!$totalVotesCount)
@@ -464,96 +463,95 @@
     #end
     #set ($showPollSummary = !$isCurrentContextUserGuest || $currentGuestUserVoted || $userCanVote || ($displayAllUsers &amp;&amp; $usersCount &gt; 0))
     {{html wiki='true' clean='false'}}
-    #if ($showPollSummary)
-      $doc.display('description')
-      $escapetool.xml($services.localization.render('contrib.xpoll.finish.message'))
-    #end
     #if (!$showPollSummary)
       {{warning}}
       $escapetool.xml($services.localization.render('contrib.xpoll.emptyPage'))
       {{/warning}}
-    #end
-    &lt;div id="xpollTableWrapper"&gt;
-      &lt;table class='xpoll medium-avatars table table-bordered'&gt;
-        ## Table header row.
-        #if ($showPollSummary)
-          &lt;tr&gt;
-            &lt;th&gt;
-              #if($displayAllUsers)
-                #if($usersCountActive == 1)
+    #else
+      $doc.display('description')
+      $escapetool.xml($services.localization.render('contrib.xpoll.finish.message'))
+      &lt;div id="xpollTableWrapper"&gt;
+        &lt;table class='xpoll medium-avatars table table-bordered'&gt;
+          ## Table header row.
+          #if ($showPollSummary)
+            &lt;tr&gt;
+              &lt;th&gt;
+                #if($displayAllUsers)
+                  #if($usersCount == 1)
+                    $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
+                  #else
+                    $escapetool.xml($services.localization.render('contrib.xpoll.user'))
+                    &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
+                  #end
+                #elseif ($currentGuestUserVoted || $currentUserVoted)
                   $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
                 #else
                   $escapetool.xml($services.localization.render('contrib.xpoll.user'))
-                  &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
+                  &lt;span class='count'&gt;(0)&lt;/span&gt;
                 #end
-              #elseif ($currentGuestUserVoted || $currentUserVoted)
-                $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
-              #else
-                $escapetool.xml($services.localization.render('contrib.xpoll.user'))
-                &lt;span class='count'&gt;(0)&lt;/span&gt;
-              #end
-            &lt;/th&gt;
-            #foreach ($proposal in $proposals)
-              &lt;th&gt; $proposal &lt;/th&gt;
-            #end
-          &lt;/tr&gt;
-        #end
-        ## Users and their votes.
-        #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
-          #set ($user = $voteObj.user)
-          #set ($votes = $voteObj.getValue('votes'))
-          #set ($guestName = $voteObj.getValue('user'))
-          #set ($escapedGuestName = $escapetool.xml($guestName))
-          #set ($guestId = $voteObj.getValue('guestId'))
-          #set ($isVoteFromGuest = "$guestId" != "")
-          #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
-          #set ($isCurrentUser = $user == $xcontext.user &amp;&amp; !$isVoteFromGuest)
-          #if($displayAllUsers)
-            &lt;tr #if($isCurrentUser || $isVoteFromCurrentGuest)class="active"#end&gt;
-              #if ($isVoteFromGuest)
-                &lt;td&gt;
-                 $escapedGuestName
-                &lt;/td&gt;
-                ## The 3rd parameter is false in order to disable the input when the poll is finished.
-                #displayInput($votes false $guestName $foreach.index)
-              #else
-                &lt;td&gt;
-                  #displayUser($user, {'wrapAvatar': true})
-                &lt;/td&gt;
-                ## The 3rd parameter is false in order to disable the input when the poll is finished.
-                #displayInput($votes false $user $foreach.index)
-              #end
-            &lt;/tr&gt;
-          #else
-            &lt;tr class="active"&gt;
-              #if ($isVoteFromCurrentGuest)
-                &lt;td&gt;
-                  $escapedGuestName
-                &lt;/td&gt;
-                #displayInput($votes false $guestName 0)
-              #elseif ($isCurrentUser)
-                &lt;td&gt;
-                  #displayUser($user, {'wrapAvatar': true})
-                &lt;/td&gt;
-                ## The 3rd parameter is false in order to disable the input when the poll is finished.
-                #displayInput($votes false $user 0)
+              &lt;/th&gt;
+              #foreach ($proposal in $proposals)
+                &lt;th&gt; $proposal &lt;/th&gt;
               #end
             &lt;/tr&gt;
           #end
-        #end
-        #if ($showPollSummary)
-          &lt;tr&gt;
-            &lt;td&gt;
-              $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
-              &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
-            &lt;/td&gt;
-            #foreach ($proposal in $proposals)
-              &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
+          ## Users and their votes.
+          #foreach ($voteObj in $doc.getObjects('XPoll.XPollVoteClass'))
+            #set ($user = $voteObj.user)
+            #set ($votes = $voteObj.getValue('votes'))
+            #set ($guestName = $voteObj.getValue('user'))
+            #set ($escapedGuestName = $escapetool.xml($guestName))
+            #set ($guestId = $voteObj.getValue('guestId'))
+            #set ($isVoteFromGuest = "$guestId" != "")
+            #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
+            #set ($isCurrentUser = $user == $xcontext.user &amp;&amp; !$isVoteFromGuest)
+            #if($displayAllUsers)
+              &lt;tr #if($isCurrentUser || $isVoteFromCurrentGuest)class="active"#end&gt;
+                #if ($isVoteFromGuest)
+                  &lt;td&gt;
+                   $escapedGuestName
+                  &lt;/td&gt;
+                  ## The 3rd parameter is false in order to disable the input when the poll is finished.
+                  #displayInput($votes false $guestName $foreach.index)
+                #else
+                  &lt;td&gt;
+                    #displayUser($user, {'wrapAvatar': true})
+                  &lt;/td&gt;
+                  ## The 3rd parameter is false in order to disable the input when the poll is finished.
+                  #displayInput($votes false $user $foreach.index)
+                #end
+              &lt;/tr&gt;
+            #else
+              &lt;tr class="active"&gt;
+                #if ($isVoteFromCurrentGuest)
+                  &lt;td&gt;
+                    $escapedGuestName
+                  &lt;/td&gt;
+                  #displayInput($votes false $guestName 0)
+                #elseif ($isCurrentUser)
+                  &lt;td&gt;
+                    #displayUser($user, {'wrapAvatar': true})
+                  &lt;/td&gt;
+                  ## The 3rd parameter is false in order to disable the input when the poll is finished.
+                  #displayInput($votes false $user 0)
+                #end
+              &lt;/tr&gt;
             #end
-          &lt;/tr&gt;
-        #end
-      &lt;/table&gt;
-    &lt;/div&gt;
+          #end
+          #if ($showPollSummary)
+            &lt;tr&gt;
+              &lt;td&gt;
+                $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
+                &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
+              &lt;/td&gt;
+              #foreach ($proposal in $proposals)
+                &lt;td&gt; $!voteCount.get($proposal) &lt;/td&gt;
+              #end
+            &lt;/tr&gt;
+          #end
+        &lt;/table&gt;
+      &lt;/div&gt;
+    #end
     {{/html}}
   #end
 #end

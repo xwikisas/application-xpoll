@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class FinishedStatusViewPage extends ViewPage
 {
-    @FindBy(xpath = "//div[@id = 'xwikicontent']/p[2]")
+    @FindBy(xpath = "//div[@id = 'xwikicontent']/p")
     public WebElement pollDescription;
 
     public List<WebElement> proposals = getDriver().findElements(By.xpath("//table//tr[1]//th[position()>1]"));
@@ -44,6 +44,9 @@ public class FinishedStatusViewPage extends ViewPage
 
     @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//td[1][not(descendant::a) and not(contains(translate(., 'SCORES', 'scores'), 'scores'))]")
     public List<WebElement> guestUsersThatVotedTableRows;
+
+    @FindBy(xpath = "//*[@class='box warningmessage']//p")
+    public WebElement emptyPageWarningMessage;
 
     public String getDescription()
     {
@@ -68,6 +71,11 @@ public class FinishedStatusViewPage extends ViewPage
     public int getNumberOfGuestsThatVotedFromTable()
     {
         return guestUsersThatVotedTableRows.size();
+    }
+
+    public String getEmptyPageWarningMessage()
+    {
+        return emptyPageWarningMessage.getText();
     }
 
     public boolean searchIfGuestUserIsInTable(String user)

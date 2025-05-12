@@ -47,6 +47,12 @@ public class ActiveStatusViewPage extends ViewPage
     @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//a")
     public List<WebElement> usersThatVotedTableRows;
 
+    @FindBy(xpath = "//*[@class='box warningmessage']//p")
+    public WebElement emptyPageWarningMessage;
+
+    @FindBy(xpath = "//*[@class='box warningmessage']")
+    public WebElement guestCannotChangeVoteWarningMessage;
+
     public ArrayList<String> pollProposals = new ArrayList<String>();
 
     public String getDescription()
@@ -83,6 +89,16 @@ public class ActiveStatusViewPage extends ViewPage
 
     public int getNumberOfUsersThatAlreadyVotedFromTable() {
         return usersThatVotedTableRows.size();
+    }
+
+    public String getEmptyPageWarningMessage()
+    {
+        return emptyPageWarningMessage.getText();
+    }
+
+    public String getGuestCannotChangeVoteWarningMessage()
+    {
+        return guestCannotChangeVoteWarningMessage.getText();
     }
 
     public boolean searchIfUserIsInTable(String user) {
