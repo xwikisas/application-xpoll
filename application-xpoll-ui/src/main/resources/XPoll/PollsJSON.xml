@@ -59,15 +59,14 @@
 #foreach ($poll in $polls)
   #set ($pollInstance = $xwiki.getDocument($poll))
   #set ($pollPublicity = $pollInstance.getValue('pollPublicity'))
-  #set ($restrictUserToSeePoll = $isCurrentUserGuest &amp;&amp; $pollPublicity == 'private')
-  #if (!$restrictUserToSeePoll)
+  #if (!$isCurrentUserGuest || $pollPublicity != 'private')
     #set ($hasEditOnDocument = $services.security.authorization.hasAccess('edit', $pollInstance))
     #set ($hasDeleteOnDocument = $services.security.authorization.hasAccess('delete', $pollInstance))
     #set ($pollMapObj = {})
-    #set ($statusValue = $pollInstance.getValue("status"))
+    #set ($status = $pollInstance.getValue("status"))
     #set ($votePrivacy = $pollInstance.getValue('votePrivacy'))
     #set ($winnerValue = "")
-    #set ($hideWinner = $statusValue == "active" &amp;&amp; $votePrivacy == 'private' &amp;&amp; !$hasEditOnDocument)
+    #set ($hideWinner = $status == "active" &amp;&amp; $votePrivacy == 'private' &amp;&amp; !$hasEditOnDocument)
     #if (!$hideWinner &amp;&amp; $pollInstance.get('winner') != "")
       #set ($winnerValue = $pollInstance.get('winner'))
     #end
@@ -75,12 +74,10 @@
     #if ($winner == "")
       #set ($winner = "-")
     #end
-    #set ($discard = $pollMapObj.put('name', $pollInstance.get("name")))
-    #set ($discard = $pollMapObj.put('name_value', $pollInstance.getValue("name")))
-    #set ($discard = $pollMapObj.put('status', $pollInstance.get("status")))
-    #set ($discard = $pollMapObj.put('status_value', $statusValue))
+    #set ($discard = $pollMapObj.put('name', $pollInstance.getValue("name")))
+    #set ($discard = $pollMapObj.put('name_url', $pollInstance.getURL()))
+    #set ($discard = $pollMapObj.put('status', $status))
     #set ($discard = $pollMapObj.put('winner', $winner))
-    #set ($discard = $pollMapObj.put('winner_value', $winnerValue))
     #set ($discard = $pollMapObj.put('doc_hasedit', $hasEditOnDocument))
     #set ($discard = $pollMapObj.put('doc_edit_url', $pollInstance.getURL('edit')))
     #set ($discard = $pollMapObj.put('doc_hasdelete', $hasDeleteOnDocument))
@@ -94,9 +91,9 @@
 #set ($statusFilter = "$!{request.get('status')}")
 #set ($winnerFilter = "$!{request.get('winner')}")
 #foreach ($entry in $pollList)
-  #if ($entry.get('name_value').contains($nameFilter) &amp;&amp;
-       $entry.get('status_value').contains($statusFilter) &amp;&amp;
-       $entry.get('winner_value').contains($winnerFilter)
+  #if ($entry.get('name').contains($nameFilter) &amp;&amp;
+       $entry.get('status').contains($statusFilter) &amp;&amp;
+       $entry.get('winner').contains($winnerFilter)
       )
     #set ($discard = $filteredPollList.add($entry))
   #end
@@ -128,10 +125,9 @@
   'doc_hasdelete': $entry.get('doc_hasdelete'),
   'doc_delete_url': $entry.get('doc_delete_url'),
   'name':  $entry.get('name'),
-  'name_url': $entry.get('name'),
-  'status': $entry.get('status'),
-  'winner': $entry.get('winner'),
-  'winner_value': $entry.get('winner_value')
+  'name_url': $entry.get('name_url'),
+  'status': $services.localization.render("xpoll.livetable.status.$entry.get('status')"),
+  'winner': $entry.get('winner')
   }))
 #end
 $jsontool.serialize($json)
