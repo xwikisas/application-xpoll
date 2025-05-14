@@ -345,7 +345,7 @@
                   #foreach($proposal in $proposals)
                     &lt;th&gt;
                       &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
-                        $proposal
+                        $escapetool.xml($proposal)
                       &lt;/label&gt;
                     &lt;/th&gt;
                   #end
@@ -491,7 +491,7 @@
                 #end
               &lt;/th&gt;
               #foreach ($proposal in $proposals)
-                &lt;th&gt; $proposal &lt;/th&gt;
+                &lt;th&gt; $escapetool.xml($proposal) &lt;/th&gt;
               #end
             &lt;/tr&gt;
           #end

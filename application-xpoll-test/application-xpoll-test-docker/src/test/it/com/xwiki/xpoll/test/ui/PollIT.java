@@ -90,7 +90,7 @@ class PollIT
 
     private static final String POLL_PUBLICITY_PRIVATE_LABEL = "Private";
 
-    private static final String EMPTY_PAGE_VOTE_WARNING = "No content on this page.";
+    private static final String EMPTY_PAGE_VOTE_WARNING = "You are not allowed to access this content.";
 
     private static final String GUEST_CANNOT_CHANGE_VOTE_WARNING = "Your vote has been recorded. At this point, you "
         + "can no longer change it!" ;
@@ -420,20 +420,9 @@ class PollIT
     @Order(13)
     void createNewEntryAndVoteWithGuestPollPublicityPublic()
     {
-        XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
-        createPage(xpollHomePage);
-        editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PRIVATE_VALUE, POLL_PUBLICITY_PUBLIC_VALUE);
+        createPollAndVoteWithGuestUser(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PRIVATE_VALUE, POLL_PUBLICITY_PUBLIC_VALUE);
 
         ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.logout();
-
-        activeStatusViewPage = new ActiveStatusViewPage();
-        assertNotNull(activeStatusViewPage.saveButton);
-
-        activeStatusViewPage.voteSetGuestName("Guest");
-        voteProposals(List.of(1));
-
-        activeStatusViewPage = new ActiveStatusViewPage();
 
         String inputCheckedAttribute = activeStatusViewPage.getVoteInput(1).getAttribute("checked");
 
@@ -459,24 +448,13 @@ class PollIT
     @Order(15)
     void createNewEntryAndVoteWithGuestPollPublicityPublicStatusFinal(TestUtils setup)
     {
-        XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
-        createPage(xpollHomePage);
-        editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PUBLIC_VALUE, POLL_PUBLICITY_PUBLIC_VALUE);
-
-        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.logout();
-
-        activeStatusViewPage = new ActiveStatusViewPage();
-        assertNotNull(activeStatusViewPage.saveButton);
-
-        activeStatusViewPage.voteSetGuestName("Guest");
-        voteProposals(List.of(1));
+        createPollAndVoteWithGuestUser(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PUBLIC_VALUE, POLL_PUBLICITY_PUBLIC_VALUE);
 
         setup.loginAndGotoPage("JaneDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
         voteProposals(List.of(1));
 
-        activeStatusViewPage = new ActiveStatusViewPage();
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.edit();
 
         XPollEditPage xpollEditPage = new XPollEditPage();
@@ -490,33 +468,20 @@ class PollIT
         assertEquals(1, finishedStatusViewPage.getNumberOfUsersThatAlreadyVotedFromTable());
     }
 
+    /**
+     * This test verifies the behavior of the polls when a guest user has already voted, and voting rights for guest
+     * users are revoked. In this scenario, a warning message should be displayed, and the guest user's
+     * vote should appear as a disabled input field.
+     */
     @Test
     @Order(16)
     void createNewEntryAndVoteWithGuestPollPublicityPublicChangePollPublicityPrivate(TestUtils setup)
     {
-        XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
-        createPage(xpollHomePage);
-        editPage(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PRIVATE_VALUE, POLL_PUBLICITY_PUBLIC_VALUE);
-
-        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
-        activeStatusViewPage.logout();
-
-        activeStatusViewPage = new ActiveStatusViewPage();
-        assertNotNull(activeStatusViewPage.saveButton);
-
-        activeStatusViewPage.voteSetGuestName("Guest");
-        voteProposals(List.of(1));
-
-        activeStatusViewPage = new ActiveStatusViewPage();
-
-        String inputCheckedAttribute = activeStatusViewPage.getVoteInput(1).getAttribute("checked");
-
-        assertEquals("true", inputCheckedAttribute);
-        assertEquals("Guest", activeStatusViewPage.voteGetGuestName());
+        createPollAndVoteWithGuestUser(STATUS_ACTIVE, POLL_VOTE_PRIVACY_PRIVATE_VALUE, POLL_PUBLICITY_PUBLIC_VALUE);
 
         setup.loginAndGotoPage("JaneDoe", "pass", setup.getURL(new LocalDocumentReference(POLL_SPACE, POLL_NAME)));
 
-        activeStatusViewPage = new ActiveStatusViewPage();
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
         activeStatusViewPage.edit();
 
         XPollEditPage xpollEditPage = new XPollEditPage();
@@ -529,12 +494,26 @@ class PollIT
 
         assertEquals(GUEST_CANNOT_CHANGE_VOTE_WARNING, activeStatusViewPage.getGuestCannotChangeVoteWarningMessage());
 
-        inputCheckedAttribute = activeStatusViewPage.getVoteInput(1).getAttribute("checked");
+        String inputCheckedAttribute = activeStatusViewPage.getVoteInput(1).getAttribute("checked");
         boolean inputIsDisabled = activeStatusViewPage.getVoteInput(1).getAttribute("disabled") != null;
 
         assertEquals("true", inputCheckedAttribute);
         assertEquals("Guest", activeStatusViewPage.voteGetGuestName());
         assertTrue(inputIsDisabled);
+    }
+
+    private void createPollAndVoteWithGuestUser(String status, String votePrivacy, String pollPublicity) {
+        XPollHomePage xpollHomePage = XPollHomePage.gotoPage();
+        createPage(xpollHomePage);
+        editPage(status, votePrivacy, pollPublicity);
+
+        ActiveStatusViewPage activeStatusViewPage = new ActiveStatusViewPage();
+        activeStatusViewPage.logout();
+
+        activeStatusViewPage = new ActiveStatusViewPage();
+
+        activeStatusViewPage.voteSetGuestName("Guest");
+        voteProposals(List.of(1));
     }
 
     private void createPage(XPollHomePage xpollHomePage)
