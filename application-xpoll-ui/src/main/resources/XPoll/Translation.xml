@@ -106,6 +106,9 @@ xpoll.livetable._actions=Actions
 xpoll.livetable.emptyvalue=-
 xpoll.livetable.name=Name
 xpoll.livetable.status=Status
+xpoll.livetable.status.active=Active
+xpoll.livetable.status.finished=Finished
+xpoll.livetable.status.inpreparation=In preparation
 xpoll.livetable.winner=Winner
 
 xpoll.extension.name=XWiki Poll Application (Pro)

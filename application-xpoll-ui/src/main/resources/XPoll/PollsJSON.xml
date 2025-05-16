@@ -1,0 +1,135 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XPoll.PollsJSON" locale="">
+  <web>XPoll</web>
+  <name>PollsJSON</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XPoll.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>PollsJSON</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity wiki="false"}}
+#if("$!{request.xpage}" == 'plain')
+  $response.setContentType('application/json')
+#end
+#set($offset = $numbertool.toNumber($request.get('offset')).intValue())
+#set($offset = $offset - 1)
+#if (!$offset || $offset &lt;= 0)
+  #set($offset = 0)
+#end
+#set($limit = $numbertool.toNumber($request.get('limit')).intValue())
+#if (!$limit)
+  #set ($limit = 10)
+#end
+#set($json = {})
+##retrieve polls
+#set ($polls = $services.query.xwql(
+  "from doc.object(XPoll.XPollClass) as poll where doc.fullName &lt;&gt; 'XPoll.XPollTemplate'"
+).execute())
+#set ($pollList = [])
+#set ($isCurrentUserGuest = $xcontext.user == 'XWiki.XWikiGuest')
+#foreach ($poll in $polls)
+  #set ($pollInstance = $xwiki.getDocument($poll))
+  #set ($pollPublicity = $pollInstance.getValue('pollPublicity'))
+  #if (!$isCurrentUserGuest || $pollPublicity != 'private')
+    #set ($hasEditOnDocument = $services.security.authorization.hasAccess('edit', $pollInstance))
+    #set ($hasDeleteOnDocument = $services.security.authorization.hasAccess('delete', $pollInstance))
+    #set ($pollMapObj = {})
+    #set ($status = $pollInstance.getValue("status"))
+    #set ($votePrivacy = $pollInstance.getValue('votePrivacy'))
+    #set ($winnerValue = "")
+    #set ($hideWinner = $status == "active" &amp;&amp; $votePrivacy == 'private' &amp;&amp; !$hasEditOnDocument)
+    #if (!$hideWinner &amp;&amp; $pollInstance.get('winner') != "")
+      #set ($winnerValue = $pollInstance.get('winner'))
+    #end
+    #set ($winner = $winnerValue)
+    #if ($winner == "")
+      #set ($winner = "-")
+    #end
+    #set ($discard = $pollMapObj.put('name', $pollInstance.getValue("name")))
+    #set ($discard = $pollMapObj.put('name_url', $pollInstance.getURL()))
+    #set ($discard = $pollMapObj.put('status', $status))
+    #set ($discard = $pollMapObj.put('winner', $winner))
+    #set ($discard = $pollMapObj.put('doc_hasedit', $hasEditOnDocument))
+    #set ($discard = $pollMapObj.put('doc_edit_url', $pollInstance.getURL('edit')))
+    #set ($discard = $pollMapObj.put('doc_hasdelete', $hasDeleteOnDocument))
+    #set ($discard = $pollMapObj.put('doc_delete_url', $pollInstance.getURL('delete')))
+    #set ($discard = $pollList.add($pollMapObj))
+  #end
+#end
+##filter the list
+#set ($filteredPollList = [])
+#set ($nameFilter = "$!{request.get('name')}")
+#set ($statusFilter = "$!{request.get('status')}")
+#set ($winnerFilter = "$!{request.get('winner')}")
+#foreach ($entry in $pollList)
+  #if ($entry.get('name').contains($nameFilter) &amp;&amp;
+       $entry.get('status').contains($statusFilter) &amp;&amp;
+       $entry.get('winner').contains($winnerFilter)
+      )
+    #set ($discard = $filteredPollList.add($entry))
+  #end
+#end
+##sort the list
+#set ($sortingProperty = $request.sort)
+#set ($sortingDirection = $request.dir)
+#set ($sortedResultPollList = $collectiontool.sort($filteredPollList, ["${sortingProperty}:${sortingDirection}"]))
+#set ($resultPollList = [])
+#if ($offset &lt;= $pollList.size())
+  #set ($toIndex = $mathtool.min($mathtool.add($offset, $limit), $sortedResultPollList.size()))
+  #set ($resultPollList = $sortedResultPollList.subList($offset, $toIndex))
+#end
+##create final json
+#set ($json = {
+  'totalrows': $sortedResultPollList.size(),
+  'matchingtags': {},
+  'tags': [],
+  'returnedrows': $resultPollList.size(),
+  'offset': $mathtool.add($offset, 1),
+  'reqNo': $numbertool.toNumber($request.reqNo).intValue(),
+  'rows': []
+})
+#foreach ($entry in $resultPollList)
+  #set ($discard = $json.rows.add({
+  'doc_viewable': true,
+  'doc_hasedit' : $entry.get('doc_hasedit'),
+  'doc_edit_url': $entry.get('doc_edit_url'),
+  'doc_hasdelete': $entry.get('doc_hasdelete'),
+  'doc_delete_url': $entry.get('doc_delete_url'),
+  'name':  $entry.get('name'),
+  'name_url': $entry.get('name_url'),
+  'status': $services.localization.render("xpoll.livetable.status.$entry.get('status')"),
+  'winner': $entry.get('winner')
+  }))
+#end
+$jsontool.serialize($json)
+{{/velocity}}</content>
+</xwikidoc>
