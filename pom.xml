@@ -29,7 +29,7 @@
   </parent>
   <groupId>com.xwiki.xpoll</groupId>
   <artifactId>application-xpoll</artifactId>
-  <version>2.4.2.rc-1-SNAPSHOT</version>
+  <version>2.4.1.rc-2</version>
   <packaging>pom</packaging>
   <name>XPoll Application (Pro) Parent POM</name>
   <description>XWiki Simple Poll Application - Doodle like</description>
@@ -44,7 +44,7 @@
     <connection>scm:git:git://github.com/xwikisas/application-xpoll.git</connection>
     <developerConnection>scm:git:git@github.com:xwikisas/application-xpoll.git</developerConnection>
     <url>https://github.com/xwikisas/application-xpoll/tree/master</url>
-    <tag>HEAD</tag>
+    <tag>application-xpoll-2.4.1.rc-2</tag>
   </scm>
   <modules>
     <module>application-xpoll-ui</module>
