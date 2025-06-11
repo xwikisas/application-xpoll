@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xwiki.xpoll</groupId>
     <artifactId>application-xpoll-test</artifactId>
-    <version>2.4.1</version>
+    <version>2.4.2-SNAPSHOT</version>
   </parent>
   <artifactId>application-xpoll-test-docker</artifactId>
   <name>XPoll Application - Tests - Functional Docker Tests</name>
