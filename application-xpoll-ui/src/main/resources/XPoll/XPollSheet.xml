@@ -314,7 +314,7 @@
       $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.emptyPage')), 'xwiki/2.1')
       {{/warning}}
     #else
-      $doc.display('description')
+      #displayPropertyValue('description')
       #if (!$isPollPublicityPublic &amp;&amp; $currentGuestUserVoted)
         {{warning}}
         $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.guestCannotChangeVote')), 'xwiki/2.1')
@@ -468,7 +468,7 @@
       $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.emptyPage')), 'xwiki/2.1')
       {{/warning}}
     #else
-      $doc.display('description')
+      #displayPropertyValue('description')
       $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.finish.message')), 'xwiki/2.1')
       &lt;div id="xpollTableWrapper"&gt;
         &lt;table class='xpoll medium-avatars table table-bordered'&gt;
