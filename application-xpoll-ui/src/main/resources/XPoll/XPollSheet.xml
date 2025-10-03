@@ -85,9 +85,9 @@
             #end
 
             #if ($disabled.isEmpty())
-              &lt;select class="xpollSelect" data-proposal="$services.rendering.escape($escapetool.xml($proposal), 'xwiki/2.1')"&gt;
+              &lt;select class="xpollSelect" data-proposal="$escapetool.xml($proposal)"&gt;
                 &lt;option disabled $noOption value=""&gt;
-                  $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.vote.select')), 'xwiki/2.1')
+                  $escapetool.xml($services.localization.render('contrib.xpoll.vote.select'))
                 &lt;/option&gt;
                 #foreach ($index in [1..$proposals.size()])
                   &lt;option value="$index" #if($index == $indexOfProposal)selected#end&gt;
@@ -97,7 +97,7 @@
               &lt;/select&gt;
               ## The hidden inputs that will have the values sent by the form.
               &lt;input class="xpollHiddenInput" id="option$foreach.count" name="proposals"
-               #if ($votes.size() &gt; $foreach.index)value="$services.localization.render($escapetool.xml($votes.get($foreach.index)), 'xwiki/2.1')"#end
+               #if ($votes.size() &gt; $foreach.index)value="$escapetool.xml($votes.get($foreach.index))"#end
                 type="hidden"/&gt;
             #else
               &lt;input type="checkbox" $checked $disabled /&gt;
@@ -109,7 +109,7 @@
           #else
             &lt;input type="#if($isRadio)radio#{else}checkbox#end"
               #if($isCurrentUser)id="xpoll-proposal$proposal.hashCode()"#end name="${inputName}"
-              value="$services.localization.render($escapetool.xml($proposal), 'xwiki/2.1')" $checked
+              value="$escapetool.xml($proposal)" $checked
               $disabled /&gt;
           #end
         &lt;/label&gt;
@@ -308,17 +308,13 @@
   #if ($status == 'active')
     #set ($showPollSummary = !$isCurrentContextUserGuest || $currentGuestUserVoted || $userCanVote || ($usersCountActive &gt; 0 &amp;&amp; $displayAllUsers ))
     #set ($restURL = $services.xpoll.url($doc.documentReference))
-    {{html clean='false', wiki='true'}}
+    {{html clean='false'}}
     #if (!($showPollSummary || $displayAllUsers))
-      {{warning}}
-      $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.emptyPage')), 'xwiki/2.1')
-      {{/warning}}
+      #warning($escapetool.xml($services.localization.render('contrib.xpoll.emptyPage')))
     #else
-      $doc.display('description')
+      #displayPropertyValue('description')
       #if (!$isPollPublicityPublic &amp;&amp; $currentGuestUserVoted)
-        {{warning}}
-        $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.guestCannotChangeVote')), 'xwiki/2.1')
-        {{/warning}}
+        #warning($escapetool.xml($services.localization.render('contrib.xpoll.guestCannotChangeVote')))
       #end
       &lt;form id="xpollSaveForm" action="$restURL" method="put"&gt;
         &lt;div id="xpollTableWrapper"&gt;
@@ -330,22 +326,22 @@
                   &lt;th&gt;
                     #if($displayAllUsers)
                       #if($usersCountActive == 1)
-                        $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.singleUser')), 'xwiki/2.1')
+                        $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
                       #else
-                        $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.user')), 'xwiki/2.1')
+                        $escapetool.xml($services.localization.render('contrib.xpoll.user'))
                         &lt;span class='count'&gt;($usersCountActive)&lt;/span&gt;
                       #end
                     #elseif ($currentGuestUserVoted || $currentUserVoted)
-                      $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.singleUser')), 'xwiki/2.1')
+                      $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
                     #else
-                      $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.user')), 'xwiki/2.1')
+                      $escapetool.xml($services.localization.render('contrib.xpoll.user'))
                       &lt;span class='count'&gt;(0)&lt;/span&gt;
                     #end
                   &lt;/th&gt;
                   #foreach($proposal in $proposals)
                     &lt;th&gt;
                       &lt;label for="xpoll-proposal$proposal.hashCode()"&gt;
-                        $services.rendering.escape($escapetool.xml($proposal), 'xwiki/2.1')
+                        $escapetool.xml($proposal)
                       &lt;/label&gt;
                     &lt;/th&gt;
                   #end
@@ -364,7 +360,7 @@
                 #set ($isCurrentUser = $user.equals($xcontext.user) &amp;&amp; !$isVoteFromGuest)
                 #set ($votes = $voteObj.getValue('votes'))
                 #set ($guestName = $voteObj.getValue('user'))
-                #set ($escapedGuestName = $services.rendering.escape($escapetool.xml($guestName), 'xwiki/2.1'))
+                #set ($escapedGuestName = $escapetool.xml($guestName))
                 #if ($isCurrentUser)
                   #set ($foundUser = true)
                 #end
@@ -433,7 +429,7 @@
               &lt;tfoot&gt;
                 &lt;tr&gt;
                   &lt;td&gt;
-                    $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.numberVotes')), 'xwiki/2.1')
+                    $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
                     &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
                   &lt;/td&gt;
                   #foreach ($proposal in $proposals)
@@ -446,8 +442,11 @@
         &lt;/div&gt;
         #if (!$isCurrentContextUserGuest || $isPollPublicityPublic)
           &lt;div class='save'&gt;
-            &lt;input type="submit" value="$services.rendering.escape($escapetool.xml($services.localization.render("contrib.xpoll.vote.user.submit")), 'xwiki/2.1')"
-              class="button"/&gt;
+            &lt;input
+              type="submit"
+              value="$escapetool.xml($services.localization.render("contrib.xpoll.vote.user.submit"))"
+              class="button"
+            /&gt;
           &lt;/div&gt;
         #end
       &lt;/form&gt;
@@ -462,14 +461,12 @@
       #end
     #end
     #set ($showPollSummary = !$isCurrentContextUserGuest || $currentGuestUserVoted || $userCanVote || ($displayAllUsers &amp;&amp; $usersCount &gt; 0))
-    {{html wiki='true' clean='false'}}
+    {{html clean='false'}}
     #if (!$showPollSummary)
-      {{warning}}
-      $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.emptyPage')), 'xwiki/2.1')
-      {{/warning}}
+      #warning($escapetool.xml($services.localization.render('contrib.xpoll.emptyPage')))
     #else
-      $doc.display('description')
-      $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.finish.message')), 'xwiki/2.1')
+      #displayPropertyValue('description')
+      $escapetool.xml($services.localization.render('contrib.xpoll.finish.message'))
       &lt;div id="xpollTableWrapper"&gt;
         &lt;table class='xpoll medium-avatars table table-bordered'&gt;
           ## Table header row.
@@ -478,20 +475,20 @@
               &lt;th&gt;
                 #if($displayAllUsers)
                   #if($usersCount == 1)
-                    $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.singleUser')), 'xwiki/2.1')
+                    $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
                   #else
-                    $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.user')), 'xwiki/2.1')
+                    $escapetool.xml($services.localization.render('contrib.xpoll.user'))
                     &lt;span class='count'&gt;($usersCount)&lt;/span&gt;
                   #end
                 #elseif ($currentGuestUserVoted || $currentUserVoted)
-                  $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.singleUser')), 'xwiki/2.1')
+                  $escapetool.xml($services.localization.render('contrib.xpoll.singleUser'))
                 #else
-                  $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.user')), 'xwiki/2.1')
+                  $escapetool.xml($services.localization.render('contrib.xpoll.user'))
                   &lt;span class='count'&gt;(0)&lt;/span&gt;
                 #end
               &lt;/th&gt;
               #foreach ($proposal in $proposals)
-                &lt;th&gt; $services.rendering.escape($escapetool.xml($proposal), 'xwiki/2.1') &lt;/th&gt;
+                &lt;th&gt; $escapetool.xml($proposal) &lt;/th&gt;
               #end
             &lt;/tr&gt;
           #end
@@ -500,7 +497,7 @@
             #set ($user = $voteObj.user)
             #set ($votes = $voteObj.getValue('votes'))
             #set ($guestName = $voteObj.getValue('user'))
-            #set ($escapedGuestName = $services.rendering.escape($escapetool.xml($guestName), 'xwiki/2.1'))
+            #set ($escapedGuestName = $escapetool.xml($guestName))
             #set ($guestId = $voteObj.getValue('guestId'))
             #set ($isVoteFromGuest = "$guestId" != "")
             #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
@@ -541,7 +538,7 @@
           #if ($showPollSummary)
             &lt;tr&gt;
               &lt;td&gt;
-                $services.rendering.escape($escapetool.xml($services.localization.render('contrib.xpoll.numberVotes')), 'xwiki/2.1')
+                $escapetool.xml($services.localization.render('contrib.xpoll.numberVotes'))
                 &lt;span class='count'&gt;($totalVotesCount)&lt;/span&gt;
               &lt;/td&gt;
               #foreach ($proposal in $proposals)
