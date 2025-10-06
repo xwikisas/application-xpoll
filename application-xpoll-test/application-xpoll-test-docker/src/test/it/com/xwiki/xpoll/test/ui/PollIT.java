@@ -90,10 +90,10 @@ class PollIT
 
     private static final String POLL_PUBLICITY_PRIVATE_LABEL = "Private";
 
-    private static final String EMPTY_PAGE_VOTE_WARNING = "You are not allowed to access this content.";
+    private static final String EMPTY_PAGE_VOTE_WARNING = "Warning: You are not allowed to access this content.";
 
-    private static final String GUEST_CANNOT_CHANGE_VOTE_WARNING = "Your vote has been recorded. At this point, you "
-        + "can no longer change it!" ;
+    private static final String GUEST_CANNOT_CHANGE_VOTE_WARNING =
+        "Warning: Your vote has been recorded. At this point, you can no longer change it!";
 
     private final ArrayList<String> proposals = new ArrayList<>(Arrays.asList(POLL_PROPOSALS.split(",")));
 
