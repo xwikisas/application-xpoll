@@ -45,7 +45,7 @@ public class FinishedStatusViewPage extends ViewPage
     @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//td[1][not(descendant::a) and not(contains(translate(., 'SCORES', 'scores'), 'scores'))]")
     public List<WebElement> guestUsersThatVotedTableRows;
 
-    @FindBy(xpath = "//*[@class='box warningmessage']//p")
+    @FindBy(css = ".warningmessage")
     public WebElement emptyPageWarningMessage;
 
     public String getDescription()

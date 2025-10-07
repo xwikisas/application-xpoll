@@ -47,10 +47,10 @@ public class ActiveStatusViewPage extends ViewPage
     @FindBy(xpath = "//table[contains(@class, 'xpoll')]//tbody//tr//a")
     public List<WebElement> usersThatVotedTableRows;
 
-    @FindBy(xpath = "//*[@class='box warningmessage']//p")
+    @FindBy(css = ".warningmessage")
     public WebElement emptyPageWarningMessage;
 
-    @FindBy(xpath = "//*[@class='box warningmessage']")
+    @FindBy(css = ".warningmessage")
     public WebElement guestCannotChangeVoteWarningMessage;
 
     public ArrayList<String> pollProposals = new ArrayList<String>();
