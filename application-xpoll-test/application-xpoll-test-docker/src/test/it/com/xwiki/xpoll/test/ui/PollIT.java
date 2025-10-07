@@ -90,8 +90,16 @@ class PollIT
 
     private static final String POLL_PUBLICITY_PRIVATE_LABEL = "Private";
 
+    /**
+     * XWIKI-22433 introduced a new way of displaying a warning using Velocity macro. When XWiki version is greater than
+     * 17.3, to avoid failing tests, the message should no longer include "Warning:"
+     */
     private static final String EMPTY_PAGE_VOTE_WARNING = "Warning: You are not allowed to access this content.";
 
+    /**
+     * XWIKI-22433 introduced a new way of displaying a warning using Velocity macro. When XWiki version is greater than
+     * 17.3, to avoid failing tests, the message should no longer include "Warning:"
+     */
     private static final String GUEST_CANNOT_CHANGE_VOTE_WARNING =
         "Warning: Your vote has been recorded. At this point, you can no longer change it!";
 
