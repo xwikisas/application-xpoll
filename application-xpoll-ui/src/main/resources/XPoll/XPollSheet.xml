@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>#if("$!doc.getObject('XPoll.XPollClass').getProperty('name').value" != '')$!doc.getObject('XPoll.XPollClass').getProperty('name').value #elseif($doc.documentReference.name=='XPollSheet' )Polls Sheet #else${doc.title} #end</title>
+  <title>#if("$!doc.getObject('XPoll.XPollClass').getProperty('name').value" != '')$!doc.getObject('XPoll.XPollClass').getProperty('name').value #elseif($doc.documentReference.name=='XPollSheet' )Polls Sheet #elseif("$!{doc.title}" != "")${doc.title}#else${doc.documentReference.name}#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -46,17 +46,6 @@
   #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
   #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
   $output
-#end
-#*
- Displays the value of the name property as the title of the document.
- If value is empty (e.g. creation step), displays the document title.
-*#
-#macro (displayPollTitle)
-  #set ($pollObj = $!doc.getObject('XPoll.XPollClass'))
-  #if ("$!pollObj.getProperty('name').value" == '')
-    #set ($discard = $pollObj.set('name', $doc.title))
-  #end
-  #displayPropertyValue('name')
 #end
 #macro(displayInput $votes $isCurrentUser $user $rowIndex)
   #set ($disabled = '')
@@ -126,6 +115,11 @@
 
 {{velocity}}
 #set ($pollObj = $doc.getObject('XPoll.XPollClass'))
+#set ($defaultName = $doc.title)
+#if ("$!defaultName" == "")
+  #set ($defaultName = $doc.documentReference.name)
+#end
+#setDefaultProperty($pollObj 'name' $defaultName)
 #setDefaultProperty($pollObj 'status' 'inpreparation')
 #set ($status = $pollObj.getValue('status'))
 #setDefaultProperty($pollObj 'pollPublicity' 'private')
@@ -181,7 +175,7 @@
     #if ($xcontext.action == 'edit')
       &lt;dl&gt;
         &lt;dt&gt;&lt;label for="XPoll.XPollClass_0_name"&gt;$doc.displayPrettyName('name', false, false)&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd&gt;#displayPollTitle()&lt;/dd&gt;
+        &lt;dd&gt;#displayPropertyValue('name')&lt;/dd&gt;
       &lt;/dl&gt;
     #end
     &lt;div class="row inline-input-row"&gt;
