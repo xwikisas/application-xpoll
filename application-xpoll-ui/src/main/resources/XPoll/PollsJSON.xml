@@ -74,7 +74,14 @@
     #if ($winner == "")
       #set ($winner = "-")
     #end
-    #set ($discard = $pollMapObj.put('name', $pollInstance.getValue("name")))
+    #set ($name = $pollInstance.getValue('name'))
+    #if ("$!name" == "")
+      #set ($name = $pollInstance.documentReference.name)
+      #if ($name == "WebHome")
+        #set ($name = $pollInstance.documentReference.lastSpaceReference.name)
+      #end
+    #end
+    #set ($discard = $pollMapObj.put('name', $name))
     #set ($discard = $pollMapObj.put('name_url', $pollInstance.getURL()))
     #set ($discard = $pollMapObj.put('status', $status))
     #set ($discard = $pollMapObj.put('winner', $winner))
@@ -130,6 +137,8 @@
   'winner': $entry.get('winner')
   }))
 #end
-$jsontool.serialize($json)
+#if ("$!request.outputSyntax" == "plain")
+  #jsonResponse($json)
+#end
 {{/velocity}}</content>
 </xwikidoc>
