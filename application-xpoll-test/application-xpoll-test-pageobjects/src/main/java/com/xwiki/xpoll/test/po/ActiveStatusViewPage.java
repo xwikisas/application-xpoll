@@ -39,7 +39,7 @@ public class ActiveStatusViewPage extends ViewPage
         By.xpath("//table[contains(@class, 'xpoll')]//tr[1]//th[position()>1]"));
 
     public List<WebElement> proposalVoteInputs = getDriver().findElements(
-        By.xpath("//table[contains(@class, 'xpoll')]//tr[contains(@class, 'active')]//input"));
+        By.xpath("//table[contains(@class, 'xpoll')]//tr[contains(@class, 'polls-active')]//input"));
 
     @FindBy(xpath = "//div[contains(@class, 'save')]/input")
     public WebElement saveButton;

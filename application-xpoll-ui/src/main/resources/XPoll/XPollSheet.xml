@@ -363,7 +363,7 @@
                 #end
                 ## Display the input for a guest user that already voted
                 #if ($isVoteFromCurrentGuest)
-                  &lt;tr class="active"&gt;
+                  &lt;tr class="polls-active"&gt;
                     &lt;td&gt;
                       &lt;input type="text" value="$escapedGuestName" name="guestName" #if(!$isPollPublicityPublic) disabled#end&gt;
                     &lt;/td&gt;
@@ -381,7 +381,7 @@
                     &lt;/tr&gt;
                   ## display the vote for users who are logged in or have voted while logged in
                   #elseif ($xwiki.exists($user) &amp;&amp; !$isVoteFromGuest)
-                    &lt;tr #if ($isCurrentUser) class="active" #end&gt;
+                    &lt;tr #if ($isCurrentUser) class="polls-active" #end&gt;
                       &lt;td&gt;
                         #displayUser($user, {'wrapAvatar': true})
                       &lt;/td&gt;
@@ -389,7 +389,7 @@
                     &lt;/tr&gt;
                   #end
                 #else
-                  &lt;tr class="active"&gt;
+                  &lt;tr class="polls-active"&gt;
                     #if ($isCurrentUser)
                       &lt;td&gt;
                         #displayUser($user, {'wrapAvatar': true})
@@ -402,7 +402,7 @@
 
               ## Display the current user if he hasn't voted yet.
               #if (!$foundUser &amp;&amp; !$isCurrentContextUserGuest)
-                &lt;tr class="active"&gt;
+                &lt;tr class="polls-active"&gt;
                   &lt;td&gt;
                     #displayUser($xcontext.user, {'wrapAvatar': true})
                   &lt;/td&gt;
@@ -411,7 +411,7 @@
                 &lt;/tr&gt;
               #end
               #if (!$foundGuestUser &amp;&amp; $isCurrentContextUserGuest &amp;&amp; $isPollPublicityPublic)
-                &lt;tr class="active"&gt;
+                &lt;tr class="polls-active"&gt;
                   &lt;td&gt;
                     &lt;input type="text" name="guestName" value="" placeholder="Name..."&gt;
                     #displayInput([] true $xcontext.user)
@@ -497,7 +497,7 @@
             #set ($isVoteFromCurrentGuest = $cookieId.equals($guestId) &amp;&amp; $isCurrentContextUserGuest)
             #set ($isCurrentUser = $user == $xcontext.user &amp;&amp; !$isVoteFromGuest)
             #if($displayAllUsers)
-              &lt;tr #if($isCurrentUser || $isVoteFromCurrentGuest)class="active"#end&gt;
+              &lt;tr #if($isCurrentUser || $isVoteFromCurrentGuest)class="polls-active"#end&gt;
                 #if ($isVoteFromGuest)
                   &lt;td&gt;
                    $escapedGuestName
@@ -513,7 +513,7 @@
                 #end
               &lt;/tr&gt;
             #else
-              &lt;tr class="active"&gt;
+              &lt;tr class="polls-active"&gt;
                 #if ($isVoteFromCurrentGuest)
                   &lt;td&gt;
                     $escapedGuestName
@@ -703,7 +703,7 @@
   width: 100%;
 }
 
-.active {
+.polls-active {
   font-weight: bold;
 }
 
