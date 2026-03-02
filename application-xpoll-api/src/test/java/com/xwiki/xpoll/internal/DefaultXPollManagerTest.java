@@ -30,7 +30,6 @@ import com.xwiki.xpoll.rest.model.jaxb.Vote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -132,7 +131,7 @@ class DefaultXPollManagerTest
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
         DocumentReference userReference = new DocumentReference("XWiki", "User", "User");
         Vote vote = new Vote();
-        vote.withProposals(Arrays.asList("Proposal1", "Proposal2"));
+        vote.getProposals().addAll(Arrays.asList("Proposal1", "Proposal2"));
 
         when(this.xWikiContext.getWiki()).thenReturn(wiki);
         when(this.xWikiContext.getRequest()).thenReturn(request);
@@ -161,8 +160,8 @@ class DefaultXPollManagerTest
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
         DocumentReference userReference = new DocumentReference("XWiki", "XWiki", "XWikiGuest");
         Vote vote = new Vote();
-        vote.withProposals(Arrays.asList("Proposal1", "Proposal2"));
-        vote.withGuestName("JohnDoe");
+        vote.getProposals().addAll(Arrays.asList("Proposal1", "Proposal2"));
+        vote.setGuestName("JohnDoe");
 
         when(this.xWikiContext.getWiki()).thenReturn(wiki);
         when(this.xWikiContext.getRequest()).thenReturn(this.request);
