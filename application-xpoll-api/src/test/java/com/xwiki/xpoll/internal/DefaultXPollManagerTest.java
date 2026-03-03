@@ -131,7 +131,7 @@ class DefaultXPollManagerTest
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
         DocumentReference userReference = new DocumentReference("XWiki", "User", "User");
         Vote vote = new Vote();
-        vote.getProposals().addAll(Arrays.asList("Proposal1", "Proposal2"));
+        vote.withProposals(Arrays.asList("Proposal1", "Proposal2"));
 
         when(this.xWikiContext.getWiki()).thenReturn(wiki);
         when(this.xWikiContext.getRequest()).thenReturn(request);
@@ -160,8 +160,8 @@ class DefaultXPollManagerTest
         DocumentReference docRef = new DocumentReference("XWiki", Arrays.asList("Space1", "Space2"), "Page");
         DocumentReference userReference = new DocumentReference("XWiki", "XWiki", "XWikiGuest");
         Vote vote = new Vote();
-        vote.getProposals().addAll(Arrays.asList("Proposal1", "Proposal2"));
-        vote.setGuestName("JohnDoe");
+        vote.withProposals(Arrays.asList("Proposal1", "Proposal2"));
+        vote.withGuestName("JohnDoe");
 
         when(this.xWikiContext.getWiki()).thenReturn(wiki);
         when(this.xWikiContext.getRequest()).thenReturn(this.request);
