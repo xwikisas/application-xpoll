@@ -37,8 +37,10 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>polls.extension.name=Polls Application (Pro)
-contrib.xpoll.app.title=Sondage
+contrib.xpoll.app.title=Sondages
+contrib.xpoll.emptyPage=Vous n'êtes pas autorisé à accéder à ce contenu.
 contrib.xpoll.finish.message=Le vote est terminé. Voici les résultats :
+contrib.xpoll.guestCannotChangeVote=Votre vote a été enregistré. Pour le moment, vous ne pouvez plus le changer !
 contrib.xpoll.home.title=Sondages
 contrib.xpoll.notVoted=Vous n'avez pas encore voté
 contrib.xpoll.numberVotes=Nombre de votes
@@ -48,9 +50,10 @@ contrib.xpoll.status.active=Actif
 contrib.xpoll.status.finished=Terminé
 contrib.xpoll.status.inPreparation=En cours de préparation
 contrib.xpoll.singleUser=Utilisateur
-contrib.xpoll.user=Utilisateur
-contrib.xpoll.vote.failed=Une erreur est survenue pendant pendant l'enregistrement du document. Raison: {0}
-contrib.xpoll.vote.failed.forbidden=Vous n'êtes pas autorisé à voter!
+contrib.xpoll.user=Utilisateurs
+contrib.xpoll.vote.failed=Échec d''enregistrement du document. Raison : {0}
+contrib.xpoll.vote.failed.forbidden=Pas autorisé à voter !
+contrib.xpoll.vote.failed.guestEmpty=Le champ "nom" ne doit pas être vide !
 contrib.xpoll.vote.guest.submit=Sauvegarder
 contrib.xpoll.vote.user.submit=Sauvegarder
 contrib.xpoll.vote.saved=Enregistré
@@ -65,6 +68,10 @@ contrib.xpoll.WebHome.winner=Résultat
 XPoll.XPollClass_description=Description
 XPoll.XPollClass_description_emptyvalue=Il n'y a pas de description
 XPoll.XPollClass_name=Nom
+XPoll.XPollClass_pollPublicity=Publicité des sondages
+XPoll.XPollClass_pollPublicity_private=Privé
+XPoll.XPollClass_pollPublicity_public=Publique
+XPoll.XPollClass_pollPublicity_hint=Autorisez les invités à voter en configurant le sondage comme publique, ou restreignez le vote aux utilisateurs autorisés uniquement
 XPoll.XPollClass_proposals=Propositions
 XPoll.XPollClass_proposals_hint=(Liste d'éléments séparés par une virgule ou une barre verticale)
 XPoll.XPollClass_status=Statut
@@ -79,7 +86,7 @@ XPoll.XPollClass_type_condorcet=Autoriser plusieurs options dans l'ordre
 XPoll.XPollClass_votePrivacy=Confidentialité des votes
 XPoll.XPollClass_votePrivacy_public=Publics
 XPoll.XPollClass_votePrivacy_private=Privé
-### Missing: XPoll.XPollClass_votePrivacy_hint=Set whether the poll results are visible to all users (including those without edit permissions) or restricted to users with edit permissions only
+XPoll.XPollClass_votePrivacy_hint=Définir si les résultats du sondage sont visibles pour tous les utilisateurs (y compris ceux sans droit de modification) ou restreint uniquement aux utilisateurs ayant les droits d'édition
 
 
 ## Migration
@@ -90,7 +97,7 @@ xpoll.migration.notifyAdmin=Veuillez informer l'administrateur de ce problème.
 xpoll.migration.linkText=Cliquez ici pour migrer.
 xpoll.migration.migrated=Migration réussie
 xpoll.migration.shouldMigrateAll=Certains sondages sont incompatibles avec la nouvelle version de l'application de sondage XWiki.
-xpoll.migration.failed=Échec de la migration
+xpoll.migration.failed=Échec de la migration !
 xpoll.migration.inProgress=Migration en cours
 
 ## Livetable
@@ -98,6 +105,9 @@ xpoll.livetable._actions=Actions
 xpoll.livetable.emptyvalue=-
 xpoll.livetable.name=Nom
 xpoll.livetable.status=Statut
+xpoll.livetable.status.active=Actif
+xpoll.livetable.status.finished=Terminé
+xpoll.livetable.status.inpreparation=En préparation
 xpoll.livetable.winner=Résultat
 xpoll.extension.name=Application XWiki Poll (Pro)
 
