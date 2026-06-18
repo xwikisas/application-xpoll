@@ -19,7 +19,7 @@
  */
 package com.xwiki.xpoll.internal;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,11 +59,16 @@ public abstract class AbstractPollResultsCalculator implements PollResultsCalcul
                     document.getDocumentReference()));
             }
             List<BaseObject> xpollVotes = document.getXObjects(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE);
-            xpollVotes.removeAll(Collections.singletonList(null));
+            List<BaseObject> filteredVotes = new ArrayList<>();
+            for (BaseObject vote : xpollVotes) {
+                if (vote != null) {
+                    filteredVotes.add(vote.clone());
+                }
+            }
 
             List<String> proposals = xpollObj.getListValue(DefaultXPollManager.PROPOSALS);
 
-            return calculateResults(xpollVotes, proposals);
+            return calculateResults(filteredVotes, proposals);
         } catch (XWikiException e) {
             throw new XPollException(String.format("Failed to compute the results for the poll [%s].",
                 documentReference), e);

@@ -221,22 +221,28 @@ class DefaultXPollManagerTest
 
         BaseObject ballot1 = mock(BaseObject.class);
         BaseObject ballot2 = mock(BaseObject.class);
-        BaseObject ballot3 = mock(BaseObject.class);
         BaseObject ballot4 = mock(BaseObject.class);
-        BaseObject ballot5 = mock(BaseObject.class);
+        BaseObject ballot6 = mock(BaseObject.class);
+        BaseObject ballot7 = mock(BaseObject.class);
 
         when(this.document.getXObjects(DefaultXPollManager.XPOLL_VOTES_CLASS_REFERENCE))
-            .thenReturn(Arrays.asList(ballot1, ballot2, ballot3, ballot4, ballot5));
+            .thenReturn(Arrays.asList(ballot1, ballot2, null, ballot4, null, ballot6, ballot7, null));
+
+        when(ballot1.clone()).thenReturn(ballot1);
+        when(ballot2.clone()).thenReturn(ballot2);
+        when(ballot4.clone()).thenReturn(ballot4);
+        when(ballot6.clone()).thenReturn(ballot6);
+        when(ballot7.clone()).thenReturn(ballot7);
 
         when(ballot1.getListValue(DefaultXPollManager.VOTES))
             .thenReturn(Arrays.asList(proposal1, proposal3, proposal2));
         when(ballot2.getListValue(DefaultXPollManager.VOTES))
             .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
-        when(ballot3.getListValue(DefaultXPollManager.VOTES))
-            .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
         when(ballot4.getListValue(DefaultXPollManager.VOTES))
             .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
-        when(ballot5.getListValue(DefaultXPollManager.VOTES))
+        when(ballot6.getListValue(DefaultXPollManager.VOTES))
+            .thenReturn(Arrays.asList(proposal2, proposal1, proposal3));
+        when(ballot7.getListValue(DefaultXPollManager.VOTES))
             .thenReturn(Arrays.asList(proposal3, proposal1, proposal2));
 
         Map<String, Integer> results = manager.getVoteResults(docRef);
