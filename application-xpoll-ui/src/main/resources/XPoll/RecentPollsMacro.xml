@@ -266,16 +266,22 @@
     #foreach ($result in $results)
       #set ($pollDoc = $xwiki.getDocument($result))
       #if ($services.security.authorization.hasAccess('view', $pollDoc.documentReference))
-        #set ($pollTitle = "[[$services.icon.render('chart_pie') $pollDoc.plainTitle.trim()&gt;&gt;$result]]")
+        #set ($pollTitle = "[[$services.icon.render('chart_pie') $services.rendering.escape($services.rendering.escape(
+          $pollDoc.plainTitle.trim(), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape(
+            $result, 'xwiki/2.1')]]")
         #set ($pollAuthor = $services.localization.render('polls.author',
-          ["[[$xwiki.getUserName($pollDoc.author, false)&gt;&gt;$pollDoc.author]]"]))
-        #set ($pollDate = $services.localization.render('polls.date', [$xwiki.formatDate($pollDoc.creationDate)]))
+          ["[[$services.rendering.escape($services.rendering.escape(
+            $xwiki.getUserName($pollDoc.author, false), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape(
+              $pollDoc.author, 'xwiki/2.1')]]"]))
+        #set ($pollDate = $services.rendering.escape($services.localization.render('polls.date',
+          [$xwiki.formatDate($pollDoc.creationDate)]), 'xwiki/2.1'))
         $pollTitle $pollAuthor $pollDate
       #end
     #end
   )))
   (% class="polls" %)(((
-    [[$services.localization.render('polls.seeallfiles')&gt;&gt;XPoll.WebHome]]
+    [[$services.rendering.escape($services.rendering.escape(
+        $services.localization.render('polls.seeallfiles'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;XPoll.WebHome]]
   )))
 #else
   (% class="polls secondary" %)(((
@@ -284,7 +290,8 @@
   #set ($spaceReference = $services.model.resolveSpace('XPoll'))
   #if ($services.security.authorization.hasAccess('edit', $spaceReference))
     (% class="polls" %)(((
-      [[$services.localization.render('polls.addfiles')&gt;&gt;XPoll.WebHome]]
+      [[$services.rendering.escape($services.rendering.escape(
+        $services.localization.render('polls.addfiles'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;XPoll.WebHome]]
     )))
   #end
 #end
